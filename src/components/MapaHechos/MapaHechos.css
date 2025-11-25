@@ -1,0 +1,11 @@
+.mapa-hechos {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-glow);
+}
+
+.mapa-hechos__contenedor {
+  height: 500px;
+}

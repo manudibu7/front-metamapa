@@ -1,0 +1,19 @@
+.home {
+  padding: 4rem clamp(1rem, 5vw, 5rem) 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+#mapa-hechos,
+#colecciones-destacadas,
+#carga-hechos,
+#roadmap {
+  scroll-margin-top: 5rem;
+}
+
+@media (max-width: 768px) {
+  .home {
+    padding: 2rem 1rem 4rem;
+  }
+}

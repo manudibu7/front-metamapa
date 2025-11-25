@@ -1,0 +1,34 @@
+.roadmap {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: clamp(2rem, 4vw, 3rem);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.6));
+  box-shadow: var(--shadow-glow);
+}
+
+.roadmap__steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.roadmap-card {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: 1.5rem;
+  background: rgba(4, 6, 16, 0.6);
+}
+
+.roadmap-card header span {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.roadmap-card header h3 {
+  margin: 0.5rem 0 0.8rem;
+}
+
+.roadmap-card p {
+  color: var(--color-muted);
+}
