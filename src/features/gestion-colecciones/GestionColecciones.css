@@ -1,0 +1,292 @@
+.gestion-colecciones {
+  padding: 2rem clamp(1rem, 5vw, 4rem) 4rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.gestion-colecciones__volver {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.gestion-colecciones__volver:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-primary);
+}
+
+.gestion-colecciones__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.gestion-colecciones__header h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  margin: 0.3rem 0 0.5rem;
+}
+
+.gestion-colecciones__header p {
+  color: var(--color-muted);
+}
+
+.gestion-colecciones__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.gestion-colecciones__card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(12, 20, 39, 0.75);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.gestion-colecciones__card-info h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
+  color: #ffffff;
+}
+
+.gestion-colecciones__card-info > p {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.gestion-colecciones__condiciones {
+  margin-top: 0.75rem;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.gestion-colecciones__condiciones li {
+  margin-bottom: 0.25rem;
+}
+
+.gestion-colecciones__card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.gestion-colecciones__vacio {
+  text-align: center;
+  color: var(--color-muted);
+  padding: 2rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.gestion-colecciones__estado {
+  text-align: center;
+  padding: 2rem;
+}
+
+.gestion-colecciones__estado--error {
+  color: var(--color-danger);
+}
+
+.gestion-colecciones--denied {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.gestion-colecciones__denied {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  max-width: 480px;
+  text-align: center;
+  background: rgba(12, 20, 39, 0.8);
+  box-shadow: 0 20px 60px rgba(2, 6, 23, 0.45);
+}
+
+.gestion-colecciones__denied-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* Modal */
+.gestion-colecciones__modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.7);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.gestion-colecciones__modal {
+  background: rgba(6, 12, 24, 0.97);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 28px;
+  padding: 2rem 2.5rem;
+  width: min(720px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 30px 80px rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(16px);
+}
+
+.gestion-colecciones__modal h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.gestion-colecciones__modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.gestion-colecciones__modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.gestion-colecciones__modal input,
+.gestion-colecciones__modal textarea,
+.gestion-colecciones__modal select {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(15, 23, 43, 0.9);
+  color: var(--color-text);
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+}
+
+.gestion-colecciones__criterios legend {
+  font-weight: 600;
+  padding: 0 0.5rem;
+}
+
+.gestion-colecciones__criterio-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.gestion-colecciones__criterio-row input,
+.gestion-colecciones__criterio-row select {
+  flex: 1 1 45%;
+  min-width: 140px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(15, 23, 43, 0.9);
+  color: var(--color-text);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+.gestion-colecciones__fuentes {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gestion-colecciones__fuentes-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
+.gestion-colecciones__fuente-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.gestion-colecciones__fuente-option input {
+  accent-color: var(--color-primary);
+}
+
+/* Botones adicionales */
+.btn--danger {
+  background: var(--color-danger, #ef4444);
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.btn--danger-outline {
+  background: transparent;
+  border: 1px solid var(--color-danger, #ef4444);
+  color: var(--color-danger, #ef4444);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn--danger-outline:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.btn--icon {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.btn--icon:hover {
+  border-color: var(--color-danger, #ef4444);
+  color: var(--color-danger, #ef4444);
+}
+
+.btn--sm {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .gestion-colecciones__header {
+    flex-direction: column;
+  }
+
+  .gestion-colecciones__card {
+    flex-direction: column;
+  }
+
+  .gestion-colecciones__card-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
