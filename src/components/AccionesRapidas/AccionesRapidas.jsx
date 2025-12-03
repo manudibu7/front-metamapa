@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import './AccionesRapidas.css';
 
 const desplazarse = (id) => {
@@ -8,6 +9,7 @@ const desplazarse = (id) => {
 };
 
 export const AccionesRapidas = ({ onVerColecciones }) => {
+  const navigate = useNavigate();
   const acciones = [
     {
       id: 'mapa',
@@ -29,17 +31,17 @@ export const AccionesRapidas = ({ onVerColecciones }) => {
       id: 'contribuir',
       icono: '⚡',
       titulo: 'Subir contribución',
-      descripcion: 'Elevá un incidente sin salir de la landing.',
+      descripcion: 'Cargá un nuevo hecho rápidamente.',
       cta: 'Completar formulario',
-      onClick: () => desplazarse('carga-hechos'),
+      onClick: () => navigate('/contribuir'),
     },
     {
-      id: 'panel',
-      icono: '📊',
-      titulo: 'Panel gubernanza',
-      descripcion: 'Consulta los KPIs de sincronización y estados.',
-      cta: 'Ver roadmap',
-      onClick: () => desplazarse('roadmap'),
+      id: 'estadisticas',
+      icono: '📈',
+      titulo: 'Panel de estadísticas',
+      descripcion: 'Explorá métricas clave del agregador.',
+      cta: 'Ver estadísticas',
+      onClick: () => navigate('/estadisticas'),
     },
   ];
 

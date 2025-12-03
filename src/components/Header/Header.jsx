@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Header.css';
 
 export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) => {
@@ -13,7 +14,7 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
 
   return (
     <header className="app-header">
-      <div className="app-header__brand">
+      <Link to="/" className="app-header__brand">
         <span className="app-header__logo" aria-hidden>
           ⟁
         </span>
@@ -21,7 +22,7 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
           <strong>MetaMapa</strong>
           <small>Instancia ONG</small>
         </div>
-      </div>
+      </Link>
 
       <form className="app-header__search" onSubmit={handleSubmit}>
         <input

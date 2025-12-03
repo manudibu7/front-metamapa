@@ -4,6 +4,9 @@ import { Home } from './features/home/Home';
 import { Colecciones } from './features/colecciones/Colecciones';
 import { ColeccionDetalle } from './features/coleccion-detalle/ColeccionDetalle';
 import { HechoDetalle } from './features/hecho-detalle/HechoDetalle';
+import { NuevaContribucion } from './features/nueva-contribucion/NuevaContribucion';
+import { Administracion } from './features/administracion/Administracion';
+import { Estadisticas } from './features/estadisticas/Estadisticas';
 import { CollectionsProvider } from './context/CollectionsContext';
 import { Header } from './components/Header/Header';
 import { Footer } from './components/Footer/Footer';
@@ -33,6 +36,9 @@ const AppShell = () => {
           <Route path="/colecciones" element={<Colecciones />} />
           <Route path="/colecciones/:id" element={<ColeccionDetalle />} />
           <Route path="/hechos/:id" element={<HechoDetalle />} />
+          <Route path="/contribuir" element={<NuevaContribucion />} />
+          <Route path="/estadisticas" element={<Estadisticas />} />
+          <Route path="/admin" element={<Administracion />} />
         </Routes>
       </main>
       <Footer />

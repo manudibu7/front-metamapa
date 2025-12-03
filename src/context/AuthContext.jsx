@@ -8,9 +8,20 @@ const AuthContext = createContext({
   user: null,
   contribuyenteId: null,
   token: null,
+  roles: [],
+  isAdmin: false,
   login: () => {},
   logout: () => {},
 });
+
+const extractRoles = (tokenParsed) => {
+  if (!tokenParsed) return [];
+  // Los roles pueden estar en realm_access.roles o en resource_access.{clientId}.roles
+  const realmRoles = tokenParsed.realm_access?.roles ?? [];
+  const resourceRoles = Object.values(tokenParsed.resource_access ?? {})
+    .flatMap((resource) => resource.roles ?? []);
+  return [...new Set([...realmRoles, ...resourceRoles])];
+};
 
 const buildUserProfile = (tokenParsed) => {
   if (!tokenParsed) return null;
@@ -37,6 +48,8 @@ export const AuthProvider = ({ children }) => {
     user: null,
     contribuyenteId: null,
     token: null,
+    roles: [],
+    isAdmin: false,
   });
 
   useEffect(() => {
@@ -72,6 +85,8 @@ export const AuthProvider = ({ children }) => {
             user: null,
             contribuyenteId: null,
             token: null,
+            roles: [],
+            isAdmin: false,
           });
         }
       }, 15000);
@@ -105,8 +120,12 @@ export const AuthProvider = ({ children }) => {
 
         if (authenticated) {
           const user = buildUserProfile(keycloak.tokenParsed);
+          const roles = extractRoles(keycloak.tokenParsed);
+          const isAdmin = roles.includes('admin') || roles.includes('administrador') || roles.includes('ADMIN');
           console.log('[Auth] 👤 Usuario autenticado:', user);
           console.log('[Auth] 🆔 ContribuyenteId:', keycloak.tokenParsed?.contribuyenteId ?? keycloak.tokenParsed?.sub);
+          console.log('[Auth] 🎭 Roles:', roles);
+          console.log('[Auth] 👑 Es admin:', isAdmin);
           
           // Limpiar la URL si tiene parámetros de Keycloak
           if (hasCodeInUrl) {
@@ -121,6 +140,8 @@ export const AuthProvider = ({ children }) => {
             user,
             contribuyenteId: keycloak.tokenParsed?.contribuyenteId ?? keycloak.tokenParsed?.sub ?? null,
             token: keycloak.token,
+            roles,
+            isAdmin,
           });
           console.log('[Auth] ✨ Estado actualizado correctamente');
         } else {
@@ -154,6 +175,8 @@ export const AuthProvider = ({ children }) => {
           user: null,
           contribuyenteId: null,
           token: null,
+          roles: [],
+          isAdmin: false,
         });
       }
     };
@@ -178,6 +201,8 @@ export const AuthProvider = ({ children }) => {
       user: null,
       contribuyenteId: null,
       token: null,
+      roles: [],
+      isAdmin: false,
     });
   }, [keycloak]);
 

@@ -1,16 +1,103 @@
 .hero {
-  background: linear-gradient(135deg, rgba(93, 231, 196, 0.08), rgba(108, 99, 255, 0.2));
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: clamp(2rem, 5vw, 4rem);
-  box-shadow: var(--shadow-glow);
-  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl, 32px);
+  padding: clamp(2rem, 5vw, 4.5rem);
+  background: radial-gradient(circle at 20% 20%, rgba(93, 231, 196, 0.15), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(108, 99, 255, 0.2), transparent 45%),
+    linear-gradient(145deg, rgba(5, 6, 23, 0.95), rgba(17, 25, 57, 0.95));
+  box-shadow: 0 40px 90px rgba(2, 6, 23, 0.7);
+}
+
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.hero::before {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  inset: 6px;
+}
+
+.hero::after {
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 55%);
+  opacity: 0.6;
 }
 
 .hero__badge {
+  position: relative;
   display: inline-flex;
-  padding: 0.4rem 1rem;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.2rem;
   border-radius: 999px;
+  background: rgba(93, 231, 196, 0.18);
+  border: 1px solid rgba(93, 231, 196, 0.35);
+  font-size: 0.85rem;
+  color: #b0ffee;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hero h1 {
+  position: relative;
+  font-size: clamp(2.5rem, 6vw, 3.75rem);
+  line-height: 1.05;
+  margin: 1rem 0 0.5rem;
+}
+
+.hero__slogan {
+  position: relative;
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f9f5ff;
+}
+
+.hero > p {
+  position: relative;
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 640px;
+  margin-bottom: 1.75rem;
+}
+
+.hero__cta {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero__admin {
+  position: relative;
+  margin-top: 2rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn--admin {
+  background: linear-gradient(120deg, rgba(255, 215, 97, 0.2), rgba(255, 166, 0, 0.25));
+  border: 1px solid rgba(255, 193, 7, 0.5);
+  color: #ffe29d;
+  padding: 0.85rem 1.8rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn--admin:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 35px rgba(255, 193, 7, 0.25);
 }
 
 @media (max-width: 768px) {
