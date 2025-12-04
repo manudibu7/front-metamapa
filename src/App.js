@@ -9,6 +9,8 @@ import { Administracion } from './features/administracion/Administracion';
 import { Estadisticas } from './features/estadisticas/Estadisticas';
 import { GestionColecciones } from './features/gestion-colecciones/GestionColecciones';
 import { GestionSolicitudes } from './features/gestion-solicitudes/GestionSolicitudes';
+import { GestionRevisiones } from './features/gestion-revisiones/GestionRevisiones';
+import { ContribucionDetalle } from './features/contribucion-detalle/ContribucionDetalle';
 import { CollectionsProvider } from './context/CollectionsContext';
 import { Header } from './components/Header/Header';
 import { Footer } from './components/Footer/Footer';
@@ -43,6 +45,8 @@ const AppShell = () => {
           <Route path="/admin" element={<Administracion />} />
           <Route path="/admin/colecciones" element={<GestionColecciones />} />
           <Route path="/admin/eliminaciones" element={<GestionSolicitudes />} />
+          <Route path="/admin/revisiones" element={<GestionRevisiones />} />
+          <Route path="/admin/revisiones/detalle" element={<ContribucionDetalle />} />
         </Routes>
       </main>
       <Footer />

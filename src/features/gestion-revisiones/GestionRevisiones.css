@@ -1,0 +1,222 @@
+.gestion-revisiones {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--color-text);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.gestion-revisiones__header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
+}
+
+.gestion-revisiones__title {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.gestion-revisiones__subtitle {
+  color: var(--color-muted);
+  font-size: 1rem;
+}
+
+.gestion-revisiones__list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.revision-card {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  transition: border-color 0.2s;
+}
+
+.revision-card:hover {
+  border-color: var(--color-primary);
+}
+
+.revision-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.revision-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.revision-card__id {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.revision-card__hecho {
+  background: rgba(15, 23, 43, 0.6);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  border-left: 3px solid var(--color-secondary);
+}
+
+.hecho-titulo {
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #e2e8f0;
+}
+
+.hecho-desc {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.hecho-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.revision-card__actions-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-left: 1px solid var(--color-border);
+  padding-left: 2rem;
+}
+
+.revision-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+.revision-form h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.revision-form textarea {
+  flex: 1;
+  background: rgba(15, 23, 43, 0.8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: none;
+  min-height: 100px;
+}
+
+.revision-form textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.revision-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.btn-revision {
+  padding: 0.6rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn-accept {
+  background: var(--color-primary);
+  color: white;
+  grid-column: span 2;
+}
+
+.btn-accept:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-changes {
+  background: rgba(234, 179, 8, 0.1);
+  color: #facc15;
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.btn-changes:hover {
+  background: rgba(234, 179, 8, 0.2);
+}
+
+.btn-reject {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-reject:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.revision-empty {
+  text-align: center;
+  padding: 4rem;
+  color: var(--color-muted);
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--color-border);
+}
+
+@media (max-width: 900px) {
+  .revision-card {
+    grid-template-columns: 1fr;
+  }
+
+  .revision-card__actions-panel {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    padding-left: 0;
+    padding-top: 1.5rem;
+  }
+
+  .revision-form textarea {
+    min-height: 80px;
+  }
+}

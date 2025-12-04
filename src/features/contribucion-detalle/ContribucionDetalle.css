@@ -1,0 +1,111 @@
+.contribucion-detalle {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: var(--color-text);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.contribucion-detalle__header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
+}
+
+.contribucion-detalle__back {
+  background: transparent;
+  border: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0;
+}
+
+.contribucion-detalle__back:hover {
+  color: var(--color-primary);
+}
+
+.contribucion-detalle__badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.contribucion-detalle__title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.contribucion-detalle__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.contribucion-detalle__content {
+  display: grid;
+  gap: 2rem;
+}
+
+.contribucion-detalle__section h2 {
+  font-size: 1.2rem;
+  color: #fff;
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--color-primary);
+  padding-left: 0.75rem;
+}
+
+.contribucion-detalle__descripcion {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  background: rgba(15, 23, 43, 0.5);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.contribucion-detalle__map-container {
+  height: 400px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.contribucion-detalle__adjuntos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.adjunto-card {
+  background: rgba(15, 23, 43, 0.6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.adjunto-preview {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.adjunto-info {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  word-break: break-all;
+}

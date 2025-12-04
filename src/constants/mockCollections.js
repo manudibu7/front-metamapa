@@ -27,7 +27,10 @@ export const mockCollections = [
         tipoHecho: 'TEXTO',
         fuente: 'loader_dinamico',
         fuenteNombre: 'Loader Dinámico Patagonia',
-        multimedia: 4,
+        adjuntos: [
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Foco+Mascardi', tipo: 'imagen' },
+          { url: 'reporte_incendio.pdf', tipo: 'PDF' }
+        ],
         consenso: true,
       },
       {

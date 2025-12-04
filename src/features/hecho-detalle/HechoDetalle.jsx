@@ -25,42 +25,20 @@ export const HechoDetalle = () => {
     const mockHecho = {
       id,
       titulo: 'Incendio en Parque Nacional Nahuel Huapi',
+      descripcion: 'Gran incendio forestal que afectó más de 500 hectáreas de bosque nativo en el Parque Nacional Nahuel Huapi. El incendio se originó el 15 de febrero de 2024 en horas de la tarde, propagándose rápidamente debido a las condiciones climáticas adversas.',
       categoria: 'Incendio forestal',
       fecha: '2024-02-15',
-      provincia: 'Río Negro',
-      descripcion: 'Gran incendio forestal que afectó más de 500 hectáreas de bosque nativo en el Parque Nacional Nahuel Huapi.',
-      detalleCompleto: `El incendio se originó el 15 de febrero de 2024 en horas de la tarde, 
-      propagándose rápidamente debido a las condiciones climáticas adversas (altas temperaturas y vientos fuertes).
-      
-      Se movilizaron más de 200 brigadistas, incluyendo personal del Servicio Nacional de Manejo del Fuego, 
-      bomberos voluntarios de distintas localidades y brigadas de Parques Nacionales.
-      
-      Las llamas afectaron principalmente la zona sur del parque, comprometiendo bosques de coihue, lenga y ñire. 
-      La fauna local se vio severamente impactada, con reportes de evacuaciones de animales por parte de guardaparques.
-      
-      Las tareas de extinción se extendieron por 72 horas continuas, requiriendo el apoyo de aviones hidrantes 
-      y helicópteros. El fuego fue finalmente controlado el 18 de febrero.`,
-      ubicacion: { lat: -41.0915, lng: -71.4225 },
-      fuente: 'ONG Ambiental',
-      fuenteDetalle: 'Relevamiento de campo realizado por ONG Ambiental Patagonia',
-      imagenes: [
-        'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Imagen+1',
-        'https://via.placeholder.com/800x400/1a1f35/22d3ee?text=Imagen+2',
-      ],
-      archivos: [
-        { nombre: 'informe_tecnico.pdf', tipo: 'PDF', tamaño: '2.4 MB' },
-        { nombre: 'registro_fotografico.zip', tipo: 'ZIP', tamaño: '15.8 MB' },
-      ],
-      contribuyente: {
-        nombre: 'ONG Ambiental Patagonia',
-        id: 'ong-ambiental-001',
-      },
-      colecciones: [
-        { id: 1, nombre: 'Incendios Forestales 2024' },
-        { id: 2, nombre: 'Crisis Ambiental Patagonia' },
-      ],
-      fechaPublicacion: '2024-02-20',
-      estado: 'Verificado',
+      fechaDeCarga: '2024-02-16',
+      ubicacionLat: '-41.0915',
+      ubicacionLon: '-71.4225',
+      etiqueta: 'Alta prioridad',
+      tipoHecho: 'TEXTO',
+      fuente: 'ONG Ambiental Patagonia',
+      adjuntos: [
+        { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Imagen+1', tipo: 'imagen' },
+        { url: 'https://via.placeholder.com/800x400/1a1f35/22d3ee?text=Imagen+2', tipo: 'imagen' },
+        { url: 'informe_tecnico.pdf', tipo: 'PDF' }
+      ]
     };
 
     setTimeout(() => {
@@ -96,31 +74,23 @@ export const HechoDetalle = () => {
           
           <div className="hecho-detalle__badges">
             <span className="badge badge--categoria">{hecho.categoria}</span>
-            <span className="badge badge--estado">{hecho.estado}</span>
+            <span className="badge badge--estado">{hecho.etiqueta}</span>
           </div>
 
           <h1>{hecho.titulo}</h1>
 
           <div className="hecho-detalle__meta">
             <div className="meta-item">
-              <span className="meta-label">Fecha del hecho:</span>
-              <span className="meta-value">{new Date(hecho.fecha).toLocaleDateString('es-AR', { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
-              })}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Provincia:</span>
-              <span className="meta-value">{hecho.provincia}</span>
+              <span className="meta-label">Fecha:</span>
+              <span className="meta-value">{new Date(hecho.fecha).toLocaleDateString('es-AR')}</span>
             </div>
             <div className="meta-item">
               <span className="meta-label">Fuente:</span>
               <span className="meta-value">{hecho.fuente}</span>
             </div>
             <div className="meta-item">
-              <span className="meta-label">Publicado:</span>
-              <span className="meta-value">{new Date(hecho.fechaPublicacion).toLocaleDateString('es-AR')}</span>
+              <span className="meta-label">Tipo:</span>
+              <span className="meta-value">{hecho.tipoHecho}</span>
             </div>
           </div>
         </header>
@@ -131,21 +101,12 @@ export const HechoDetalle = () => {
             <p className="hecho-detalle__descripcion">{hecho.descripcion}</p>
           </section>
 
-          <section className="hecho-detalle__section">
-            <h2>Detalle completo</h2>
-            <div className="hecho-detalle__detalle">
-              {hecho.detalleCompleto.split('\n').map((parrafo, idx) => (
-                <p key={idx}>{parrafo.trim()}</p>
-              ))}
-            </div>
-          </section>
-
-          {hecho.ubicacion && (
+          {hecho.ubicacionLat && hecho.ubicacionLon && (
             <section className="hecho-detalle__section">
               <h2>Ubicación georreferenciada</h2>
               <div className="hecho-detalle__map">
                 <MapContainer
-                  center={[hecho.ubicacion.lat, hecho.ubicacion.lng]}
+                  center={[parseFloat(hecho.ubicacionLat), parseFloat(hecho.ubicacionLon)]}
                   zoom={11}
                   scrollWheelZoom
                   className="hecho-detalle__map-container"
@@ -155,68 +116,35 @@ export const HechoDetalle = () => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                   <Marker
-                    position={[hecho.ubicacion.lat, hecho.ubicacion.lng]}
+                    position={[parseFloat(hecho.ubicacionLat), parseFloat(hecho.ubicacionLon)]}
                     icon={markerIcon}
                   />
                 </MapContainer>
                 <div className="hecho-detalle__coordenadas">
-                  <span>Lat: {hecho.ubicacion.lat}</span>
-                  <span>Lng: {hecho.ubicacion.lng}</span>
+                  <span>Lat: {hecho.ubicacionLat}</span>
+                  <span>Lng: {hecho.ubicacionLon}</span>
                 </div>
               </div>
             </section>
           )}
 
-          {hecho.imagenes && hecho.imagenes.length > 0 && (
+          {hecho.adjuntos && hecho.adjuntos.length > 0 && (
             <section className="hecho-detalle__section">
-              <h2>Evidencia visual</h2>
+              <h2>Adjuntos y Evidencia</h2>
               <div className="hecho-detalle__imagenes">
-                {hecho.imagenes.map((img, idx) => (
-                  <img key={idx} src={img} alt={`Evidencia ${idx + 1}`} />
+                {hecho.adjuntos.filter(a => a.tipo === 'imagen' || (a.url && a.url.match(/\.(jpeg|jpg|gif|png)$/))).map((img, idx) => (
+                  <img key={idx} src={img.url} alt={`Evidencia ${idx + 1}`} />
                 ))}
               </div>
-            </section>
-          )}
-
-          {hecho.archivos && hecho.archivos.length > 0 && (
-            <section className="hecho-detalle__section">
-              <h2>Archivos adjuntos</h2>
               <div className="hecho-detalle__archivos">
-                {hecho.archivos.map((archivo, idx) => (
+                {hecho.adjuntos.filter(a => a.tipo !== 'imagen' && (!a.url || !a.url.match(/\.(jpeg|jpg|gif|png)$/))).map((archivo, idx) => (
                   <div key={idx} className="archivo-card">
                     <div className="archivo-card__icon">📄</div>
                     <div className="archivo-card__info">
-                      <span className="archivo-card__nombre">{archivo.nombre}</span>
-                      <span className="archivo-card__meta">{archivo.tipo} · {archivo.tamaño}</span>
+                      <span className="archivo-card__nombre">{archivo.url || 'Archivo adjunto'}</span>
+                      <span className="archivo-card__meta">{archivo.tipo}</span>
                     </div>
-                    <button className="archivo-card__btn">Descargar</button>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          <section className="hecho-detalle__section">
-            <h2>Información de la fuente</h2>
-            <div className="hecho-detalle__fuente-info">
-              <p><strong>Contribuyente:</strong> {hecho.contribuyente.nombre}</p>
-              <p><strong>ID:</strong> <code>{hecho.contribuyente.id}</code></p>
-              <p><strong>Detalle:</strong> {hecho.fuenteDetalle}</p>
-            </div>
-          </section>
-
-          {hecho.colecciones && hecho.colecciones.length > 0 && (
-            <section className="hecho-detalle__section">
-              <h2>Colecciones relacionadas</h2>
-              <div className="hecho-detalle__colecciones">
-                {hecho.colecciones.map((col) => (
-                  <button
-                    key={col.id}
-                    className="coleccion-tag"
-                    onClick={() => navigate(`/colecciones/${col.id}`)}
-                  >
-                    {col.nombre}
-                  </button>
                 ))}
               </div>
             </section>
