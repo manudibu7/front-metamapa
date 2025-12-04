@@ -1,6 +1,11 @@
 import { mockCollections } from '../constants/mockCollections';
 
-export const fuentesDisponibles = ['loader-estatico', 'loader-dinamico', 'loader-proxy'];
+// Mock sources with IDs to match backend expectation
+export const fuentesMock = [
+  { id: 1, nombre: 'loader-estatico', tipo: 'INTERNO' },
+  { id: 2, nombre: 'loader-dinamico', tipo: 'EXTERNO' },
+  { id: 3, nombre: 'loader-proxy', tipo: 'PROXY' },
+];
 
 const deepClone = (payload) => JSON.parse(JSON.stringify(payload));
 
@@ -9,54 +14,62 @@ const simulateDelay = (data, delay = 350) =>
     setTimeout(() => resolve(deepClone(data)), delay);
   });
 
+// Helper to map string sources from mockCollections to IDs
+const mapSourcesToIds = (sourceNames) => {
+  if (!sourceNames) return [];
+  return sourceNames.map(name => {
+    const found = fuentesMock.find(f => f.nombre === name);
+    return found ? found.id : null;
+  }).filter(Boolean);
+};
+
 const ensureCondiciones = (coleccion) =>
   coleccion.Condiciones && coleccion.Condiciones.length
     ? coleccion.Condiciones
     : (coleccion.tags ?? []).map((tag, index) => ({
-        id: `${coleccion.id}-tag-${index}`,
+        id: index + 1000, // Mock ID
         detail: `Tag = ${tag}`,
       }));
 
+// Transform mockCollections to match backend ColeccionDto
 const adminCollections = deepClone(mockCollections).map((coleccion, index) => ({
-  ...coleccion,
   id: coleccion.id ?? index + 1,
+  titulo: coleccion.titulo,
+  descripcion: coleccion.descripcion,
   Condiciones: ensureCondiciones(coleccion),
+  // Extra fields for frontend display that might not be in DTO but useful
+  fuentesIds: mapSourcesToIds(coleccion.fuentes), 
+  consenso: coleccion.consenso,
+  estado: coleccion.estado,
+  ultimaActualizacion: coleccion.ultimaActualizacion,
+  totalHechos: coleccion.totalHechos
 }));
 
-const normalizeInput = (coleccionInput) => {
-  const tags = coleccionInput.tagsInput
-    ? coleccionInput.tagsInput
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean)
-    : [];
-  const fuentes = (coleccionInput.fuentesInput ?? []).filter((fuente) => fuentesDisponibles.includes(fuente));
-
-  return {
-    titulo: coleccionInput.tituloInput?.trim() ?? '',
-    descripcion: coleccionInput.descripcionInput?.trim() ?? '',
-    consenso: coleccionInput.algoritmoConcenso?.trim() ?? '',
-    tags,
-    fuentes,
-    Condiciones: (coleccionInput.criteriosInput ?? []).map((criterio, index) => ({
-      id: `${Date.now()}-${index}`,
-      detail: `${criterio.tipo} = ${criterio.valor}`,
-    })),
-  };
-};
+export const obtenerFuentes = async () => simulateDelay(fuentesMock);
 
 export const obtenerColeccionesAdmin = async () => simulateDelay(adminCollections);
 
 export const crearColeccion = async (coleccionInput) => {
-  const payload = normalizeInput(coleccionInput);
+  // coleccionInput matches ColeccionInput backend DTO
+  // { tituloInput, descripcionInput, fuentesInput: [ids], criteriosInput: [{tipo, valor}], algoritmoConcenso }
+  
+  const nuevasCondiciones = (coleccionInput.criteriosInput ?? []).map((c, i) => ({
+    id: Date.now() + i,
+    detail: `${c.tipo} = ${c.valor}`
+  }));
+
   const nuevaColeccion = {
-    ...payload,
-    id: `${Date.now()}`,
-    handle: payload.titulo.toLowerCase().replace(/\s+/g, '-'),
+    id: Date.now(),
+    titulo: coleccionInput.tituloInput,
+    descripcion: coleccionInput.descripcionInput,
+    Condiciones: nuevasCondiciones,
+    fuentesIds: coleccionInput.fuentesInput,
+    consenso: coleccionInput.algoritmoConcenso,
     estado: 'borrador',
     ultimaActualizacion: new Date().toISOString(),
-    totalHechos: 0,
+    totalHechos: 0
   };
+
   adminCollections.push(nuevaColeccion);
   return simulateDelay(nuevaColeccion);
 };
@@ -66,12 +79,22 @@ export const actualizarColeccion = async (id, coleccionInput) => {
   if (index === -1) {
     throw new Error('Colección no encontrada');
   }
-  const payload = normalizeInput(coleccionInput);
+
+  const nuevasCondiciones = (coleccionInput.criteriosInput ?? []).map((c, i) => ({
+    id: Date.now() + i,
+    detail: `${c.tipo} = ${c.valor}`
+  }));
+
   adminCollections[index] = {
     ...adminCollections[index],
-    ...payload,
+    titulo: coleccionInput.tituloInput,
+    descripcion: coleccionInput.descripcionInput,
+    Condiciones: nuevasCondiciones,
+    fuentesIds: coleccionInput.fuentesInput,
+    consenso: coleccionInput.algoritmoConcenso,
     ultimaActualizacion: new Date().toISOString(),
   };
+  
   return simulateDelay(adminCollections[index]);
 };
 

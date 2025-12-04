@@ -1,4 +1,4 @@
-// import { API_URL } from '../config/api';
+import { API_URL } from '../config/api';
 
 // Mock data matching the ORIGINAL EstadisticaOutputDTO (no tipoEstadistica)
 const mockEstadisticas = [
@@ -77,4 +77,8 @@ export const getEstadisticas = async () => {
       resolve(mockEstadisticas);
     }, 500);
   });
+};
+
+export const downloadCSV = () => {
+  window.location.href = `${API_URL}/estadisticas/exportar`;
 };

@@ -9,7 +9,7 @@ import {
   VictoryLabel,
   VictoryContainer
 } from 'victory';
-import { getEstadisticas } from '../../services/estadisticasService';
+import { getEstadisticas, downloadCSV } from '../../services/estadisticasService';
 import './Estadisticas.css';
 
 export const Estadisticas = () => {
@@ -124,6 +124,9 @@ export const Estadisticas = () => {
       <header className="estadisticas-header">
         <h1>Panel de Estadísticas</h1>
         <p>Visualización de métricas del sistema</p>
+        <button className="btn-download" onClick={downloadCSV}>
+          📥 Descargar Reporte CSV
+        </button>
       </header>
 
       {/* Global Stats Section */}

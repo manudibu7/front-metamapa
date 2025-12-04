@@ -6,7 +6,7 @@ import {
   crearColeccion,
   actualizarColeccion,
   eliminarColeccion,
-  fuentesDisponibles,
+  obtenerFuentes,
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -23,25 +23,28 @@ const criterioOptions = [
     tipo: 'Estado',
     valores: ['Pendiente', 'Aprobada', 'Rechazada'],
   },
-  {
-    tipo: 'Fuente',
-    valores: fuentesDisponibles,
-  },
+];
+
+const consensusAlgorithms = [
+  { value: 'MAYORIA_SIMPLE', label: 'Mayoría Simple' },
+  { value: 'MULTIPLES_MENCIONES', label: 'Múltiples Menciones' },
+  { value: 'ABSOLUTA', label: 'Consenso Absoluto' },
+  { value: 'DEFAULT', label: 'Consenso Default' },
 ];
 
 const buildEmptyForm = () => ({
   tituloInput: '',
   descripcionInput: '',
-  fuentesInput: [],
+  fuentesInput: [], // Array of IDs
   criteriosInput: [],
   algoritmoConcenso: '',
-  tagsInput: '',
 });
 
 export const GestionColecciones = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin } = useAuth();
   const [colecciones, setColecciones] = useState([]);
+  const [fuentesDisponibles, setFuentesDisponibles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -54,14 +57,18 @@ export const GestionColecciones = () => {
   // Confirmación de eliminación
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
-  const fetchColecciones = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await obtenerColeccionesAdmin();
-      setColecciones(data ?? []);
+      const [cols, fuentes] = await Promise.all([
+        obtenerColeccionesAdmin(),
+        obtenerFuentes()
+      ]);
+      setColecciones(cols ?? []);
+      setFuentesDisponibles(fuentes ?? []);
       setError('');
     } catch (err) {
-      console.error('[GestionColecciones] Error cargando colecciones', err);
+      console.error('[GestionColecciones] Error cargando datos', err);
       setError('No pudimos cargar las colecciones.');
     } finally {
       setLoading(false);
@@ -73,7 +80,7 @@ export const GestionColecciones = () => {
       setLoading(false);
       return;
     }
-    fetchColecciones();
+    fetchData();
   }, [isAuthenticated, isAdmin]);
 
   const openCreateModal = () => {
@@ -87,13 +94,12 @@ export const GestionColecciones = () => {
     setForm({
       tituloInput: coleccion.titulo ?? '',
       descripcionInput: coleccion.descripcion ?? '',
-      fuentesInput: coleccion.fuentes ?? [],
+      fuentesInput: coleccion.fuentesIds ?? [],
       criteriosInput: (coleccion.Condiciones ?? []).map((c) => {
         const [tipo, valor] = (c.detail ?? '').split('=');
         return { id: c.id, tipo: tipo?.trim() ?? '', valor: valor?.trim() ?? '' };
       }),
       algoritmoConcenso: coleccion.consenso ?? '',
-      tagsInput: (coleccion.tags ?? []).join(', '),
     });
     setModalOpen(true);
   };
@@ -133,13 +139,13 @@ export const GestionColecciones = () => {
     }));
   };
 
-  const handleFuenteToggle = (fuente) => {
+  const handleFuenteToggle = (fuenteId) => {
     setForm((prev) => {
       const actual = prev.fuentesInput ?? [];
-      const existe = actual.includes(fuente);
+      const existe = actual.includes(fuenteId);
       return {
         ...prev,
-        fuentesInput: existe ? actual.filter((item) => item !== fuente) : [...actual, fuente],
+        fuentesInput: existe ? actual.filter((id) => id !== fuenteId) : [...actual, fuenteId],
       };
     });
   };
@@ -158,7 +164,7 @@ export const GestionColecciones = () => {
         await crearColeccion(form);
       }
       closeModal();
-      fetchColecciones();
+      fetchData();
     } catch (err) {
       console.error('[GestionColecciones] Error guardando colección', err);
       alert('No pudimos guardar la colección. Intentá de nuevo.');
@@ -171,18 +177,12 @@ export const GestionColecciones = () => {
     try {
       await eliminarColeccion(id);
       setConfirmDeleteId(null);
-      fetchColecciones();
+      fetchData();
     } catch (err) {
       console.error('[GestionColecciones] Error eliminando colección', err);
       alert('No pudimos eliminar la colección.');
     }
   };
-
-  const criterioTipos = useMemo(() => {
-    const base = criterioOptions.map((opt) => opt.tipo);
-    const dinamicos = (form.criteriosInput ?? []).map((c) => c.tipo).filter(Boolean);
-    return Array.from(new Set([...base, ...dinamicos]));
-  }, [form.criteriosInput]);
 
   const getValoresForTipo = (tipo) => criterioOptions.find((opt) => opt.tipo === tipo)?.valores ?? [];
 
@@ -243,13 +243,10 @@ export const GestionColecciones = () => {
               <div className="gestion-colecciones__card-info">
                 <h2>{col.titulo}</h2>
                 <p>{col.descripcion}</p>
-                {col.Condiciones?.length > 0 && (
-                  <ul className="gestion-colecciones__condiciones">
-                    {col.Condiciones.map((cond) => (
-                      <li key={cond.id}>{cond.detail}</li>
-                    ))}
-                  </ul>
-                )}
+                <div className="gestion-colecciones__card-meta">
+                  <span>Fuentes: {col.fuentesIds?.length ?? 0}</span>
+                  <span>Criterios: {col.Condiciones?.length ?? 0}</span>
+                </div>
               </div>
               <div className="gestion-colecciones__card-actions">
                 <button type="button" className="btn btn--ghost" onClick={() => openEditModal(col)}>
@@ -279,10 +276,14 @@ export const GestionColecciones = () => {
       {modalOpen && (
         <div className="gestion-colecciones__modal-overlay" onClick={closeModal}>
           <div className="gestion-colecciones__modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{editingId ? 'Editar colección' : 'Nueva colección'}</h2>
-            <form onSubmit={handleSubmit}>
-              <label>
-                Título
+            <header className="gestion-colecciones__modal-header">
+              <h2>{editingId ? 'Editar colección' : 'Nueva colección'}</h2>
+              <button type="button" className="btn-close" onClick={closeModal}>×</button>
+            </header>
+            
+            <form onSubmit={handleSubmit} className="gestion-colecciones__form">
+              <div className="form-group">
+                <label>Título</label>
                 <input
                   type="text"
                   name="tituloInput"
@@ -290,113 +291,106 @@ export const GestionColecciones = () => {
                   onChange={handleFormChange}
                   required
                   maxLength={200}
+                  placeholder="Ej: Incendios en Córdoba"
                 />
-              </label>
-              <label>
-                Descripción
+              </div>
+              
+              <div className="form-group">
+                <label>Descripción</label>
                 <textarea
                   name="descripcionInput"
                   value={form.descripcionInput}
                   onChange={handleFormChange}
                   rows={3}
+                  placeholder="Breve descripción de la colección..."
                 />
-              </label>
-              <label>
-                Algoritmo de consenso
-                <input
-                  type="text"
-                  name="algoritmoConcenso"
-                  value={form.algoritmoConcenso}
-                  onChange={handleFormChange}
-                  placeholder="Ej: Mayoría simple"
-                />
-              </label>
-              <label>
-                Tags (separados por coma)
-                <input
-                  type="text"
-                  name="tagsInput"
-                  value={form.tagsInput}
-                  onChange={handleFormChange}
-                  placeholder="Ej: Incendios, Bosques"
-                />
-              </label>
+              </div>
 
-              <fieldset className="gestion-colecciones__fuentes">
-                <legend>Fuentes habilitadas</legend>
+              <div className="form-group">
+                <label>Fuentes de datos</label>
                 <div className="gestion-colecciones__fuentes-grid">
                   {fuentesDisponibles.map((fuente) => (
-                    <label key={fuente} className="gestion-colecciones__fuente-option">
+                    <label key={fuente.id} className={`fuente-checkbox ${form.fuentesInput.includes(fuente.id) ? 'active' : ''}`}>
                       <input
                         type="checkbox"
-                        checked={form.fuentesInput?.includes(fuente)}
-                        onChange={() => handleFuenteToggle(fuente)}
+                        checked={form.fuentesInput.includes(fuente.id)}
+                        onChange={() => handleFuenteToggle(fuente.id)}
                       />
-                      <span>{fuente}</span>
+                      <span className="fuente-name">{fuente.nombre}</span>
+                      <span className="fuente-type">{fuente.tipo}</span>
                     </label>
                   ))}
                 </div>
-              </fieldset>
+              </div>
 
-              <fieldset className="gestion-colecciones__criterios">
-                <legend>Criterios / Condiciones</legend>
-                {form.criteriosInput.map((criterio, idx) => (
-                  <div key={idx} className="gestion-colecciones__criterio-row">
-                    <select
-                      value={criterio.tipo}
-                      onChange={(e) => {
-                        const nuevoTipo = e.target.value;
-                        const valores = getValoresForTipo(nuevoTipo);
-                        handleCriterioChange(idx, 'tipo', nuevoTipo);
-                        if (valores.length) {
-                          handleCriterioChange(idx, 'valor', valores[0]);
-                        }
-                      }}
-                    >
-                      <option value="" disabled>
-                        Seleccionar criterio
-                      </option>
-                      {criterioTipos.map((tipo) => (
-                        <option key={tipo} value={tipo}>
-                          {tipo}
-                        </option>
-                      ))}
-                    </select>
-                    {getValoresForTipo(criterio.tipo).length ? (
+              <div className="form-group">
+                <div className="form-group-header">
+                  <label>Criterios de selección</label>
+                  <button type="button" className="btn btn--small btn--secondary" onClick={addCriterio}>
+                    + Agregar criterio
+                  </button>
+                </div>
+                
+                {form.criteriosInput.length === 0 && (
+                  <p className="text-muted">No hay criterios definidos.</p>
+                )}
+
+                <div className="criterios-list">
+                  {form.criteriosInput.map((criterio, index) => (
+                    <div key={index} className="criterio-row">
                       <select
-                        value={criterio.valor}
-                        onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
+                        value={criterio.tipo}
+                        onChange={(e) => handleCriterioChange(index, 'tipo', e.target.value)}
                       >
-                        {getValoresForTipo(criterio.tipo).map((valor) => (
-                          <option key={valor} value={valor}>
-                            {valor}
-                          </option>
+                        {criterioOptions.map((opt) => (
+                          <option key={opt.tipo} value={opt.tipo}>{opt.tipo}</option>
                         ))}
                       </select>
-                    ) : (
-                      <input
-                        type="text"
-                        placeholder="Valor"
+                      
+                      <select
                         value={criterio.valor}
-                        onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
-                      />
-                    )}
-                    <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>
-                      ✕
-                    </button>
-                  </div>
-                ))}
-                <button type="button" className="btn btn--ghost btn--sm" onClick={addCriterio}>
-                  + Agregar criterio
-                </button>
-              </fieldset>
+                        onChange={(e) => handleCriterioChange(index, 'valor', e.target.value)}
+                      >
+                        {getValoresForTipo(criterio.tipo).map((val) => (
+                          <option key={val} value={val}>{val}</option>
+                        ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        className="btn-icon-danger"
+                        onClick={() => removeCriterio(index)}
+                        title="Eliminar criterio"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Algoritmo de Consenso</label>
+                <select
+                  name="algoritmoConcenso"
+                  value={form.algoritmoConcenso}
+                  onChange={handleFormChange}
+                >
+                  <option value="">Seleccionar algoritmo...</option>
+                  {consensusAlgorithms.map((algo) => (
+                    <option key={algo.value} value={algo.value}>
+                      {algo.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <div className="gestion-colecciones__modal-actions">
-                <button type="button" className="btn btn--ghost" onClick={closeModal} disabled={submitting}>
+                <button type="button" className="btn btn--ghost" onClick={closeModal}>
                   Cancelar
                 </button>
                 <button type="submit" className="btn btn--primary" disabled={submitting}>
-                  {submitting ? 'Guardando...' : 'Guardar'}
+                  {submitting ? 'Guardando...' : 'Guardar colección'}
                 </button>
               </div>
             </form>
