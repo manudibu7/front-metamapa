@@ -55,6 +55,7 @@ const generateMockSolicitudes = () => {
 };
 
 // In-memory store for the session
+/*
 let solicitudesStore = generateMockSolicitudes();
 
 export const obtenerSolicitudes = async () => {
@@ -74,3 +75,65 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
     }, 400);
   });
 };
+*/
+const BASE_URL = "http://localhost:8080/solicitudes";
+// Cambiá esta URL si tu backend corre en otro puerto/path
+
+// GET /solicitudes
+export const obtenerSolicitudes = async () => {
+  try {
+    const response = await fetch(BASE_URL);
+
+    if (!response.ok) {
+      throw new Error("Error al obtener solicitudes");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error en obtenerSolicitudes:", error);
+    throw error;
+  }
+};
+
+// POST /solicitudes
+export const crearSolicitud = async (solicitud) => {
+  try {
+    const response = await fetch(BASE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(solicitud),
+    });
+
+    if (!response.ok) {
+      const msg = await response.text();
+      throw new Error(msg || "Error al crear solicitud");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error en crearSolicitud:", error);
+    throw error;
+  }
+};
+
+// PUT o PATCH (dependiendo del back) — si solo querés cambiar el estado
+// Si tu backend no tiene endpoint para actualizar estado, avisame y lo adaptamos
+export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estado: nuevoEstado }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al actualizar estado");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error en actualizarEstadoSolicitud:", error);
+    throw error;
+  }
+};
+
