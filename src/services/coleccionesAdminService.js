@@ -1,7 +1,7 @@
 import { mockCollections } from '../constants/mockCollections';
-import { collectionsService } from './collectionsService';
+import { collectionsService,obtenerFuentes } from './collectionsService';
 
-export const fuentesDisponibles = ['loader-estatico', 'loader-dinamico', 'loader-proxy'];
+export const fuentesDisponibles = obtenerFuentes();
 
 const deepClone = (payload) => JSON.parse(JSON.stringify(payload));
 
@@ -12,30 +12,31 @@ const simulateDelay = (data, delay = 350) =>
 
 const ensureCondiciones = (coleccion) =>
   coleccion.Condiciones && coleccion.Condiciones.length
-    ? coleccion.Condiciones
-    : (coleccion.tags ?? []).map((tag, index) => ({
+    ? coleccion.Condiciones: false;
+    /*: (coleccion.tags ?? []).map((tag, index) => ({
         id: `${coleccion.id}-tag-${index}`,
         detail: `Tag = ${tag}`,
-      }));
+      })); */
 
 const normalizeInput = (coleccionInput) => {
-  const tags = coleccionInput.tagsInput
+ /* const tags = coleccionInput.tagsInput
     ? coleccionInput.tagsInput
         .split(',')
         .map((tag) => tag.trim())
         .filter(Boolean)
-    : [];
+    : []; */
   const fuentes = (coleccionInput.fuentesInput ?? []).filter((fuente) => fuentesDisponibles.includes(fuente));
 
   return {
     titulo: coleccionInput.tituloInput?.trim() ?? '',
     descripcion: coleccionInput.descripcionInput?.trim() ?? '',
     consenso: coleccionInput.algoritmoConcenso?.trim() ?? '',
-    tags,
+    //tags,
     fuentes,
-    Condiciones: (coleccionInput.criteriosInput ?? []).map((criterio, index) => ({
-      id: `${Date.now()}-${index}`,
-      detail: `${criterio.tipo} = ${criterio.valor}`,
+    Condiciones: (coleccionInput.criteriosInput ?? []).map((criterio,index) => ({
+      //id: `${Date.now()}-${index}`,
+      tipo: `${criterio.tipo}`,
+      valor: `${criterio.valor}`,
     })),
   };
 };

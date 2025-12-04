@@ -9,7 +9,7 @@ import {
   fuentesDisponibles,
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
-
+{
 const criterioOptions = [
   {
     tipo: 'Categoría',
@@ -27,7 +27,7 @@ const criterioOptions = [
     tipo: 'Fuente',
     valores: fuentesDisponibles,
   },
-];
+];}
 
 const buildEmptyForm = () => ({
   tituloInput: '',
@@ -35,7 +35,7 @@ const buildEmptyForm = () => ({
   fuentesInput: [],
   criteriosInput: [],
   algoritmoConcenso: '',
-  tagsInput: '',
+  //tagsInput: '',
 });
 
 export const GestionColecciones = () => {
@@ -57,7 +57,7 @@ export const GestionColecciones = () => {
   const fetchColecciones = async () => {
     try {
       setLoading(true);
-      const data = await obtenern();
+      const data = await obtenerColeccionesAdmin();
       setColecciones(data ?? []);
       setError('');
     } catch (err) {
@@ -88,12 +88,14 @@ export const GestionColecciones = () => {
       tituloInput: coleccion.titulo ?? '',
       descripcionInput: coleccion.descripcion ?? '',
       fuentesInput: coleccion.fuentes ?? [],
-      criteriosInput: (coleccion.Condiciones ?? []).map((c) => {
-        const [tipo, valor] = (c.detail ?? '').split('=');
-        return { id: c.id, tipo: tipo?.trim() ?? '', valor: valor?.trim() ?? '' };
-      }),
+      criteriosInput: coleccion.criterios?.map(c => ({
+        id: c.id ?? null,
+        tipo: c.tipo,
+        valor: c.valor
+      })) ?? [],
+
       algoritmoConcenso: coleccion.consenso ?? '',
-      tagsInput: (coleccion.tags ?? []).join(', '),
+      //tagsInput: (coleccion.tags ?? []).join(', '),
     });
     setModalOpen(true);
   };
@@ -311,6 +313,7 @@ export const GestionColecciones = () => {
                   placeholder="Ej: Mayoría simple"
                 />
               </label>
+              {/* LO COMENTO POR QUE NO APLICAMOS EN NINGUN MOMENTO LAS ETIQUETAS
               <label>
                 Tags (separados por coma)
                 <input
@@ -320,7 +323,7 @@ export const GestionColecciones = () => {
                   onChange={handleFormChange}
                   placeholder="Ej: Incendios, Bosques"
                 />
-              </label>
+              </label> */}
 
               <fieldset className="gestion-colecciones__fuentes">
                 <legend>Fuentes habilitadas</legend>
@@ -339,7 +342,7 @@ export const GestionColecciones = () => {
               </fieldset>
 
               <fieldset className="gestion-colecciones__criterios">
-                <legend>Criterios / Condiciones</legend>
+                <legend>Criterios / Condiciones de Pertenencia</legend>
                 {form.criteriosInput.map((criterio, idx) => (
                   <div key={idx} className="gestion-colecciones__criterio-row">
                     <select

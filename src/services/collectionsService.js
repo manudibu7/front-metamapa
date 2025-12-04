@@ -1,5 +1,5 @@
-import { mockCollections } from '../constants/mockCollections';
-
+import { mockCollections } from "../constants/mockCollections";
+import axios from "axios";
 const deepClone = (payload) => JSON.parse(JSON.stringify(payload));
 
 const simulateLatency = (payload) =>
@@ -7,40 +7,66 @@ const simulateLatency = (payload) =>
     setTimeout(() => resolve(deepClone(payload)), 550);
   });
 //API ADMINISTRATIVA
-const API_ADMINISTRATIVA_URL = 'http://localhost:8081/colecciones';
+const API_ADMINISTRATIVA_URL = "http://localhost:8081/colecciones";
 
-export const collectionsService = {
-  async getCollections() {
-    try{
-       let url = `${API_ADMINISTRATIVA_URL}/colecciones`
-       const response = await axios.get(url, {
-      headers: { "Cache-Control": "no-cache" }, });
-       
-      return response;
-     } catch (error) {
+export const obtenerFuentes = async () => {
+  try {
+    let url = `${API_ADMINISTRATIVA_URL}/fuentes`;
+    const response = await axios.get(url, {
+      headers: { "Cache-Control": "no-cache" },
+    });
+  } catch (error) {
     console.error("Error obteniendo los productos", error);
     throw error;
   }
+};
 
+export const collectionsService = {
+  async getCollections() {
+    try {
+      let url = `${API_ADMINISTRATIVA_URL}/colecciones`;
+      const response = await axios.get(url, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+
+      return response;
+    } catch (error) {
+      console.error("Error obteniendo los productos", error);
+      throw error;
+    }
   },
-
 
   async getCollectionById(idOrHandle) {
     //SOLO CONSIDERO PARA ID
-    if(idOrHandle.isNumber()){
-      let url =`${API_BASE_URL}/coleccion/${idOrHandle}`
+    if (idOrHandle.isNumber()) {
+      let url = `${API_ADMINISTRATIVA_URL}/coleccion/${idOrHandle}`;
 
       const response = await axios.get(url, {
-      headers: { "Cache-Control": "no-cache" }, });
-       return response;
+        headers: { "Cache-Control": "no-cache" },
+      });
+      return response;
     }
-   /* const found = mockCollections.find(
+    /* const found = mockCollections.find(
       (collection) => collection.id === idOrHandle || collection.handle === idOrHandle
     );
     return simulateLatency(found ?? null);*/
   },
 
-  async createCollection(collectionInput){
-    
-  }
+  async createCollection(collectionInput) {
+    try {
+      const response = await axios.post(
+        `${API_ADMINISTRATIVA_URL}/colecciones`,
+        collectionInput,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error creando el Coleccion", error);
+      throw error;
+    }
+  },
 };
