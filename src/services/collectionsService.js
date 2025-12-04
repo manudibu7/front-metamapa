@@ -69,4 +69,40 @@ export const collectionsService = {
       throw error;
     }
   },
+    async updateCollection(id ,collection) {
+    try {
+      const response = await axios.put(
+        `${API_ADMINISTRATIVA_URL}/colecciones/${id}`,
+        collection,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error actualizando el Coleccion", error);
+      throw error;
+    }
+
+
+  },
+
+  async deleteById(id) {
+    try {
+      const response = await axios.delete(
+        `${API_ADMINISTRATIVA_URL}/colecciones/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error borrando la colleccion", error);
+      throw error;
+    }
+  }
 };
