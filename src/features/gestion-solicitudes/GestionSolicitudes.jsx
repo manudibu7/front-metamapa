@@ -13,10 +13,10 @@ export const GestionSolicitudes = () => {
   const [processingId, setProcessingId] = useState(null);
 
   useEffect(() => {
-    if (!isAdmin) {
-      navigate('/');
-      return;
-    }
+   // if (!isAdmin) {
+  //    navigate('/');
+    //  return;
+    //}
 
     const fetchSolicitudes = async () => {
       try {
@@ -80,18 +80,18 @@ export const GestionSolicitudes = () => {
           </div>
         ) : (
           solicitudes.map((solicitud) => (
-            <div key={solicitud.id} className="solicitud-card">
+            <div key={solicitud.id_solicitud} className="solicitud-card">
               <div className="solicitud-card__info">
                 <div className="solicitud-card__header">
-                  <span className="solicitud-card__id">{solicitud.id}</span>
-                  <span className={`solicitud-card__status status-${solicitud.estado.toLowerCase()}`}>
-                    {solicitud.estado}
+                  <span className="solicitud-card__id">{solicitud.id_solicitud}</span>
+                  <span className={`solicitud-card__status status-${solicitud.estadoSolicitud!=null? solicitud.estadoSolicitud.toLowerCase(): "sin estado"}`}>
+                    {solicitud.estadoSolicitud}
                   </span>
                 </div>
 
                 <div 
                   className="solicitud-card__hecho"
-                  onClick={() => navigate(`/hechos/${solicitud.hecho.id}`)}
+                  onClick={() => navigate(`/hechos/${solicitud.hecho.id_hecho}`)}
                   title="Ver detalle del hecho"
                 >
                   <div className="hecho-titulo">
@@ -99,9 +99,10 @@ export const GestionSolicitudes = () => {
                   </div>
                   <div className="hecho-desc">{solicitud.hecho.descripcion}</div>
                   <div className="hecho-meta">
-                    <span>📍 {solicitud.hecho.provincia}</span>
+                    <span>📍 {solicitud.hecho.ubicacion.provincia}</span>
+                    <span>📍 {solicitud.hecho.ubicacion.pais}</span>
                     <span>📅 {solicitud.hecho.fecha}</span>
-                    <span>📂 {solicitud.hecho.coleccionTitulo}</span>
+                    <span>📂 {solicitud.hecho.fuente}</span>
                   </div>
                 </div>
 
@@ -112,7 +113,7 @@ export const GestionSolicitudes = () => {
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Solicitante</span>
-                    <span className="detail-value">{solicitud.usuario} • {new Date(solicitud.fechaSolicitud).toLocaleDateString()}</span>
+                    <span className="detail-value">{solicitud.id_contribuyente} • {new Date(solicitud.fechaSolicitud).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
@@ -137,7 +138,7 @@ export const GestionSolicitudes = () => {
                   </>
                 ) : (
                   <div className="action-completed">
-                    Solicitud {solicitud.estado.toLowerCase()}
+                    Solicitud {solicitud.estadoSolicitud != null? solicitud.estadoSolicitud.toLowerCase(): "sinestado"}
                   </div>
                 )}
               </div>

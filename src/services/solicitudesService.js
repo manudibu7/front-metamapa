@@ -76,21 +76,21 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
   });
 };
 */
-const BASE_URL = "http://localhost:8080/solicitudes";
+const BASE_URL = "http://localhost:8100/solicitudes";
 // Cambiá esta URL si tu backend corre en otro puerto/path
 
 // GET /solicitudes
 export const obtenerSolicitudes = async () => {
   try {
     const response = await fetch(BASE_URL);
-
+    console.log("Código de estado recibido:", response.status);
     if (!response.ok) {
       throw new Error("Error al obtener solicitudes");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error en obtenerSolicitudes:", error);
+    console.error("Error en obtenerSolicitudeees:", error);
     throw error;
   }
 };
