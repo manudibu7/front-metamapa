@@ -7,7 +7,7 @@ const simulateLatency = (payload) =>
     setTimeout(() => resolve(deepClone(payload)), 550);
   });
 //API ADMINISTRATIVA
-const API_ADMINISTRATIVA_URL = "http://localhost:8081/colecciones";
+const API_ADMINISTRATIVA_URL = "http://localhost:8084";
 
 export const obtenerFuentes = async () => {
   try {

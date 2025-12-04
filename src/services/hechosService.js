@@ -22,7 +22,7 @@ export const hechosService = {
 // hecho.service.js
 
 // 💡 URL base de tu backend
-const API_URL = 'http://localhost:8080/hechos';
+const API_URL = 'http://localhost:8100/hechos';
 // Asegúrate de cambiar 'localhost:8080' por la dirección correcta de tu API.
 
 /**
@@ -102,4 +102,41 @@ export const hechosService = {
         throw error;
     }
   },
+  async obtenerHechoPorId(id) {
+    if (!id) {
+      throw new Error("Se requiere un ID para obtener los detalles del hecho.");
+    }
+
+    // 🌟 URL específica para un hecho: Ejem: /api/v1/hechos/123
+    const url = `${API_URL}/${id}`; 
+
+    console.log(`Llamando al backend para detalle en: ${url}`);
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+          // Incluir 'Authorization' si tu API requiere un token
+        }
+      });
+
+      if (response.status === 404) {
+        // Manejo específico si el recurso no existe
+        return null;
+      }
+      
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(`Error en la API al obtener el detalle: ${response.status} - ${errorBody.message || 'Error desconocido'}`);
+      }
+
+      const data = await response.json();
+      return data; // Devuelve el objeto individual
+      
+    } catch (error) {
+      console.error(`Fallo al obtener el detalle del hecho ${id}:`, error);
+      throw error;
+    }
+  }
 };
