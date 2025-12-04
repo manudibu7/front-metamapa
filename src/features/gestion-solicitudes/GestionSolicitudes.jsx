@@ -99,7 +99,8 @@ export const GestionSolicitudes = () => {
                   </div>
                   <div className="hecho-desc">{solicitud.hecho.descripcion}</div>
                   <div className="hecho-meta">
-                    <span>📍 {solicitud.hecho.provincia}</span>
+                    <span>📍 {solicitud.hecho.ubicacion.provincia}</span>
+                    <span>📍 {solicitud.hecho.ubicacion.pais}</span>
                     <span>📅 {solicitud.hecho.fecha}</span>
                     <span>📂 {solicitud.hecho.fuente}</span>
                   </div>
