@@ -9,7 +9,7 @@ import {
   fuentesDisponibles,
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
-{
+
 const criterioOptions = [
   {
     tipo: 'Categoría',
@@ -27,7 +27,7 @@ const criterioOptions = [
     tipo: 'Fuente',
     valores: fuentesDisponibles,
   },
-];}
+];
 
 const buildEmptyForm = () => ({
   tituloInput: '',
