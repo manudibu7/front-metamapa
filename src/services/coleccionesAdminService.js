@@ -1,8 +1,7 @@
 import { mockCollections } from '../constants/mockCollections';
 import { collectionsService,obtenerFuentes } from './collectionsService';
 
-export const fuentesDisponibles = obtenerFuentes();
-
+export const fuentesDisponibles =  await obtenerFuentes();
 const deepClone = (payload) => JSON.parse(JSON.stringify(payload));
 
 const simulateDelay = (data, delay = 350) =>
@@ -12,7 +11,7 @@ const simulateDelay = (data, delay = 350) =>
 
 const ensureCondiciones = (coleccion) =>
   coleccion.Condiciones && coleccion.Condiciones.length
-    ? coleccion.Condiciones: false;
+    ? coleccion.Condiciones: [];
     /*: (coleccion.tags ?? []).map((tag, index) => ({
         id: `${coleccion.id}-tag-${index}`,
         detail: `Tag = ${tag}`,
@@ -25,19 +24,20 @@ const normalizeInput = (coleccionInput) => {
         .map((tag) => tag.trim())
         .filter(Boolean)
     : []; */
-  const fuentes = (coleccionInput.fuentesInput ?? []).filter((fuente) => fuentesDisponibles.includes(fuente));
+  const fuentes = (coleccionInput.fuentes ?? []).filter((fuente) => fuentesDisponibles.includes(fuente));
 
   return {
-    titulo: coleccionInput.tituloInput?.trim() ?? '',
-    descripcion: coleccionInput.descripcionInput?.trim() ?? '',
-    consenso: coleccionInput.algoritmoConcenso?.trim() ?? '',
-    //tags,
+    titulo: coleccionInput.titulo?.trim() ?? '',
+    descripcion: coleccionInput.descripcion?.trim() ?? '',
     fuentes,
-    Condiciones: (coleccionInput.criteriosInput ?? []).map((criterio,index) => ({
+    //tags,
+    Condiciones: (coleccionInput.criterios ?? []).map((criterio,index) => ({
       //id: `${Date.now()}-${index}`,
+      id : null,
       tipo: `${criterio.tipo}`,
       valor: `${criterio.valor}`,
     })),
+     consenso: coleccionInput.algoritmoConcenso?.trim() ?? '',
   };
 };
 
@@ -63,38 +63,20 @@ export const obtenerColeccionesAdmin = async () => {
 };
 
 export const crearColeccion = async (coleccionInput) => {
-  const payload = normalizeInput(coleccionInput);
-  const nuevaColeccion = {
-    ...payload,
-    handle: payload.titulo.toLowerCase().replace(/\s+/g, '-'),
-    estado: 'PENDIENTE',
-    ultimaActualizacion: new Date().toISOString(),
-    totalHechos: 0,
-  };
+  const nuevaColeccion = normalizeInput(coleccionInput);
   
-  adminCollections.push(nuevaColeccion);
-  return simulateDelay(nuevaColeccion);
+  await collectionsService.createCollection(nuevaColeccion);
+
 };
 
 export const actualizarColeccion = async (id, coleccionInput) => {
-  const index = adminCollections.findIndex((c) => c.id === id);
-  if (index === -1) {
-    throw new Error('Colección no encontrada');
-  }
-  const payload = normalizeInput(coleccionInput);
-  adminCollections[index] = {
-    ...adminCollections[index],
-    ...payload,
-    ultimaActualizacion: new Date().toISOString(),
-  };
-  return simulateDelay(adminCollections[index]);
+ 
+  const coleccionActualizada = normalizeInput(coleccionInput);
+  
+  await collectionsService.updateCollection(id,coleccionActualizada);
 };
 
 export const eliminarColeccion = async (id) => {
-  const index = adminCollections.findIndex((c) => c.id === id);
-  if (index === -1) {
-    throw new Error('Colección no encontrada');
-  }
-  adminCollections.splice(index, 1);
-  return simulateDelay({ success: true });
+  
+  await collectionsService.deleteById(id);
 };

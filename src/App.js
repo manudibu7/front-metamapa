@@ -16,6 +16,7 @@ import { Header } from './components/Header/Header';
 import { Footer } from './components/Footer/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
+import { HechosListNav } from './components/HechoListaNav/HechoListNav';
 
 const AppShell = () => {
   const { login, logout, isAuthenticated, user } = useAuth();
@@ -40,6 +41,7 @@ const AppShell = () => {
           <Route path="/colecciones" element={<Colecciones />} />
           <Route path="/colecciones/:id" element={<ColeccionDetalle />} />
           <Route path="/hechos/:id" element={<HechoDetalle />} />
+          <Route path="/hechos" element={<HechosListNav/>}/>
           <Route path="/contribuir" element={<NuevaContribucion />} />
           <Route path="/estadisticas" element={<Estadisticas />} />
           <Route path="/admin" element={<Administracion />} />

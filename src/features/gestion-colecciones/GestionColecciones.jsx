@@ -179,12 +179,9 @@ export const GestionColecciones = () => {
       alert('No pudimos eliminar la colección.');
     }
   };
+//MEJORA : DEBERIAOS CREAR TIPOS DE ALGORITMOS.
+  const criterioTipos = ['FechaAntes', 'FechaDespues', 'Provincia',"Categoria","Titulo",];
 
-  const criterioTipos = useMemo(() => {
-    const base = criterioOptions.map((opt) => opt.tipo);
-    const dinamicos = (form.criteriosInput ?? []).map((c) => c.tipo).filter(Boolean);
-    return Array.from(new Set([...base, ...dinamicos]));
-  }, [form.criteriosInput]);
 
   const getValoresForTipo = (tipo) => criterioOptions.find((opt) => opt.tipo === tipo)?.valores ?? [];
 

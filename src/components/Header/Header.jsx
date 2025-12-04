@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 
 export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(''); 
+  const navigate = useNavigate();
+  //const [categoria, setCategoria] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const trimmed = query.trim();
-    if (!trimmed) return;
-    onSearch?.(trimmed);
+  const handleSearch = (event) => {
+    event.preventDefault(); 
+    
+    const textoBusqueda = query.trim();
+    
+    navigate(`/hechos?q=${encodeURIComponent(textoBusqueda)}`);
   };
 
   return (
@@ -24,14 +27,14 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
         </div>
       </Link>
 
-      <form className="app-header__search" onSubmit={handleSubmit}>
+      <form className="app-header__search" onSubmit={handleSearch}>
         <input
           type="search"
           placeholder="Buscar hechos, colecciones o fuentes"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
-        <button type="submit">Buscar</button>
+        <button onClick={handleSearch}  type="submit">Buscar</button>
       </form>
 
       <div className="app-header__actions">
