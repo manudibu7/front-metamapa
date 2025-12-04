@@ -47,7 +47,10 @@ export const mockCollections = [
         tipoHecho: 'TEXTO',
         fuente: 'loader_proxy',
         fuenteNombre: 'Metamapa Córdoba',
-        multimedia: 2,
+        adjuntos: [
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Cortafuegos', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Humo', tipo: 'imagen' }
+        ],
         consenso: true,
       },
       {
@@ -64,7 +67,7 @@ export const mockCollections = [
         tipoHecho: 'TEXTO',
         fuente: 'loader_estatico',
         fuenteNombre: 'Dataset SINAGIR 2025',
-        multimedia: 0,
+        adjuntos: [],
         consenso: false,
       },
       {
@@ -81,7 +84,10 @@ export const mockCollections = [
         tipoHecho: 'MULTIMEDIA',
         fuente: 'loader_dinamico',
         fuenteNombre: 'Contribuyentes Valle de Calamuchita',
-        multimedia: 7,
+        adjuntos: [
+             { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Drone+1', tipo: 'imagen' },
+             { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Drone+2', tipo: 'imagen' }
+        ],
         consenso: true,
       },
     ],
@@ -112,7 +118,11 @@ export const mockCollections = [
         tipoHecho: 'TEXTO',
         fuente: 'loader_dinamico',
         fuenteNombre: 'Contribuyentes Zona Sur',
-        multimedia: 3,
+        adjuntos: [
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Vertido+1', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Vertido+2', tipo: 'imagen' },
+          { url: 'informe_vertido.pdf', tipo: 'PDF' }
+        ],
         consenso: true,
       },
       {
@@ -129,7 +139,13 @@ export const mockCollections = [
         tipoHecho: 'MULTIMEDIA',
         fuente: 'loader_proxy',
         fuenteNombre: 'Metamapa Rosario',
-        multimedia: 5,
+        adjuntos: [
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Peces+1', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Peces+2', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Peces+3', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Peces+4', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Peces+5', tipo: 'imagen' }
+        ],
         consenso: true,
       },
       {
@@ -146,7 +162,9 @@ export const mockCollections = [
         tipoHecho: 'TEXTO',
         fuente: 'loader_estatico',
         fuenteNombre: 'Dataset ACUMAR 2025',
-        multimedia: 1,
+        adjuntos: [
+          { url: 'reporte_acumar.pdf', tipo: 'PDF' }
+        ],
         consenso: true,
       },
     ],
@@ -177,7 +195,14 @@ export const mockCollections = [
         tipoHecho: 'TEXTO',
         fuente: 'loader_proxy',
         fuenteNombre: 'Metamapa Rosario',
-        multimedia: 6,
+        adjuntos: [
+          { url: 'expediente_andhes.pdf', tipo: 'PDF' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Evidencia+1', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Evidencia+2', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Evidencia+3', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Evidencia+4', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Evidencia+5', tipo: 'imagen' }
+        ],
         consenso: true,
       },
       {
@@ -194,7 +219,17 @@ export const mockCollections = [
         tipoHecho: 'MULTIMEDIA',
         fuente: 'loader_dinamico',
         fuenteNombre: 'Uploader ciudadano',
-        multimedia: 9,
+        adjuntos: [
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+1', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+2', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+3', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+4', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+5', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+6', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+7', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+8', tipo: 'imagen' },
+          { url: 'https://via.placeholder.com/800x400/1a1f35/4ade80?text=Video+9', tipo: 'imagen' }
+        ],
         consenso: true,
       },
       {
@@ -211,7 +246,7 @@ export const mockCollections = [
         tipoHecho: 'TEXTO',
         fuente: 'loader_proxy',
         fuenteNombre: 'Metamapa Córdoba',
-        multimedia: 0,
+        adjuntos: [],
         consenso: true,
       },
     ],

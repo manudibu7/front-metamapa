@@ -1,54 +1,80 @@
+// import { API_URL } from '../config/api';
+
+// Mock data matching the ORIGINAL EstadisticaOutputDTO (no tipoEstadistica)
 const mockEstadisticas = [
   {
-    discriminante: { valor: 'Colección: Contaminación industrial', tipo: 'COLECCION' },
+    // MAXCATEGORIACONHECHOS
+    discriminante: { tipo: 'SIN', valor: '' },
+    resultado: { nombre: 'Incendio forestal', cantidad: 150 },
     datos: [
-      { nombre: 'Buenos Aires', cantidad: 42 },
-      { nombre: 'Santa Fe', cantidad: 27 },
-      { nombre: 'Córdoba', cantidad: 18 },
-      { nombre: 'Chaco', cantidad: 9 },
-    ],
-    resultado: { nombre: 'Buenos Aires', cantidad: 42 },
+      { nombre: 'Incendio forestal', cantidad: 150 },
+      { nombre: 'Inundación', cantidad: 80 },
+      { nombre: 'Accidente', cantidad: 45 },
+      { nombre: 'Contaminación', cantidad: 30 }
+    ]
   },
   {
-    discriminante: { valor: 'Categoría: Incendios forestales', tipo: 'CATEGORIA' },
+    // CANTSOLICITUDESSPAM
+    discriminante: { tipo: 'SIN', valor: '' },
+    resultado: { nombre: 'cantidad spam', cantidad: 12 },
     datos: [
-      { nombre: '08:00', cantidad: 4 },
-      { nombre: '12:00', cantidad: 11 },
-      { nombre: '16:00', cantidad: 14 },
-      { nombre: '20:00', cantidad: 7 },
-      { nombre: '00:00', cantidad: 3 },
-    ],
-    resultado: { nombre: '16:00', cantidad: 14 },
+      { nombre: 'cantidad total', cantidad: 120 },
+      { nombre: 'cantidad spam', cantidad: 12 }
+    ]
   },
   {
-    discriminante: { valor: 'Solicitudes de eliminación', tipo: 'ESTADO' },
+    // MAXHORASEGUNCATEGORIA
+    discriminante: { tipo: 'CATEGORIA', valor: 'Incendio forestal' },
+    resultado: { nombre: '14:00', cantidad: 25 },
     datos: [
-      { nombre: 'Aprobadas', cantidad: 12 },
-      { nombre: 'Pendientes', cantidad: 6 },
-      { nombre: 'Rechazadas', cantidad: 4 },
-    ],
-    resultado: { nombre: 'Aprobadas', cantidad: 12 },
+      { nombre: '10:00', cantidad: 5 },
+      { nombre: '11:00', cantidad: 10 },
+      { nombre: '12:00', cantidad: 15 },
+      { nombre: '13:00', cantidad: 20 },
+      { nombre: '14:00', cantidad: 25 },
+      { nombre: '15:00', cantidad: 22 },
+      { nombre: '16:00', cantidad: 18 }
+    ]
   },
+  {
+    // MAXHORASEGUNCATEGORIA
+    discriminante: { tipo: 'CATEGORIA', valor: 'Inundación' },
+    resultado: { nombre: '09:00', cantidad: 12 },
+    datos: [
+      { nombre: '08:00', cantidad: 8 },
+      { nombre: '09:00', cantidad: 12 },
+      { nombre: '10:00', cantidad: 10 }
+    ]
+  },
+  {
+    // MAXPROVINCIASEGUNCONCATEGORIA
+    discriminante: { tipo: 'CATEGORIA', valor: 'Incendio forestal' },
+    resultado: { nombre: 'Córdoba', cantidad: 50 },
+    datos: [
+      { nombre: 'Córdoba', cantidad: 50 },
+      { nombre: 'Río Negro', cantidad: 40 },
+      { nombre: 'Chubut', cantidad: 30 }
+    ]
+  },
+  {
+    // MAXPROVINCIADEUNACOLECCION
+    discriminante: { tipo: 'COLECCION', valor: 'incendios-argentina-2025' },
+    resultado: { nombre: 'Córdoba', cantidad: 100 },
+    datos: [
+      { nombre: 'Córdoba', cantidad: 100 },
+      { nombre: 'San Luis', cantidad: 50 }
+    ]
+  }
 ];
 
-const simulateDelay = (data, delay = 400) =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve(JSON.parse(JSON.stringify(data))), delay);
+export const getEstadisticas = async () => {
+  // In a real app, this would be:
+  // const response = await fetch(`${API_URL}/estadisticas`);
+  // return response.json();
+  
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockEstadisticas);
+    }, 500);
   });
-
-export const obtenerEstadisticas = async () => simulateDelay(mockEstadisticas);
-
-export const exportarEstadisticasCSV = async () => {
-  const header = 'discriminante,discriminante_tipo,nombre,cantidad';
-  const rows = mockEstadisticas.flatMap((estadistica) =>
-    estadistica.datos.map((dato) =>
-      [
-        JSON.stringify(estadistica.discriminante?.valor ?? 'N/A'),
-        JSON.stringify(estadistica.discriminante?.tipo ?? 'N/A'),
-        JSON.stringify(dato.nombre ?? ''),
-        dato.cantidad ?? 0,
-      ].join(',')
-    )
-  );
-  return [header, ...rows].join('\n');
 };
