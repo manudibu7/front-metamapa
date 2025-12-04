@@ -10,6 +10,7 @@ import {
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
 {
+  
 const criterioOptions = [
   {
     tipo: 'Categoría',
