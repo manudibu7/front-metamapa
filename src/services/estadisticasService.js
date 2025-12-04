@@ -1,4 +1,4 @@
-const mockEstadisticas = [
+/*const mockEstadisticas = [
   {
     discriminante: { valor: 'Colección: Contaminación industrial', tipo: 'COLECCION' },
     datos: [
@@ -30,11 +30,11 @@ const mockEstadisticas = [
     resultado: { nombre: 'Aprobadas', cantidad: 12 },
   },
 ];
-
-const simulateDelay = (data, delay = 400) =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve(JSON.parse(JSON.stringify(data))), delay);
-  });
+*/
+//const simulateDelay = (data, delay = 400) =>
+//  new Promise((resolve) => {
+//    setTimeout(() => resolve(JSON.parse(JSON.stringify(data))), delay);
+//  });
 
 export const obtenerEstadisticas = async () => simulateDelay(mockEstadisticas);
 
