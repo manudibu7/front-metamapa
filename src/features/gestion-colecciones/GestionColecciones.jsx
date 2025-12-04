@@ -57,7 +57,7 @@ export const GestionColecciones = () => {
   const fetchColecciones = async () => {
     try {
       setLoading(true);
-      const data = await obtenerColeccionesAdmin();
+      const data = await obtenern();
       setColecciones(data ?? []);
       setError('');
     } catch (err) {

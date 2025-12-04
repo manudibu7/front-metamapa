@@ -1,4 +1,5 @@
 import { mockCollections } from '../constants/mockCollections';
+import { collectionsService } from './collectionsService';
 
 export const fuentesDisponibles = ['loader-estatico', 'loader-dinamico', 'loader-proxy'];
 
@@ -16,12 +17,6 @@ const ensureCondiciones = (coleccion) =>
         id: `${coleccion.id}-tag-${index}`,
         detail: `Tag = ${tag}`,
       }));
-
-const adminCollections = deepClone(mockCollections).map((coleccion, index) => ({
-  ...coleccion,
-  id: coleccion.id ?? index + 1,
-  Condiciones: ensureCondiciones(coleccion),
-}));
 
 const normalizeInput = (coleccionInput) => {
   const tags = coleccionInput.tagsInput
@@ -45,18 +40,37 @@ const normalizeInput = (coleccionInput) => {
   };
 };
 
-export const obtenerColeccionesAdmin = async () => simulateDelay(adminCollections);
+let adminCollections = []; // se carga luego de forma ASÍNCRONA
+
+export const cargarAdminCollections = async () => {
+  const response = await collectionsService.getCollections();
+  const datos = response.data;
+
+  adminCollections = datos.map((coleccion, index) => ({
+    ...coleccion,
+    id: coleccion.id ?? index + 1,
+    Condiciones: ensureCondiciones(coleccion),
+  }));
+};
+
+export const obtenerColeccionesAdmin = async () => {
+  if (adminCollections.length === 0) {
+    await cargarAdminCollections();
+    
+  }
+  return adminCollections;
+};
 
 export const crearColeccion = async (coleccionInput) => {
   const payload = normalizeInput(coleccionInput);
   const nuevaColeccion = {
     ...payload,
-    id: `${Date.now()}`,
     handle: payload.titulo.toLowerCase().replace(/\s+/g, '-'),
-    estado: 'borrador',
+    estado: 'PENDIENTE',
     ultimaActualizacion: new Date().toISOString(),
     totalHechos: 0,
   };
+  
   adminCollections.push(nuevaColeccion);
   return simulateDelay(nuevaColeccion);
 };
