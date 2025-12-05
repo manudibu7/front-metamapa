@@ -27,7 +27,7 @@ export const MapaHechos = ({ hechos = [] }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {hechos.map((hecho) => (
-          <Marker key={hecho.id} position={[hecho.lat, hecho.lon]}>
+          <Marker key={hecho.id} position={[hecho.ubicacion.latitud, hecho.ubicacion.longitud]}>
             <Popup>
               <strong>{hecho.titulo}</strong>
               <p>{hecho.descripcion}</p>

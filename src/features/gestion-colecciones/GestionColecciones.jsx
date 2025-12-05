@@ -137,11 +137,11 @@ export const GestionColecciones = () => {
 
   const handleFuenteToggle = (fuente) => {
     setForm((prev) => {
-      const actual = prev.fuentesInput ?? [];
+      const actual = prev.fuentes ?? [];
       const existe = actual.includes(fuente);
       return {
         ...prev,
-        fuentesInput: existe ? actual.filter((item) => item !== fuente) : [...actual, fuente],
+        fuentes: existe ? actual.filter((item) => item !== fuente) : [...actual, fuente],
       };
     });
   };
@@ -179,6 +179,7 @@ export const GestionColecciones = () => {
       alert('No pudimos eliminar la colección.');
     }
   };
+  
 //MEJORA : DEBERIAOS CREAR TIPOS DE ALGORITMOS.
   const criterioTipos = ['FechaAntes', 'FechaDespues', 'Provincia',"Categoria","Titulo",];
 
@@ -323,7 +324,7 @@ export const GestionColecciones = () => {
               </label> */}
 
               <fieldset className="gestion-colecciones__fuentes">
-                <legend>Fuentes habilitadas</legend>
+                <legend>Fuentes</legend>
                 <div className="gestion-colecciones__fuentes-grid">
                   {fuentesDisponibles.map((fuente) => (
                     <label key={fuente} className="gestion-colecciones__fuente-option">
