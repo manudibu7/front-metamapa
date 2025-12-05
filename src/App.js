@@ -40,7 +40,7 @@ const AppShell = () => {
         <Routes>
           <Route path="/" element={<Home onLogin={login} isAuthenticated={isAuthenticated} />} />
           <Route path="/colecciones" element={<Colecciones />} />
-          <Route path="/colecciones/:id" element={<ColeccionDetalle />} />
+          <Route path="/colecciones/:id/hechos" element={<ColeccionDetalle />} />
           <Route path="/hechos/:id" element={<HechoDetalle />} />
           <Route path="/hechos" element={<HechosListNav/>}/>
           <Route path="/contribuir" element={<NuevaContribucion />} />

@@ -18,10 +18,6 @@ export const Colecciones = () => {
   const { collections, isLoading } = useCollectionsContext();
   const navigate = useNavigate();
 
-  const handleColeccionClick = (id) => {
-    navigate(`/colecciones/${id}`);
-  };
-
   return (
     <div className="colecciones-page">
       <header className="colecciones-page__header">
@@ -49,9 +45,9 @@ export const Colecciones = () => {
           <div className="colecciones-grid">
             {collections.map((collection) => (
               <article
-                key={collection.id_coleccion}
+                key={collection.id}
                 className="coleccion-card"
-                onClick={() => handleColeccionClick(collection.id_coleccion)}
+                onClick={() => navigate(`/colecciones/${collection.id_coleccion}/hechos`)}
               >
                 <div className="coleccion-card__header">
                   <span className="coleccion-card__estado">{collection.estado}</span>

@@ -23,7 +23,7 @@ export const Footer = () => (
       </div>
       <div>
         <strong>MetaMapa</strong>
-        <p>TPA DDSI 2025 · Grupo 01</p>
+        <p>TPA DDSI 2025 · Grupo 09</p>
       </div>
     </div>
     <div className="app-footer__grid">
