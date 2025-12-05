@@ -59,7 +59,7 @@ export const exportarEstadisticasCSV = async () => {
 */
 
 // 💡 URL base de tu backend para el controlador /estadisticas
-const API_URL_BASE = 'http://localhost:8080/estadisticas';
+const API_URL_BASE = 'http://localhost:8200/estadisticas';
 
 /*
  * Función genérica para manejar respuestas HTTP, verificando el estado 'ok'.
@@ -98,17 +98,34 @@ export const obtenerEstadisticas = async () => {
     const url = API_URL_BASE;
 
     try {
-        const response = await fetch(url);
-        // Espera recibir List<EstadisticaOutputDTO> o 204
-        const estadisticas = await handleResponse(response);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                    // 'Authorization': 'Bearer ...' // Si usas token
+                }
+            });
 
-        // Devuelve el array de datos o un array vacío si el backend mandó 204
-        return estadisticas || [];
+            // 1. Manejo explícito del 204 (No Content)
+            // Si el backend dice "no hay nada", devolvemos array vacío y NO hacemos .json()
+            if (response.status === 204) {
+                return []; 
+            }
 
-    } catch (error) {
-        console.error("Fallo al obtener estadísticas:", error);
-        throw error;
-    }
+            // 2. Manejo de errores (4xx, 5xx)
+            if (!response.ok) {
+                const textoError = await response.text();
+                throw new Error(`Error ${response.status}: ${textoError || response.statusText}`);
+            }
+
+            // 3. Éxito (200 OK) -> Parseamos el JSON
+            const data = await response.json();
+            return data;
+
+        } catch (error) {
+            console.error("[Estadisticas] Error en servicio:", error);
+            throw error;
+        }
 };
 
 export const exportarEstadisticasCSV = async () => {
