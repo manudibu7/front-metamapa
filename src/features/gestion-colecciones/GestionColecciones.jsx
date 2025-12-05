@@ -30,10 +30,10 @@ const criterioOptions = [
 ];
 
 const buildEmptyForm = () => ({
-  tituloInput: '',
-  descripcionInput: '',
-  fuentesInput: [],
-  criteriosInput: [],
+  titulo: '',
+  descripcion: '',
+  fuentes: [],
+  criterios: [],
   algoritmoConcenso: '',
   //tagsInput: '',
 });
@@ -85,10 +85,10 @@ export const GestionColecciones = () => {
   const openEditModal = (coleccion) => {
     setEditingId(coleccion.id);
     setForm({
-      tituloInput: coleccion.titulo ?? '',
-      descripcionInput: coleccion.descripcion ?? '',
-      fuentesInput: coleccion.fuentes ?? [],
-      criteriosInput: coleccion.criterios?.map(c => ({
+      titulo: coleccion.titulo ?? '',
+      descripcion: coleccion.descripcion ?? '',
+      fuentes: coleccion.fuentes ?? [],
+      criterios: coleccion.criterios?.map(c => ({
         id: c.id ?? null,
         tipo: c.tipo,
         valor: c.valor
@@ -113,9 +113,9 @@ export const GestionColecciones = () => {
 
   const handleCriterioChange = (index, field, value) => {
     setForm((prev) => {
-      const criterios = [...prev.criteriosInput];
+      const criterios = [...prev.criterios];
       criterios[index] = { ...criterios[index], [field]: value };
-      return { ...prev, criteriosInput: criterios };
+      return { ...prev, criterios: criterios };
     });
   };
 
@@ -242,9 +242,9 @@ export const GestionColecciones = () => {
               <div className="gestion-colecciones__card-info">
                 <h2>{col.titulo}</h2>
                 <p>{col.descripcion}</p>
-                {col.Condiciones?.length > 0 && (
+                {col.criterios?.length > 0 && (
                   <ul className="gestion-colecciones__condiciones">
-                    {col.Condiciones.map((cond) => (
+                    {col.criterios.map((cond) => (
                       <li key={cond.id}>{cond.detail}</li>
                     ))}
                   </ul>
@@ -285,7 +285,7 @@ export const GestionColecciones = () => {
                 <input
                   type="text"
                   name="tituloInput"
-                  value={form.tituloInput}
+                  value={form.titulo}
                   onChange={handleFormChange}
                   required
                   maxLength={200}
@@ -295,7 +295,7 @@ export const GestionColecciones = () => {
                 Descripción
                 <textarea
                   name="descripcionInput"
-                  value={form.descripcionInput}
+                  value={form.descripcion}
                   onChange={handleFormChange}
                   rows={3}
                 />
@@ -329,7 +329,7 @@ export const GestionColecciones = () => {
                     <label key={fuente} className="gestion-colecciones__fuente-option">
                       <input
                         type="checkbox"
-                        checked={form.fuentesInput?.includes(fuente)}
+                        checked={form.fuentes?.includes(fuente)}
                         onChange={() => handleFuenteToggle(fuente)}
                       />
                       <span>{fuente}</span>
@@ -340,7 +340,7 @@ export const GestionColecciones = () => {
 
               <fieldset className="gestion-colecciones__criterios">
                 <legend>Criterios / Condiciones de Pertenencia</legend>
-                {form.criteriosInput.map((criterio, idx) => (
+                {form.criterios.map((criterio, idx) => (
                   <div key={idx} className="gestion-colecciones__criterio-row">
                     <select
                       value={criterio.tipo}

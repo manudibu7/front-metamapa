@@ -1,13 +1,12 @@
 import { mockCollections } from '../constants/mockCollections';
 import { collectionsService,obtenerFuentes } from './collectionsService';
 
-export const fuentesDisponibles =  await obtenerFuentes();
-const deepClone = (payload) => JSON.parse(JSON.stringify(payload));
+export let fuentesDisponibles = [];
 
-const simulateDelay = (data, delay = 350) =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve(deepClone(data)), delay);
-  });
+export const cargarFuentes = async () => {
+  fuentesDisponibles = await obtenerFuentes();
+};
+
 
 const ensureCondiciones = (coleccion) =>
   coleccion.Condiciones && coleccion.Condiciones.length
@@ -31,7 +30,7 @@ const normalizeInput = (coleccionInput) => {
     descripcion: coleccionInput.descripcion?.trim() ?? '',
     fuentes,
     //tags,
-    Condiciones: (coleccionInput.criterios ?? []).map((criterio,index) => ({
+    criterios: (coleccionInput.criterios ?? []).map((criterio,index) => ({
       //id: `${Date.now()}-${index}`,
       id : null,
       tipo: `${criterio.tipo}`,
@@ -44,14 +43,9 @@ const normalizeInput = (coleccionInput) => {
 let adminCollections = []; // se carga luego de forma ASÍNCRONA
 
 export const cargarAdminCollections = async () => {
-  const response = await collectionsService.getCollections();
-  const datos = response.data;
+    const response = await collectionsService.getCollections();
+    adminCollections=response;
 
-  adminCollections = datos.map((coleccion, index) => ({
-    ...coleccion,
-    id: coleccion.id ?? index + 1,
-    Condiciones: ensureCondiciones(coleccion),
-  }));
 };
 
 export const obtenerColeccionesAdmin = async () => {
