@@ -15,6 +15,7 @@ export const obtenerFuentes = async () => {
     const response = await axios.get(url, {
       headers: { "Cache-Control": "no-cache" },
     });
+    return response.data;
   } catch (error) {
     console.error("Error obteniendo los productos", error);
     throw error;
@@ -29,7 +30,7 @@ export const collectionsService = {
         headers: { "Cache-Control": "no-cache" },
       });
 
-      return response;
+      return response.data;
     } catch (error) {
       console.error("Error obteniendo los productos", error);
       throw error;
@@ -44,7 +45,7 @@ export const collectionsService = {
       const response = await axios.get(url, {
         headers: { "Cache-Control": "no-cache" },
       });
-      return response;
+      return response.data;
     }
     /* const found = mockCollections.find(
       (collection) => collection.id === idOrHandle || collection.handle === idOrHandle
@@ -63,7 +64,7 @@ export const collectionsService = {
           },
         }
       );
-      return response;
+      return response.data;
     } catch (error) {
       console.error("Error creando el Coleccion", error);
       throw error;
@@ -80,7 +81,7 @@ export const collectionsService = {
           },
         }
       );
-      return response;
+      return response.data;
     } catch (error) {
       console.error("Error actualizando el Coleccion", error);
       throw error;
@@ -99,7 +100,7 @@ export const collectionsService = {
           },
         }
       );
-      return response;
+      return response.data;
     } catch (error) {
       console.error("Error borrando la colleccion", error);
       throw error;

@@ -1,16 +1,22 @@
 import './ColeccionesDestacadas.css';
 
-const formatearFecha = (valor) =>
-  new Intl.DateTimeFormat('es-AR', {
+const formatearFecha = (valor) => {
+  if (!valor) return '-';
+
+  const fecha = new Date(valor);
+
+  if (isNaN(fecha.getTime())) return 'Fecha inválida';
+
+  return new Intl.DateTimeFormat('es-AR', {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(valor));
+  }).format(fecha);
+};
 
 export const ColeccionesDestacadas = ({ colecciones = [], cargando, onExplorar }) => {
-  const destacadas = colecciones.slice(0, 3);
-
+const destacadas = Array.isArray(colecciones) ? colecciones.slice(0, 3) : [];
   return (
     <section className="colecciones-destacadas" id="colecciones-destacadas">
       <header>
@@ -38,7 +44,7 @@ export const ColeccionesDestacadas = ({ colecciones = [], cargando, onExplorar }
               <p>{coleccion.descripcion}</p>
 
               <ul className="coleccion-card__tags">
-                {coleccion.tags.slice(0, 3).map((tag) => (
+                {(coleccion.tags || []).slice(0, 3).map((tag) => (
                   <li key={tag}>{tag}</li>
                 ))}
               </ul>
@@ -49,7 +55,7 @@ export const ColeccionesDestacadas = ({ colecciones = [], cargando, onExplorar }
                   <span>hechos</span>
                 </div>
                 <div>
-                  <strong>{coleccion.fuentes.length}</strong>
+                  <strong>{coleccion.fuentes?.length || 0}</strong>
                   <span>loaders</span>
                 </div>
                 <div>
