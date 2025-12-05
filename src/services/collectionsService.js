@@ -8,7 +8,7 @@ const simulateLatency = (payload) =>
   });
 //API ADMINISTRATIVA
 const API_ADMINISTRATIVA_URL = "http://localhost:8084";
-const API_PUBLICA_URL = "http://localhost:8100"
+const API_PUBLICA_URL = "http://localhost:8100";
 
 export const obtenerFuentes = async () => {
   try {
@@ -38,22 +38,35 @@ export const collectionsService = {
     }
   },
 
-  async getCollectionById(idOrHandle) {
+  async getCollectionById(coleccionID) {
+  // Solo permitimos ID numérico
+  if (!coleccionID) {
+    throw new Error(`ID inválido: ${coleccionID}`);
+  }
+
+  const url = `${API_PUBLICA_URL}/colecciones/${coleccionID}`;
+
+  try {
+    const response = await axios.get(url, {
+      headers: { "Cache-Control": "no-cache" },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error obteniendo la colección", error);
+    throw error;
+  }
+},
+  async getCollectionByIdADMIN(idOrHandle) {
     //SOLO CONSIDERO PARA ID
-    if (idOrHandle.isNumber()) {
-      let url = `${API_ADMINISTRATIVA_URL}/coleccion/${idOrHandle}`;
+    if (idOrHandle) {
+      let url = `${API_ADMINISTRATIVA_URL}/colecciones/${idOrHandle}`;
 
       const response = await axios.get(url, {
         headers: { "Cache-Control": "no-cache" },
       });
       return response.data;
     }
-    /* const found = mockCollections.find(
-      (collection) => collection.id === idOrHandle || collection.handle === idOrHandle
-    );
-    return simulateLatency(found ?? null);*/
   },
-
   async createCollection(collectionInput) {
     try {
       const response = await axios.post(
@@ -106,5 +119,21 @@ export const collectionsService = {
       console.error("Error borrando la colleccion", error);
       throw error;
     }
-  }
+  },
+  async getHechosDeColeccion(coleccionID) {
+    try {
+      const url = `${API_PUBLICA_URL}/colecciones/${coleccionID}/hechos`;
+
+      const response = await axios.get(url, {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error obteniendo hechos de la colección", error);
+      throw error;
+    }
+  },
 };

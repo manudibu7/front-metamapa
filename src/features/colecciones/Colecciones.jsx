@@ -49,9 +49,9 @@ export const Colecciones = () => {
           <div className="colecciones-grid">
             {collections.map((collection) => (
               <article
-                key={collection.id}
+                key={collection.id_coleccion}
                 className="coleccion-card"
-                onClick={() => handleColeccionClick(collection.id)}
+                onClick={() => handleColeccionClick(collection.id_coleccion)}
               >
                 <div className="coleccion-card__header">
                   <span className="coleccion-card__estado">{collection.estado}</span>

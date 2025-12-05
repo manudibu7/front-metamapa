@@ -37,7 +37,7 @@ const destacadas = Array.isArray(colecciones) ? colecciones.slice(0, 3) : [];
       ) : destacadas.length ? (
         <div className="colecciones-destacadas__grid">
           {destacadas.map((coleccion) => (
-            <article key={coleccion.id} className="coleccion-card">
+            <article key={coleccion.id_coleccion} className="coleccion-card">
               <div className="coleccion-card__meta">
                 <span className="coleccion-card__estado">{coleccion.estado}</span>
                 <span>{coleccion.consenso}</span>

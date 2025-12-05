@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { icon } from 'leaflet';
+import { collectionsService } from '../../services/collectionsService';
 import './ColeccionDetalle.css';
 
 const markerIcon = icon({
@@ -23,52 +24,25 @@ export const ColeccionDetalle = () => {
   const [selectedHecho, setSelectedHecho] = useState(null);
 
   useEffect(() => {
-    // TODO: Reemplazar con llamada real a la API
-    const mockColeccion = {
-      id,
-      nombre: 'Incendios Forestales 2024',
-      descripcion: 'Registro de incendios forestales ocurridos durante el año 2024 en distintas provincias.',
-      cantidadHechos: 15,
-      fechaCreacion: '2024-01-15',
-    };
+    const fetchData = async () => {
+    try {
+      const coleccionData = await collectionsService.getCollectionById(id);
+      setColeccion(coleccionData);
 
-    const mockHechos = [
-      {
-        id: 1,
-        titulo: 'Incendio en Parque Nacional Nahuel Huapi',
-        categoria: 'Incendio forestal',
-        fecha: '2024-02-15',
-        provincia: 'Río Negro',
-        descripcion: 'Gran incendio forestal que afectó más de 500 hectáreas de bosque nativo.',
-        ubicacion: { lat: -41.0915, lng: -71.4225 },
-        fuente: 'ONG Ambiental',
-      },
-      {
-        id: 2,
-        titulo: 'Incendio en Córdoba Sierras',
-        categoria: 'Incendio forestal',
-        fecha: '2024-03-20',
-        provincia: 'Córdoba',
-        descripcion: 'Incendio en zona serrana que requirió evacuación de 200 familias.',
-        ubicacion: { lat: -31.4201, lng: -64.1888 },
-        fuente: 'Bomberos Voluntarios',
-      },
-      {
-        id: 3,
-        titulo: 'Incendio en Delta del Paraná',
-        categoria: 'Incendio forestal',
-        fecha: '2024-04-10',
-        provincia: 'Entre Ríos',
-        descripcion: 'Incendio intencional en humedales del Delta del Paraná afectó fauna local.',
-        ubicacion: { lat: -33.7399, lng: -59.2489 },
-        fuente: 'Prefectura Naval',
-      },
-    ];
+      const hechosData = await collectionsService.getHechosDeColeccion(id);
+      setHechos(hechosData);
 
-    setColeccion(mockColeccion);
-    setHechos(mockHechos);
-    setLoading(false);
-  }, [id]);
+    } catch (error) {
+      console.error("Error cargando datos:", error);
+      setColeccion(null);
+      setHechos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [id]);
 
   const handleHechoClick = (hechoId) => {
     navigate(`/hechos/${hechoId}`);
@@ -96,7 +70,7 @@ export const ColeccionDetalle = () => {
   }
 
   const center = hechos.length > 0 && hechos[0].ubicacion
-    ? [hechos[0].ubicacion.lat, hechos[0].ubicacion.lng]
+    ? [hechos[0].ubicacion.latitud, hechos[0].ubicacion.longitud]
     : [-38.4161, -63.6167]; // Centro de Argentina
 
   return (
@@ -123,21 +97,21 @@ export const ColeccionDetalle = () => {
             <div className="hechos-list">
               {hechos.map((hecho) => (
                 <article
-                  key={hecho.id}
-                  className={`hecho-card ${selectedHecho?.id === hecho.id ? 'hecho-card--selected' : ''}`}
-                  onClick={() => handleHechoClick(hecho.id)}
+                  key={hecho.id_hecho}
+                  className={`hecho-card ${selectedHecho?.id_hecho === hecho.id_hecho ? 'hecho-card--selected' : ''}`}
+                  onClick={() => handleHechoClick(hecho.id_hecho)}
                   onMouseEnter={() => setSelectedHecho(hecho)}
                   onMouseLeave={() => setSelectedHecho(null)}
                 >
                   <div className="hecho-card__header">
                     <span className="hecho-card__categoria">{hecho.categoria}</span>
-                    <span className="hecho-card__fecha">{new Date(hecho.fecha).toLocaleDateString('es-AR')}</span>
+                    <span className="hecho-card__fecha">hecho.fecha</span>
                   </div>
                   <h3 className="hecho-card__titulo">{hecho.titulo}</h3>
                   <p className="hecho-card__descripcion">{hecho.descripcion}</p>
                   <div className="hecho-card__footer">
-                    <span className="hecho-card__provincia">{hecho.provincia}</span>
-                    <span className="hecho-card__fuente">Fuente: {hecho.fuente}</span>
+                    <span className="hecho-card__provincia">{hecho.ubicacion.provincia}</span>
+                    <span className="hecho-card__fuente">Fuente: {hecho.fuente.nombre}</span>
                   </div>
                 </article>
               ))}
@@ -160,8 +134,8 @@ export const ColeccionDetalle = () => {
               .filter((h) => h.ubicacion)
               .map((hecho) => (
                 <Marker
-                  key={hecho.id}
-                  position={[hecho.ubicacion.lat, hecho.ubicacion.lng]}
+                  key={hecho.id_hecho}
+                  position={[hecho.ubicacion.latitud, hecho.ubicacion.longitud]}
                   icon={markerIcon}
                   eventHandlers={{
                     click: () => handleMapMarkerClick(hecho),
@@ -173,7 +147,7 @@ export const ColeccionDetalle = () => {
                       <p>{hecho.descripcion}</p>
                       <button
                         className="marker-popup__btn"
-                        onClick={() => handleHechoClick(hecho.id)}
+                        onClick={() => handleHechoClick(hecho.id_hecho)}
                       >
                         Ver detalle
                       </button>

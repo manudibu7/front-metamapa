@@ -83,7 +83,7 @@ export const GestionColecciones = () => {
   };
 
   const openEditModal = (coleccion) => {
-    setEditingId(coleccion.id);
+    setEditingId(coleccion.id_coleccion);
     setForm({
       titulo: coleccion.titulo ?? '',
       descripcion: coleccion.descripcion ?? '',
