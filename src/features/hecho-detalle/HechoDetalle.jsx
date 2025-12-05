@@ -23,6 +23,10 @@ export const HechoDetalle = () => {
 
   const { contribuyenteId,isAuthenticated} = useAuthContext(); // <--- OBTENER EL ID DEL CONTEXTO
   
+  console.log('Usuario:', { isAuthenticated, contribuyenteId });
+
+  const [showModal, setShowModal] = useState(false);
+  const [motivo, setMotivo] = useState('');
   const [hecho, setHecho] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,7 +59,11 @@ export const HechoDetalle = () => {
 
   // Función para manejar la solicitud de eliminación
   const handleSolicitarEliminacion = async () => {
-    if (!contribuyenteId || !hecho || isRequesting()) return;
+    if (!contribuyenteId || !hecho || isRequesting) return;
+    if (!motivo.trim()) {
+      alert("Por favor, escribe un motivo.");
+      return;
+    }
 
     if (!window.confirm("¿Estás seguro de que quieres solicitar la eliminación de este hecho?")) {
       return;
@@ -67,14 +75,20 @@ export const HechoDetalle = () => {
 
     // Estructura de la solicitud (ajusta esto según tu backend)
     const solicitudData = {
-      idHecho: hecho.id_hecho,
+      idHecho: hecho.id_hecho, // Ojo: verifica si tu objeto usa id_hecho o id
       idContribuyente: contribuyenteId,
-      Motivo: `Solicitud de eliminación para el hecho ID: ${hecho.id}`,
+      motivo: motivo, // <--- AQUI VA EL TEXTO DEL USUARIO
     };
-
+    console.log(motivo)
     try {
       await crearSolicitud(solicitudData);
       setRequestMessage("✅ Solicitud de eliminación enviada con éxito.");
+
+      setTimeout(() => {
+         setShowModal(false);
+         setMotivo('');
+         //navigate(-1); // Descomenta si quieres que vuelva atrás automáticamente
+      }, 1500);
     } catch (err) {
       console.error("Error al enviar solicitud:", err);
       setError("❌ Error al enviar la solicitud: " + (err.message || "Inténtalo de nuevo."));
@@ -122,12 +136,24 @@ export const HechoDetalle = () => {
           {/*. BOTÓN CONDICIONAL */}
           {contribuyenteId && ( // <-- La condición clave
             <button 
-              className="hecho-detalle__button hecho-detalle__button--delete"
-              onClick={handleSolicitarEliminacion}
-              disabled={isRequesting}
-            >
-              {isRequesting ? 'Enviando Solicitud...' : '🗑️ Enviar Solicitud de Eliminación'}
-            </button>
+  className="btn-solicitud"
+  onClick={() => setShowModal(true)} // O tu función handleSolicitarEliminacion
+  disabled={isRequesting}
+>
+  {isRequesting ? (
+    <>
+      {/* Icono de carga giratorio */}
+      <span className="icon-loading">⏳</span> 
+      <span>Procesando...</span>
+    </>
+  ) : (
+    <>
+      {/* Icono de papelera o advertencia */}
+      <span>🗑️</span> 
+      <span>Solicitar Eliminación</span>
+    </>
+  )}
+</button>
           )}
           {/* FIN BOTÓN CONDICIONAL */}
 
@@ -216,6 +242,48 @@ export const HechoDetalle = () => {
           )}
         </div>
       </div>
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Solicitud de Eliminación</h3>
+            <p>Por favor, indica por qué este hecho debería ser eliminado:</p>
+            
+            <textarea
+              className="modal-textarea"
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              placeholder="Ej: La información es incorrecta, la imagen es ofensiva..."
+              rows={4}
+            />
+
+            {requestMessage && <p className="modal-message">{requestMessage}</p>}
+            {error && <p className="modal-error">{error}</p>}
+
+            <div className="modal-actions">
+              <button 
+                className="btn-cancelar"
+                onClick={() => {
+                  setShowModal(false);
+                  setMotivo('');
+                  setError(null);
+                  setRequestMessage('');
+                }}
+                disabled={isRequesting}
+              >
+                Cancelar
+              </button>
+              
+              <button 
+                className="btn-confirmar" 
+                onClick={handleSolicitarEliminacion}
+                disabled={isRequesting || !motivo.trim()}
+              >
+                {isRequesting ? 'Enviando...' : 'Enviar Solicitud'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
