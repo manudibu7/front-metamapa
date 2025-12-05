@@ -11,6 +11,7 @@ import { GestionColecciones } from './features/gestion-colecciones/GestionColecc
 import { GestionSolicitudes } from './features/gestion-solicitudes/GestionSolicitudes';
 import { GestionRevisiones } from './features/gestion-revisiones/GestionRevisiones';
 import { ContribucionDetalle } from './features/contribucion-detalle/ContribucionDetalle';
+import { MisContribuciones } from './features/mis-contribuciones/MisContribuciones';
 import { CollectionsProvider } from './context/CollectionsContext';
 import { Header } from './components/Header/Header';
 import { Footer } from './components/Footer/Footer';
@@ -43,6 +44,7 @@ const AppShell = () => {
           <Route path="/hechos/:id" element={<HechoDetalle />} />
           <Route path="/hechos" element={<HechosListNav/>}/>
           <Route path="/contribuir" element={<NuevaContribucion />} />
+          <Route path="/mis-contribuciones" element={<MisContribuciones />} />
           <Route path="/estadisticas" element={<Estadisticas />} />
           <Route path="/admin" element={<Administracion />} />
           <Route path="/admin/colecciones" element={<GestionColecciones />} />

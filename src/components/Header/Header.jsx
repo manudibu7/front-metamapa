@@ -41,6 +41,9 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
         {isAuthenticated ? (
           <>
             <span className="app-header__user">{user?.name ?? user?.username ?? 'Cuenta'}</span>
+            <Link to="/mis-contribuciones" className="btn btn--ghost">
+              Mis Contribuciones
+            </Link>
             <button type="button" className="btn btn--ghost" onClick={onLogout}>
               Salir
             </button>

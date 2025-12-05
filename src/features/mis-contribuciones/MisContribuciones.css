@@ -1,0 +1,72 @@
+.mis-contribuciones {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mis-contribuciones__loading,
+.mis-contribuciones__error,
+.mis-contribuciones__msg {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+}
+
+.mis-contribuciones__error {
+  color: var(--color-error);
+}
+
+.mis-contribuciones__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.contribucion-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.contribucion-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.contribucion-card__header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+
+.contribucion-card__date {
+  font-size: 0.875rem;
+  color: var(--color-text-tertiary);
+}
+
+.contribucion-card__desc {
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.contribucion-card__meta {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}

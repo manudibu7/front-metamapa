@@ -9,7 +9,6 @@ const buildDefaultHecho = () => ({
   categoria: '',
   descripcion: '',
   fecha: new Date().toISOString().split('T')[0],
-  provincia: '',
   ubicacion: null,
 });
 
@@ -117,15 +116,6 @@ export const FastFactForm = () => {
               <label>
                 Fecha del hecho
                 <input type="date" name="fecha" value={hecho.fecha} onChange={handleHechoChange} max={new Date().toISOString().split('T')[0]} required />
-              </label>
-              <label>
-                Jurisdicción / región
-                <input
-                  name="provincia"
-                  value={hecho.provincia ?? ''}
-                  onChange={handleHechoChange}
-                  placeholder="Buenos Aires"
-                />
               </label>
             </div>
 
