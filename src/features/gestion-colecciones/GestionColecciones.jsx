@@ -94,7 +94,7 @@ export const GestionColecciones = () => {
         valor: c.valor
       })) ?? [],
 
-      algoritmoConcenso: coleccion.consenso ?? '',
+      algoritmoConcenso: coleccion.algoritmoDeConsenso ?? '',
       //tagsInput: (coleccion.tags ?? []).join(', '),
     });
     setModalOpen(true);
@@ -124,14 +124,14 @@ export const GestionColecciones = () => {
     const defaultValor = criterioOptions[0]?.valores?.[0] ?? '';
     setForm((prev) => ({
       ...prev,
-      criteriosInput: [...prev.criteriosInput, { tipo: defaultTipo, valor: defaultValor }],
+      criterios: [...prev.criterios, { tipo: defaultTipo, valor: defaultValor }],
     }));
   };
 
   const removeCriterio = (index) => {
     setForm((prev) => ({
       ...prev,
-      criteriosInput: prev.criteriosInput.filter((_, i) => i !== index),
+      criterios: prev.criterios.filter((_, i) => i !== index),
     }));
   };
 
@@ -148,7 +148,7 @@ export const GestionColecciones = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.tituloInput.trim()) {
+    if (!form.titulo.trim()) {
       alert('El título es obligatorio.');
       return;
     }
@@ -350,7 +350,7 @@ export const GestionColecciones = () => {
                         const valores = getValoresForTipo(nuevoTipo);
                         handleCriterioChange(idx, 'tipo', nuevoTipo);
                         if (valores.length) {
-                          handleCriterioChange(idx, 'valor', valores[0]);
+                          handleCriterioChange(idx, 'valor', valores);
                         }
                       }}
                     >
