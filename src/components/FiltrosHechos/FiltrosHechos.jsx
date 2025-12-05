@@ -23,8 +23,9 @@ export const FiltrosHechos = ({ categorias, provincias, filtros, onChange }) => 
         <label>Categoría</label>
         <select name="categoria" value={filtros.categoria ?? ''} onChange={handleChange}>
           <option value="">Todas</option>
-          {categorias.map((category) => (
-            <option key={category} value={category}>
+          {categorias.map((category, index) => (
+            // Usamos index para garantizar unicidad
+            <option key={`${category}-${index}`} value={category}>
               {category}
             </option>
           ))}

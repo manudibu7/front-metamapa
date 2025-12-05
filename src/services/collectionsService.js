@@ -8,6 +8,7 @@ const simulateLatency = (payload) =>
   });
 //API ADMINISTRATIVA
 const API_ADMINISTRATIVA_URL = "http://localhost:8084";
+const API_PUBLICA_URL = "http://localhost:8100"
 
 export const obtenerFuentes = async () => {
   try {

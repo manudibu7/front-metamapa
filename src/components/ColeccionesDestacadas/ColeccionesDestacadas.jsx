@@ -15,6 +15,8 @@ const formatearFecha = (valor) => {
   }).format(fecha);
 };
 
+
+
 export const ColeccionesDestacadas = ({ colecciones = [], cargando, onExplorar }) => {
 const destacadas = Array.isArray(colecciones) ? colecciones.slice(0, 3) : [];
   return (
