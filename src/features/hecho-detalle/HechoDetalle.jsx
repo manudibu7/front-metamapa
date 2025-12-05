@@ -78,8 +78,8 @@ export const HechoDetalle = () => {
           </button>
           
           <div className="hecho-detalle__badges">
-            <span className="badge badge--categoria">{hecho.categoria}</span>
-            <span className="badge badge--estado">{hecho.etiqueta}</span>
+            <span className="badge badge--categoria">{hecho.categoria!=null?hecho.categoria:"Sin Categorias" }</span>
+            <span className="badge badge--estado">{hecho.etiqueta!=null?hecho.etiqueta:"Sin Etiquetas"}</span>
           </div>
 
           <h1>{hecho.titulo}</h1>
@@ -110,12 +110,12 @@ export const HechoDetalle = () => {
           </section>
 
           {/* Sección: Mapa (solo si hay coordenadas) */}
-          {hecho.ubicacion.latitud && hecho.ubicacion.logitud && (
+          {hecho.ubicacion.latitud!=null && hecho.ubicacion.longitud!=null && (
             <section className="hecho-detalle__section">
               <h2>Ubicación georreferenciada</h2>
               <div className="hecho-detalle__map">
                 <MapContainer
-                  center={[parseFloat(hecho.ubicacion.latitud), parseFloat(hecho.ubicacion.logitud)]}
+                  center={[parseFloat(hecho.ubicacion.latitud), parseFloat(hecho.ubicacion.longitud)]}
                   zoom={11}
                   scrollWheelZoom
                   className="hecho-detalle__map-container"
