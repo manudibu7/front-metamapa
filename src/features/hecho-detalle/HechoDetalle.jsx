@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { icon } from 'leaflet';
 import { hechosService } from '../../services/hechosService';
+import { crearSolicitud } from '../../services/solicitudesService';
+import { useAuthContext } from '../../context/AuthContext';
 import './HechoDetalle.css';
 // Configuración del icono de Leaflet
 const markerIcon = icon({
@@ -18,10 +20,14 @@ const markerIcon = icon({
 export const HechoDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const { contribuyenteId,isAuthenticated} = useAuthContext(); // <--- OBTENER EL ID DEL CONTEXTO
   
   const [hecho, setHecho] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRequesting, setIsRequesting] = useState(false); // Estado para evitar doble envío
+  const [requestMessage, setRequestMessage] = useState(''); // Mensaje de éxito/error
 
   useEffect(() => {
     const fetchHecho = async () => {
@@ -46,6 +52,36 @@ export const HechoDetalle = () => {
 
     fetchHecho();
   }, [id]);
+
+  // Función para manejar la solicitud de eliminación
+  const handleSolicitarEliminacion = async () => {
+    if (!contribuyenteId || !hecho || isRequesting()) return;
+
+    if (!window.confirm("¿Estás seguro de que quieres solicitar la eliminación de este hecho?")) {
+      return;
+    }
+
+    setIsRequesting(true);
+    setRequestMessage('');
+    setError(null);
+
+    // Estructura de la solicitud (ajusta esto según tu backend)
+    const solicitudData = {
+      idHecho: hecho.id_hecho,
+      idContribuyente: contribuyenteId,
+      Motivo: `Solicitud de eliminación para el hecho ID: ${hecho.id}`,
+    };
+
+    try {
+      await crearSolicitud(solicitudData);
+      setRequestMessage("✅ Solicitud de eliminación enviada con éxito.");
+    } catch (err) {
+      console.error("Error al enviar solicitud:", err);
+      setError("❌ Error al enviar la solicitud: " + (err.message || "Inténtalo de nuevo."));
+    } finally {
+      setIsRequesting(false);
+    }
+  };
 
   // --- Renderizado: Estado de Carga ---
   if (loading) {
@@ -83,6 +119,17 @@ export const HechoDetalle = () => {
           </div>
 
           <h1>{hecho.titulo}</h1>
+          {/*. BOTÓN CONDICIONAL */}
+          {contribuyenteId && ( // <-- La condición clave
+            <button 
+              className="hecho-detalle__button hecho-detalle__button--delete"
+              onClick={handleSolicitarEliminacion}
+              disabled={isRequesting}
+            >
+              {isRequesting ? 'Enviando Solicitud...' : '🗑️ Enviar Solicitud de Eliminación'}
+            </button>
+          )}
+          {/* FIN BOTÓN CONDICIONAL */}
 
           <div className="hecho-detalle__meta">
             <div className="meta-item">
