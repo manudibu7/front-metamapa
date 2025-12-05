@@ -62,4 +62,24 @@ export const hechosService = {
         throw error;
     }
   },
+  async obtenerHechoPorId(id) {
+    if (!id) {
+      throw new Error("Se requiere un ID para obtener los detalles del hecho.");
+    }
+
+    // 🌟 URL específica para un hecho: Ejem: /api/v1/hechos/123
+    const url = `${API_URL}/${id}`; 
+
+    console.log(`Llamando al backend para detalle en: ${url}`);
+
+    try {
+        const response = await axios.get(url);
+        
+        return response.data; 
+
+    } catch (error) {
+        console.error("Fallo al obtener hechos del backend:", error);
+        throw error;
+    }
+  },
 };
