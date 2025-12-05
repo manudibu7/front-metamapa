@@ -1,6 +1,5 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-// Asegúrate de que la ruta al archivo sea la correcta
 import { hechosService } from '../../services/hechosService'; 
 import './HechoListNav.css' 
 
