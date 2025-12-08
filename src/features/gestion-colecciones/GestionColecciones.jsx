@@ -10,24 +10,6 @@ import {
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
 
-const criterioOptions = [
-  {
-    tipo: 'Categoría',
-    valores: ['Incendio forestal', 'Vertido químico', 'Violencia policial', 'Detención arbitraria'],
-  },
-  {
-    tipo: 'Provincia',
-    valores: ['Buenos Aires', 'Santa Fe', 'Córdoba', 'Chaco', 'Misiones', 'Río Negro'],
-  },
-  {
-    tipo: 'Estado',
-    valores: ['Pendiente', 'Aprobada', 'Rechazada'],
-  },
-  {
-    tipo: 'Fuente',
-    valores: fuentesDisponibles,
-  },
-];
 
 const buildEmptyForm = () => ({
   titulo: '',
@@ -119,9 +101,9 @@ export const GestionColecciones = () => {
     });
   };
 
-  const addCriterio = () => {
-    const defaultTipo = criterioOptions[0]?.tipo ?? '';
-    const defaultValor = criterioOptions[0]?.valores?.[0] ?? '';
+  const addCriterio = (tipo, valor) => {
+    const defaultTipo = tipo ?? '';
+    const defaultValor = valor ?? '';
     setForm((prev) => ({
       ...prev,
       criterios: [...prev.criterios, { tipo: defaultTipo, valor: defaultValor }],
@@ -184,7 +166,7 @@ export const GestionColecciones = () => {
   const criterioTipos = ['FechaAntes', 'FechaDespues', 'Provincia',"Categoria","Titulo",];
 
 
-  const getValoresForTipo = (tipo) => criterioOptions.find((opt) => opt.tipo === tipo)?.valores ?? [];
+  const getValoresForTipo = (tipo) => criterioTipos.find((opt) => opt === tipo) ?? [];
 
   if (!isAuthenticated || !isAdmin) {
     return (
@@ -246,7 +228,7 @@ export const GestionColecciones = () => {
                 {col.criterios?.length > 0 && (
                   <ul className="gestion-colecciones__condiciones">
                     {col.criterios.map((cond) => (
-                      <li key={cond.id}>{cond.detail}</li>
+                      <li key={cond.id}>{cond.tipo} = {cond.valor}</li>
                     ))}
                   </ul>
                 )}
@@ -285,7 +267,7 @@ export const GestionColecciones = () => {
                 Título
                 <input
                   type="text"
-                  name="tituloInput"
+                  name="titulo"
                   value={form.titulo}
                   onChange={handleFormChange}
                   required
@@ -295,7 +277,7 @@ export const GestionColecciones = () => {
               <label>
                 Descripción
                 <textarea
-                  name="descripcionInput"
+                  name="descripcion"
                   value={form.descripcion}
                   onChange={handleFormChange}
                   rows={3}

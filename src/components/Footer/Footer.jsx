@@ -19,7 +19,7 @@ export const Footer = () => (
   <footer className="app-footer">
     <div className="app-footer__brand">
       <div className="app-footer__logo" aria-hidden>
-        ⟁
+        <img src={process.env.PUBLIC_URL + "image.png"} alt='logo' height={'20px'} width={'20px'} ></img>
       </div>
       <div>
         <strong>MetaMapa</strong>

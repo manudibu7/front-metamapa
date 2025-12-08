@@ -83,8 +83,6 @@ export const ColeccionDetalle = () => {
         <p className="coleccion-detalle__descripcion">{coleccion.descripcion}</p>
         <div className="coleccion-detalle__meta">
           <span>{hechos.length} hechos</span>
-          <span>·</span>
-          <span>Creada: {new Date(coleccion.fechaCreacion).toLocaleDateString('es-AR')}</span>
         </div>
       </header>
 
@@ -105,7 +103,7 @@ export const ColeccionDetalle = () => {
                 >
                   <div className="hecho-card__header">
                     <span className="hecho-card__categoria">{hecho.categoria}</span>
-                    <span className="hecho-card__fecha">hecho.fecha</span>
+                    <span className="hecho-card__fecha">{hecho.fecha}</span>
                   </div>
                   <h3 className="hecho-card__titulo">{hecho.titulo}</h3>
                   <p className="hecho-card__descripcion">{hecho.descripcion}</p>
