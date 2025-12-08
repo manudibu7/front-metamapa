@@ -19,11 +19,10 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
     <header className="app-header">
       <Link to="/" className="app-header__brand">
         <span className="app-header__logo" aria-hidden>
-          ⟁
+          <img src={process.env.PUBLIC_URL + "image.png"} alt='logo' width={'20px'} height={'20px'}></img>
         </span>
         <div>
           <strong>MetaMapa</strong>
-          <small>Instancia ONG</small>
         </div>
       </Link>
 
