@@ -77,6 +77,7 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
 };
 */
 const BASE_URL = "http://localhost:8100/solicitudes";
+const ADMINISTRATIVA_URL = "http://localhost:8084/solicitudes";
 // Cambiá esta URL si tu backend corre en otro puerto/path
 
 // GET /solicitudes
@@ -120,7 +121,7 @@ export const crearSolicitud = async (solicitud) => {
 // Si tu backend no tiene endpoint para actualizar estado, avisame y lo adaptamos
 export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
   try {
-    const response = await fetch(`${BASE_URL}/${id}`, {
+    const response = await (`${ADMINISTRATIVA_URL}/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ estado: nuevoEstado }),
