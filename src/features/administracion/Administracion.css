@@ -5,10 +5,10 @@
 }
 
 .administracion__volver {
-  background: transparent;
+  background: var(--color-primary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  color: var(--color-text);
+  color: var(--color-text-dark);
   padding: 0.5rem 1rem;
   font-size: 0.95rem;
   cursor: pointer;
@@ -17,7 +17,7 @@
 }
 
 .administracion__volver:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-primary);
   border-color: var(--color-primary);
 }
 
@@ -32,7 +32,7 @@
 }
 
 .administracion__header p {
-  color: var(--color-muted);
+  color: var(--color-text);
 }
 
 .administracion__grid {
@@ -53,7 +53,7 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 2rem;
-  background: rgba(12, 20, 39, 0.7);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -64,7 +64,7 @@
 
 .administracion__card:hover {
   border-color: var(--color-primary);
-  box-shadow: var(--shadow-glow);
+  box-shadow: var(--shadow-soft);
   transform: translateY(-2px);
 }
 
@@ -75,7 +75,7 @@
 .administracion__card h3 {
   font-size: 1.15rem;
   margin-bottom: 0.3rem;
-  color: #ffffff;
+  color: var(--color-text);
 }
 
 .administracion__card p {

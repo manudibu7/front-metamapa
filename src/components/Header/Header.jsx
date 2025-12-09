@@ -49,7 +49,7 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
           </>
         ) : (
           <button type="button" className="btn btn--ghost" onClick={onLogin}>
-            Ingresar con Keycloak
+            Ingresar
           </button>
         )}
       </div>

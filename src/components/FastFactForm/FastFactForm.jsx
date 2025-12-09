@@ -75,7 +75,6 @@ export const FastFactForm = () => {
   } else if (!isAuthenticated) {
     bodyContent = (
       <div className="fast-fact__locked">
-        <p>Necesitás ingresar con Keycloak para registrar contribuciones en el Loader Dinámico.</p>
         <button type="button" className="btn btn--primary" onClick={login}>
           Ingresar ahora
         </button>
@@ -87,7 +86,6 @@ export const FastFactForm = () => {
           <div className="fast-fact__section">
             <div className="fast-fact__section-header">
               <h3>Detalle del hecho</h3>
-              <span className="fast-fact__badge">ContribucionInputDTO.hecho</span>
             </div>
 
             <label>
@@ -135,19 +133,13 @@ export const FastFactForm = () => {
           <div className="fast-fact__section">
             <div className="fast-fact__section-header">
               <h3>Ubicación georreferenciada</h3>
-              <span className="fast-fact__badge">UbicacionInputDTO</span>
             </div>
             <UbicacionSelector value={hecho.ubicacion} onChange={handleUbicacionChange} />
-            <p className="fast-fact__hint">
-              Marcá un punto en el mapa o escribí la dirección. La herramienta traduce esa referencia a latitud y
-              longitud en WGS84, tal como espera el loader Dinámico.
-            </p>
           </div>
 
           <div className="fast-fact__section">
             <div className="fast-fact__section-header">
               <h3>Adjunto opcional</h3>
-              <span className="fast-fact__badge">ArchivoInputDTO</span>
             </div>
             <label className="fast-fact__file">
               Evidencia (foto, video o PDF)
@@ -163,9 +155,7 @@ export const FastFactForm = () => {
                 {archivo.name} · {(archivo.size / 1024).toFixed(1)} KB
               </p>
             ) : (
-              <p className="fast-fact__hint">
-                El archivo se adjunta luego vía <code>{'PATCH /contribuciones/{id}'}</code>.
-              </p>
+              <p></p>
             )}
           </div>
 
@@ -176,7 +166,6 @@ export const FastFactForm = () => {
             <button type="submit" className="btn btn--primary" disabled={status === 'loading'}>
               {status === 'loading' ? 'Enviando...' : 'Enviar contribución'}
             </button>
-            <span className="fast-fact__legal">El loader asigna la fuente "dinámica" automáticamente según tu token.</span>
           </div>
         </form>
     );
@@ -187,18 +176,7 @@ export const FastFactForm = () => {
       <header>
         <p className="section-eyebrow">Carga rápida</p>
         <h2>Subí un hecho en menos de un minuto</h2>
-        <p>
-          Este formulario replica el flujo del loader dinámico: usa tu sesión de Keycloak para enviar el ID del
-          contribuyente y adjunta la ubicación traducida automáticamente a coordenadas.
-        </p>
-        {isAuthenticated && contribuyenteId && (
-          <p className="fast-fact__hint">
-            Sesión activa: <strong>{user?.name ?? user?.username ?? 'usuario'}</strong> · ID enviado:{' '}
-            <code>{contribuyenteId}</code>
-          </p>
-        )}
       </header>
-
       {bodyContent}
     </section>
   );

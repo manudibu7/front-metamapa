@@ -102,9 +102,7 @@ export const Estadisticas = () => {
     <section className="estadisticas">
       <header className="estadisticas__encabezado">
         <div>
-          <p className="section-eyebrow">Indicadores del agregador</p>
           <h1>Panel de estadísticas</h1>
-          <p>Datos mockeados con la misma estructura del servicio /estadisticas. Reemplazá la llamada en estadisticasService para conectarlo a la API real.</p>
         </div>
         <button type="button" className="btn btn--primary" onClick={handleDownload} disabled={downloading}>
           {downloading ? 'Generando CSV...' : 'Descargar CSV'}

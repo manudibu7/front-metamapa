@@ -1,7 +1,7 @@
 .coleccion-detalle {
   min-height: 100vh;
-  background: var(--background-primary, #0a0e27);
-  color: var(--text-primary, #e0e6ed);
+  background: var(--color-bg);
+  color: var(--color-text);
   padding: 2rem 1rem;
 }
 
@@ -21,9 +21,9 @@
 }
 
 .coleccion-detalle__back {
-  background: transparent;
+    background: var(--color-primary);
   border: 1px solid var(--border-color, #2a3447);
-  color: var(--text-primary, #e0e6ed);
+  color: var(--color-text-dark);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
@@ -34,7 +34,6 @@
 
 .coleccion-detalle__back:hover {
   background: var(--background-secondary, #1a1f35);
-  border-color: var(--accent-primary, #4ade80);
 }
 
 .coleccion-detalle__header h1 {
@@ -56,7 +55,7 @@
 .coleccion-detalle__meta {
   display: flex;
   gap: 0.75rem;
-  color: var(--text-tertiary, #64748b);
+  color: var(--color-text);
   font-size: 0.9rem;
 }
 
@@ -70,7 +69,7 @@
 }
 
 .coleccion-detalle__hechos-list {
-  background: var(--background-card, #0f1629);
+  background: var(--color-bg);
   border: 1px solid var(--border-color, #2a3447);
   border-radius: 12px;
   padding: 1.5rem;
@@ -81,7 +80,7 @@
 .coleccion-detalle__hechos-list h2 {
   font-size: 1.25rem;
   margin-bottom: 1.5rem;
-  color: var(--text-primary, #e0e6ed);
+  color: var(--color-text);
 }
 
 .coleccion-detalle__empty {
@@ -121,7 +120,7 @@
 
 .hecho-card__categoria {
   background: var(--accent-primary, #4ade80);
-  color: var(--background-primary, #0a0e27);
+  color: var(--color-text);
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -137,12 +136,12 @@
 .hecho-card__titulo {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
-  color: var(--text-primary, #e0e6ed);
+  color: var(--color-text);
   line-height: 1.4;
 }
 
 .hecho-card__descripcion {
-  color: var(--text-secondary, #94a3b8);
+  color: var(--color-text);
   font-size: 0.9rem;
   line-height: 1.5;
   margin-bottom: 1rem;

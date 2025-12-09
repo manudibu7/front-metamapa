@@ -86,17 +86,6 @@ export const GestionRevisiones = () => {
         <button 
           className="btn-back-admin" 
           onClick={() => navigate('/admin')}
-          style={{ 
-            background: 'transparent', 
-            border: 'none', 
-            color: 'var(--color-muted)', 
-            cursor: 'pointer', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            fontSize: '0.9rem'
-          }}
         >
           ← Volver al panel
         </button>

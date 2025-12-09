@@ -1,7 +1,7 @@
 .hecho-detalle {
   min-height: 100vh;
-  background: var(--background-primary, #0a0e27);
-  color: var(--text-primary, #e0e6ed);
+  background: var(--color-bg);
+  color: var(--color-text);
   padding: 2rem 0;
 }
 
@@ -26,9 +26,9 @@
 }
 
 .hecho-detalle__back {
-  background: transparent;
-  border: 1px solid var(--border-color, #2a3447);
-  color: var(--text-primary, #e0e6ed);
+  background: var(--color-primary);
+  border: 1px solid var(--color-border, #2a3447);
+  color: var(--color-text-dark);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
@@ -39,7 +39,7 @@
 
 .hecho-detalle__back:hover {
   background: var(--background-secondary, #1a1f35);
-  border-color: var(--accent-primary, #4ade80);
+  border-color: var(--color-border);
 }
 
 .hecho-detalle__badges {
@@ -71,7 +71,7 @@
   font-size: 2.75rem;
   line-height: 1.2;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, var(--accent-primary, #4ade80), var(--accent-secondary, #22d3ee));
+  background: var(--color-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -82,8 +82,8 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   padding: 1.5rem;
-  background: var(--background-card, #0f1629);
-  border: 1px solid var(--border-color, #2a3447);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border, #2a3447);
   border-radius: 12px;
 }
 
@@ -94,14 +94,14 @@
 }
 
 .meta-label {
-  color: var(--text-tertiary, #64748b);
+  color: var(--color-text);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .meta-value {
-  color: var(--text-primary, #e0e6ed);
+  color: var(--color-text);
   font-size: 1rem;
   font-weight: 500;
 }
@@ -115,15 +115,15 @@
 .hecho-detalle__section h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: var(--text-primary, #e0e6ed);
-  border-bottom: 2px solid var(--accent-primary, #4ade80);
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-border);
   padding-bottom: 0.5rem;
 }
 
 .hecho-detalle__descripcion {
   font-size: 1.15rem;
   line-height: 1.8;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--color-text);
 }
 
 .hecho-detalle__detalle {
@@ -141,7 +141,7 @@
 
 .hecho-detalle__map {
   position: relative;
-  border: 1px solid var(--border-color, #2a3447);
+  border: 1px solid var(--color-border, #2a3447);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -157,7 +157,7 @@
   gap: 2rem;
   padding: 1rem;
   background: var(--background-card, #0f1629);
-  border-top: 1px solid var(--border-color, #2a3447);
+  border-top: 1px solid var(--color-border, #2a3447);
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
   color: var(--text-tertiary, #64748b);
@@ -174,7 +174,7 @@
   height: 250px;
   object-fit: cover;
   border-radius: 10px;
-  border: 1px solid var(--border-color, #2a3447);
+  border: 1px solid var(--color-border, #2a3447);
 }
 
 .hecho-detalle__archivos {
@@ -189,13 +189,13 @@
   gap: 1rem;
   padding: 1.25rem;
   background: var(--background-card, #0f1629);
-  border: 1px solid var(--border-color, #2a3447);
+  border: 1px solid var(--color-border, #2a3447);
   border-radius: 10px;
   transition: all 0.2s;
 }
 
 .archivo-card:hover {
-  border-color: var(--accent-primary, #4ade80);
+  border-color: var(--color-border);
 }
 
 .archivo-card__icon {
@@ -217,7 +217,7 @@
 }
 
 .archivo-card__nombre {
-  color: var(--text-primary, #e0e6ed);
+  color: var(--color-text);
   font-weight: 500;
 }
 
@@ -227,7 +227,7 @@
 }
 
 .archivo-card__btn {
-  background: var(--accent-primary, #4ade80);
+  background: var(--color-border);
   color: var(--background-primary, #0a0e27);
   border: none;
   padding: 0.6rem 1.25rem;
@@ -245,7 +245,7 @@
 .hecho-detalle__fuente-info {
   padding: 1.5rem;
   background: var(--background-card, #0f1629);
-  border: 1px solid var(--border-color, #2a3447);
+  border: 1px solid var(--color-border, #2a3447);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -277,7 +277,7 @@
 
 .coleccion-tag {
   background: var(--background-card, #0f1629);
-  border: 1px solid var(--accent-primary, #4ade80);
+  border: 1px solid var(--color-border);
   color: var(--accent-primary, #4ade80);
   padding: 0.6rem 1.25rem;
   border-radius: 8px;
