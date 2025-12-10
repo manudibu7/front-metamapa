@@ -63,6 +63,45 @@ export const Estadisticas = () => {
 
     return <EstadisticaBarra data={data} />;
   };
+  const grupoCategoria = estadisticas.filter(e => e.discriminante?.tipo === 'CATEGORIA');
+  const grupoColeccion = estadisticas.filter(e => e.discriminante?.tipo === 'COLECCION');
+  const grupoSin = estadisticas.filter(e => e.discriminante?.tipo === 'SIN');
+
+  const renderSection = (titulo, listaEstadisticas) => {
+    if (!listaEstadisticas || listaEstadisticas.length === 0) return null;
+
+    return (
+      <div className="estadisticas__grupo">
+        {/* Puedes agregar una clase CSS para darle estilo al título si quieres */}
+        <h2 style={{ margin: '2rem 0 1rem', fontSize: '1.5rem', color: '#333' }}>
+          {titulo}
+        </h2>
+        
+        <div className="estadisticas__grid">
+          {listaEstadisticas.map((estadistica, index) => (
+            <article key={`${estadistica?.discriminante?.valor ?? 'estadistica'}-${index}`} className="estadisticas__card">
+              <div className="estadisticas__card-header">
+                <div className="estadisticas__tag">
+                  <span className="estadisticas__label">
+                    {estadistica?.descripcion ?? 'ESTADISTICA'}
+                    <b className="estadisticas__value">
+                      {estadistica?.discriminante?.valor ?? 'Estadística'}
+                    </b>
+                  </span>
+                </div>
+                {estadistica?.resultado && (
+                  <p className="estadisticas__resumen">
+                    Resultado con más hechos: <strong>{estadistica.resultado.nombre + " con " + estadistica.resultado.cantidad + " hechos"}</strong>
+                  </p>
+                )}
+              </div>
+              <div className="estadisticas__chart">{renderChart(estadistica)}</div>
+            </article>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   if (estado.loading) {
     return (
@@ -80,40 +119,33 @@ export const Estadisticas = () => {
     );
   }
 
-  return (
+ return (
     <section className="estadisticas">
       <header className="estadisticas__encabezado">
         <div>
-          <h1>Estadisticas de Metamapa</h1>
+          <h1>Estadísticas de Metamapa</h1>
         </div>
         <button type="button" className="btn btn--primary" onClick={handleDownload} disabled={downloading}>
           {downloading ? 'Generando CSV...' : 'Descargar CSV'}
         </button>
       </header>
 
-      <div className="estadisticas__grid">
-        {estadisticas.map((estadistica, index) => (
-          <article key={`${estadistica?.discriminante?.valor ?? 'estadistica'}-${index}`} className="estadisticas__card">
-            <div className="estadisticas__card-header">
-              <div className="estadisticas__tag">
-                <span className="estadisticas__label">
-                  {estadistica?.descripcion ?? 'ESTADISTICA'}
-                  <b className="estadisticas__value">
-                  {estadistica?.discriminante?.valor ?? 'Estadística'}
-                </b>
-                </span>
-                
-              </div>              
-              {estadistica?.resultado && (
-                <p className="estadisticas__resumen">
-                  Resultado con mas hechos: <strong>{estadistica.resultado.nombre + " con " + estadistica.resultado.cantidad + " hechos"}</strong> 
-                </p>
-              )}
-            </div>
-            <div className="estadisticas__chart">{renderChart(estadistica)}</div>
-          </article>
-        ))}
-      </div>
+      {/* 3. Renderizamos los grupos en el orden solicitado */}
+      
+      {/* Grupo 1: Categoria */}
+      {renderSection('Por Categoría', grupoCategoria)}
+
+      {/* Grupo 2: Coleccion */}
+      {renderSection('Por Colección', grupoColeccion)}
+
+      {/* Grupo 3: Sin (Generales u otros) */}
+      {renderSection('Generales', grupoSin)}
+
+      {/* Mensaje por si no hay nada en ninguno de los grupos */}
+      {estadisticas.length === 0 && (
+         <p className="estadisticas__sin-datos">No hay estadísticas para mostrar.</p>
+      )}
+
     </section>
   );
 };
