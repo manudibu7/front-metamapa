@@ -3,6 +3,7 @@ import "./FastFactForm.css";
 import { enviarContribucionRapida } from "../../services/contribucionesService";
 import { useAuth } from "../../hooks/useAuth";
 import { UbicacionSelector } from "../UbicacionSelector/UbicacionSelector";
+import { getCategorias } from "../../services/contribucionesService";
 
 const buildDefaultHecho = () => ({
   titulo: "",
@@ -38,12 +39,14 @@ export const FastFactForm = () => {
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
   const [categorias, setCategorias] = useState([]);
+  const [nuevaCategoria, setNuevaCategoria] = useState({
+  categoria: { id: null, nombre: "" },});
+
 
   const handleHechoChange = (event) => {
     const { name, value } = event.target;
     setHecho((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleUbicacionChange = (coords) => {
     setHecho((prev) => ({ ...prev, ubicacion: coords }));
   };
@@ -96,15 +99,17 @@ export const FastFactForm = () => {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        //const categorias = await getCategorias();
-        //setCategorias(categorias);
-        console.log("fetchCategorias mock ejecutado");
+        const categorias = await getCategorias();
+        setCategorias(categorias);
       } catch (error) {
         setStatus("error");
         setError(error?.message ?? "No se pudo obtener las categorias.");
       }
     };
+
+    fetchCategorias();
   }, []);
+
 
   let bodyContent = null;
   if (authLoading) {
@@ -143,14 +148,36 @@ export const FastFactForm = () => {
             <label>
               Categoría
               <select
-                name="categoria"
-                value={hecho.categoria}
-                onChange={handleHechoChange}
-                required
+                value={hecho.categoria.nombre || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (value !== "__agregar__") {
+                    // Buscar la categoría existente por el nombre
+                    const categoriaSeleccionada = categorias.find(
+                      c => c.nombre === value
+                    );
+
+                    setHecho({
+                      categoria: {
+                        id: categoriaSeleccionada.id,
+                        nombre: categoriaSeleccionada.nombre
+                      }
+                    });
+                  } else {
+                    // Nueva categoría: nombre vacío + id null
+                    setHecho({
+                      categoria: {
+                        id: null,
+                        nombre: ""
+                      }
+                    });
+                  }
+                }}
               >
                 <option value="">Seleccioná una categoría</option>
 
-                {categorias.map((cat) => (
+                {categorias.map(cat => (
                   <option key={cat.id} value={cat.nombre}>
                     {cat.nombre}
                   </option>
@@ -159,14 +186,20 @@ export const FastFactForm = () => {
                 <option value="__agregar__">Otra</option>
               </select>
 
-              {hecho.categoria === "__agregar__" && (
+              {/* Campo visible si elige "Otra" */}
+              {hecho.categoria.id === null && (
                 <input
                   type="text"
-                  name="categoriaNueva"
                   placeholder="Ingresá nueva categoría"
-                  value={hecho.categoriaNueva  === "__agregar__" ? "" : hecho.categoria}
-                  onChange={handleHechoChange}
-                  className="input-nueva-categoria"
+                  value={hecho.categoria.nombre}
+                  onChange={(e) =>
+                    setHecho({
+                      categoria: {
+                        id: null,
+                        nombre: e.target.value
+                      }
+                    })
+                  }
                 />
               )}
             </label>
