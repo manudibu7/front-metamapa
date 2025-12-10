@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { VictoryPie, VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from 'victory';
 import './Estadisticas.css';
 import { obtenerEstadisticas, exportarEstadisticasCSV } from '../../services/estadisticasService';
 import EstadisticaTorta from '../../components/Estadistica/EstadisticaTorta/estadisticaTorta';

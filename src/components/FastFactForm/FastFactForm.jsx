@@ -4,6 +4,7 @@ import { enviarContribucionRapida } from "../../services/contribucionesService";
 import { useAuth } from "../../hooks/useAuth";
 import { UbicacionSelector } from "../UbicacionSelector/UbicacionSelector";
 import { getCategorias } from "../../services/contribucionesService";
+import { useNavigate } from "react-router-dom";
 
 const buildDefaultHecho = () => ({
   titulo: "",
@@ -14,26 +15,27 @@ const buildDefaultHecho = () => ({
 });
 
 
-const mockAuth = {
-    isAuthenticated: true,
-    login: () => console.log("login mock ejecutado"),
-    contribuyenteId: "123",
-    token: "mock-token",
-    loading: false,
-    user: { nombre: "Usuario Mock" },
-  };
+//const mockAuth = {
+//    isAuthenticated: true,
+//    login: () => console.log("login mock ejecutado"),
+//    contribuyenteId: "123",
+//    token: "mock-token",
+//    loading: false,
+//    user: { nombre: "Usuario Mock" },
+//  };
 
-  const {
-    isAuthenticated,
-    login,
-    contribuyenteId,
-    token,
-    loading: authLoading,
-    user,
-  } = mockAuth;
+//  const {
+//    isAuthenticated,
+//    login,
+//    contribuyenteId,
+//    token,
+//    loading: authLoading,
+//    user,
+//  } = mockAuth;
 
 export const FastFactForm = () => {
- // const { isAuthenticated, login, contribuyenteId, token, loading: authLoading, user } = useAuth();
+  const { isAuthenticated, login, contribuyenteId, token, loading: authLoading, user } = useAuth();
+  const navigate = useNavigate();
 
   const [hecho, setHecho] = useState(() => buildDefaultHecho());
   const [archivo, setArchivo] = useState(null);
@@ -42,6 +44,8 @@ export const FastFactForm = () => {
   const fileInputRef = useRef(null);
   const [categorias, setCategorias] = useState([]);
   const [nuevaCategoria, setNuevaCategoria] = useState("");
+
+  const [mapKey, setMapKey] = useState(0);
 
 
   const handleHechoChange = (event) => {
@@ -64,6 +68,9 @@ const handleArchivoChange = (event) => {
   const resetForm = () => {
     setHecho(buildDefaultHecho());
     setArchivo(null);
+    setNuevaCategoria("");
+    setStatus("idle"); // Volvemos a estado inicial
+    setMapKey(prev => prev + 1);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -103,12 +110,18 @@ const handleArchivoChange = (event) => {
         token,
       });
       setStatus("success");
-      resetForm();
-      setTimeout(() => setStatus("idle"), 3500);
+      //setTimeout(() => setStatus("idle"), 3500);
     } catch (err) {
       setStatus("error");
       setError(err?.message ?? "No se pudo registrar la contribución.");
     }
+  };
+
+  const handleNuevaCarga = () => {
+    resetForm(); // Limpia y vuelve al formulario
+  };
+  const handleIrAInicio = () => {
+    navigate("/"); // O la ruta que sea tu home
   };
 
   useEffect(() => {
@@ -230,6 +243,7 @@ const handleArchivoChange = (event) => {
             <h3>Ubicación georreferenciada</h3>
           </div>
           <UbicacionSelector
+            key={mapKey}
             value={hecho.ubicacion}
             onChange={handleUbicacionChange}
           />
@@ -258,11 +272,6 @@ const handleArchivoChange = (event) => {
         </div>
 
         {status === "error" && <p className="fast-fact__error">{error}</p>}
-        {status === "success" && (
-          <p className="fast-fact__success">
-            Contribución enviada para revisión.
-          </p>
-        )}
 
         <div className="fast-fact__actions">
           <button
@@ -284,6 +293,32 @@ const handleArchivoChange = (event) => {
         <h2>Subí un hecho en menos de un minuto</h2>
       </header>
       {bodyContent}
+      {status === "success" && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-success-icon">✓</div>
+            <h3>¡Carga Exitosa!</h3>
+            <p style={{ color: '#666' }}>Su contribución ha sido enviada y se encuentra con <b>revisión pendiente</b>.</p>
+            
+            <div className="modal-summary">
+              <h4>Resumen de lo cargado:</h4>
+              <p><strong>Título:</strong> {hecho.titulo}</p>
+              <p><strong>Categoría:</strong> {hecho.categoria === "__agregar__" ? nuevaCategoria : hecho.categoria}</p>
+              <p><strong>Fecha:</strong> {hecho.fecha}</p>
+              <p><strong>Archivo:</strong> {archivo ? archivo.name : "Sin adjunto"}</p>
+            </div>
+
+            <div className="modal-actions">
+              <button className="btn btn--secondary" onClick={handleIrAInicio}>
+                Ir a Inicio
+              </button>
+              <button className="btn btn--primary" onClick={handleNuevaCarga}>
+                Cargar nueva contribución
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
