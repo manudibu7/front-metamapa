@@ -10,7 +10,15 @@ import {
 import './GestionRevisiones.css';
 
 export const GestionRevisiones = () => {
-  const { isAdmin } = useAuth();
+ // const { isAdmin } = useAuth();
+
+ const mockUseAuth = () => {
+    return {
+      isAdmin: true, // Cambiar a false para probar redirección
+    };
+  };
+  const [mensaje, setMensaje] = useState("");
+  const { isAdmin } = mockUseAuth();
   const navigate = useNavigate();
   const [pendientes, setPendientes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,36 +49,45 @@ export const GestionRevisiones = () => {
     setComentarios((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleAction = async (id, actionType) => {
-    setProcessingId(id);
-    const comentario = comentarios[id] || '';
+  const handleAction = async (id, actionType, tituloHecho) => {
+  setProcessingId(id);
+  const comentario = comentarios[id] || '';
 
-    try {
-      if (actionType === 'ACEPTAR') {
-        await aceptarRevision(id, comentario);
-      } else if (actionType === 'CAMBIOS') {
-        await aceptarConCambios(id, comentario);
-      } else if (actionType === 'RECHAZAR') {
-        await rechazarRevision(id, comentario);
-      }
-
-      // Remove from list locally
-      setPendientes((prev) => prev.filter((p) => p.idContribucion !== id));
-      
-      // Clear comment
-      setComentarios((prev) => {
-        const newComments = { ...prev };
-        delete newComments[id];
-        return newComments;
-      });
-
-    } catch (err) {
-      console.error('Error al procesar revisión:', err);
-      alert('Ocurrió un error al procesar la solicitud.');
-    } finally {
-      setProcessingId(null);
+  try {
+    if (actionType === 'ACEPTAR') {
+      await aceptarRevision(id, comentario);
+    } else if (actionType === 'CAMBIOS') {
+      await aceptarConCambios(id, comentario);
+    } else if (actionType === 'RECHAZAR') {
+      await rechazarRevision(id, comentario);
     }
-  };
+
+    setPendientes((prev) => prev.filter((p) => p.idContribucion !== id));
+
+    setComentarios((prev) => {
+      const updated = { ...prev };
+      delete updated[id];
+      return updated;
+    });
+
+    // 🔥 Ahora el mensaje trae el nombre del hecho
+    let texto = "";
+    if (actionType === "ACEPTAR") texto = `✔️ " ${tituloHecho}" fue aceptado.`;
+    if (actionType === "CAMBIOS") texto = `⚠️ " ${tituloHecho}" requiere cambios.`;
+    if (actionType === "RECHAZAR") texto = `❌ " ${tituloHecho}" fue rechazado.`;
+
+    setMensaje(texto);
+    setTimeout(() => setMensaje(""), 4000);
+
+  } catch (err) {
+    console.error('Error al procesar revisión:', err);
+    alert('Ocurrió un error al procesar la solicitud.');
+  } finally {
+    setProcessingId(null);
+  }
+};
+
+
 
   if (loading) {
     return (
@@ -94,6 +111,12 @@ export const GestionRevisiones = () => {
           Validá las contribuciones pendientes enviadas por la comunidad.
         </p>
       </header>
+
+        {mensaje && (
+          <div className="toast-feedback">
+            {mensaje}
+          </div>
+        )}
 
       <div className="gestion-revisiones__list">
         {pendientes.length === 0 ? (
@@ -148,28 +171,31 @@ export const GestionRevisiones = () => {
                   />
                   
                   <div className="revision-actions">
-                    <button
-                      className="btn-revision btn-accept"
-                      onClick={() => handleAction(item.idContribucion, 'ACEPTAR')}
-                      disabled={processingId === item.idContribucion}
-                    >
-                      ✅ Aceptar
-                    </button>
-                    <button
-                      className="btn-revision btn-changes"
-                      onClick={() => handleAction(item.idContribucion, 'CAMBIOS')}
-                      disabled={processingId === item.idContribucion}
-                    >
-                      ⚠️ Con cambios
-                    </button>
-                    <button
-                      className="btn-revision btn-reject"
-                      onClick={() => handleAction(item.idContribucion, 'RECHAZAR')}
-                      disabled={processingId === item.idContribucion}
-                    >
-                      ❌ Rechazar
-                    </button>
-                  </div>
+                   <button
+                    className="btn-revision btn-accept"
+                    onClick={() => handleAction(item.idContribucion, 'ACEPTAR', item.hecho.titulo)}
+                    disabled={processingId === item.idContribucion}
+                  >
+                    ✅ Aceptar
+                  </button>
+
+                  <button
+                    className="btn-revision btn-changes"
+                    onClick={() => handleAction(item.idContribucion, 'CAMBIOS', item.hecho.titulo)}
+                    disabled={processingId === item.idContribucion}
+                  >
+                    ⚠️ Con cambios
+                  </button>
+
+                  <button
+                    className="btn-revision btn-reject"
+                    onClick={() => handleAction(item.idContribucion, 'RECHAZAR', item.hecho.titulo)}
+                    disabled={processingId === item.idContribucion}
+                  >
+                    ❌ Rechazar
+                  </button>
+                </div>
+
                 </div>
               </div>
             </div>
