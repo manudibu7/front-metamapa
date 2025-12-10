@@ -32,6 +32,24 @@
   font-weight: 600;
 }
 
+.input-nueva-categoria {
+  display: block;
+  width: 100%;
+  margin-top: 8px;       /* separación del select */
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-nueva-categoria:focus {
+  border-color: #4a90e2; /* color del borde al escribir */
+  box-shadow: 0 0 4px rgba(74, 144, 226, 0.4);
+  outline: none;
+}
+
 .fast-fact__form input,
 .fast-fact__form select,
 .fast-fact__form textarea {
