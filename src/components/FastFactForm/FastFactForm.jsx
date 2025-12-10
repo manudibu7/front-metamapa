@@ -7,31 +7,14 @@ import { getCategorias } from "../../services/contribucionesService";
 
 const buildDefaultHecho = () => ({
   titulo: "",
-  categoria: "",
+  categoria: { id: null, nombre: "" }, // <--- CAMBIO AQUÍ (era "")
   descripcion: "",
   fecha: new Date().toISOString().split("T")[0],
   ubicacion: null,
 });
 
 export const FastFactForm = () => {
-  // const { isAuthenticated, login, contribuyenteId, token, loading: authLoading, user } = useAuth();
-  const mockAuth = {
-    isAuthenticated: true,
-    login: () => console.log("login mock ejecutado"),
-    contribuyenteId: "123",
-    token: "mock-token",
-    loading: false,
-    user: { nombre: "Usuario Mock" },
-  };
-
-  const {
-    isAuthenticated,
-    login,
-    contribuyenteId,
-    token,
-    loading: authLoading,
-    user,
-  } = mockAuth;
+  const { isAuthenticated, login, contribuyenteId, token, loading: authLoading, user } = useAuth();
 
   const [hecho, setHecho] = useState(() => buildDefaultHecho());
   const [archivo, setArchivo] = useState(null);
@@ -162,20 +145,22 @@ const handleArchivoChange = (event) => {
                       c => c.nombre === value
                     );
 
-                    setHecho({
+                    setHecho((prev) => ({
+                      ...prev, // Mantiene el título, descripción, etc.
                       categoria: {
                         id: categoriaSeleccionada.id,
-                        nombre: categoriaSeleccionada.nombre
-                      }
-                    });
+                        nombre: categoriaSeleccionada.nombre,
+                      },
+                    }));
                   } else {
                     // Nueva categoría: nombre vacío + id null
-                    setHecho({
+                    setHecho((prev) => ({
+                      ...prev, // Mantiene el resto de los datos
                       categoria: {
                         id: null,
-                        nombre: ""
-                      }
-                    });
+                        nombre: "",
+                      },
+                    }));
                   }
                 }}
               >
@@ -197,12 +182,13 @@ const handleArchivoChange = (event) => {
                   placeholder="Ingresá nueva categoría"
                   value={hecho.categoria.nombre}
                   onChange={(e) =>
-                    setHecho({
+                    setHecho((prev) => ({
+                      ...prev,
                       categoria: {
                         id: null,
                         nombre: e.target.value
                       }
-                    })
+                    }))
                   }
                 />
               )}
