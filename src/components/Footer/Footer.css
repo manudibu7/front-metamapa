@@ -28,10 +28,10 @@
 
 .app-footer__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
   gap: 1.5rem;
 }
-
+/*
 .app-footer__grid h4 {
   color: var(--color-primary);
   margin-bottom: 0.6rem;
@@ -44,7 +44,7 @@
   flex-direction: column;
   gap: 0.3rem;
 }
-
+*/
 .app-footer__meta {
   display: flex;
   flex-wrap: wrap;

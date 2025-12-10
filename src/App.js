@@ -18,6 +18,7 @@ import { Footer } from './components/Footer/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import { HechosListNav } from './components/HechoListaNav/HechoListNav';
+import { ScrollToTopButton } from './components/ScrollToTopButton/ScrollToTopButton';
 
 const AppShell = () => {
   const { login, logout, isAuthenticated, user } = useAuth();
@@ -54,6 +55,7 @@ const AppShell = () => {
         </Routes>
       </main>
       <Footer />
+      <ScrollToTopButton />
     </div>
   );
 };
