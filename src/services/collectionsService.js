@@ -33,7 +33,7 @@ export const collectionsService = {
 
       return response.data;
     } catch (error) {
-      console.error("Error obteniendo los productos", error);
+      console.error("Error obteniendo las colecciones", error);
       throw error;
     }
   },

@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const delay = (ms = 700) => new Promise((resolve) => setTimeout(resolve, ms));
 const API_BASE_URL = 'http://localhost:8090';
+const API_ADMINISTRATIVA_URL = 'http://localhost:8084';
 
 const sanitizeHecho = (hecho) => {
   if (!hecho) throw new Error('El hecho es obligatorio');
@@ -115,3 +116,19 @@ export const getContribucionesByKeycloakId = async (keycloakId, token) => {
     throw new Error('Error obteniendo contribuciones');
   }
 };
+
+export const getCategorias = async () => {
+  try {
+      let url = `${API_ADMINISTRATIVA_URL}/categorias`;
+      const response = await axios.get(url, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error obteniendo las categorias", error);
+      throw error;
+    }
+ 
+};
+

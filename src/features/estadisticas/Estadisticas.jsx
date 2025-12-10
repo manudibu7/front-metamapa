@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { VictoryPie, VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from 'victory';
 import './Estadisticas.css';
 import { obtenerEstadisticas, exportarEstadisticasCSV } from '../../services/estadisticasService';
+import EstadisticaTorta from '../../components/Estadistica/EstadisticaTorta/estadisticaTorta';
+import EstadisticaBarra from '../../components/Estadistica/EstadisticaBarra/estadisticaBarra';
 
 const colors = ['#38bdf8', '#818cf8', '#f472b6', '#facc15', '#34d399', '#fb7185'];
 
@@ -56,30 +58,11 @@ export const Estadisticas = () => {
     }
 
     if (data.length <= 5) {
-      return (
-        <VictoryPie
-          data={data}
-          innerRadius={60}
-          colorScale={data.map((item) => item.fill)}
-          padAngle={1.5}
-          labels={({ datum }) => `${datum.x}: ${datum.y}`}
-          style={{ labels: { fill: '#e2e8f0', fontSize: 12 } }}
-        />
-      );
-    }
+  return <EstadisticaTorta data={data} />;
+  }
 
-    return (
-      <VictoryChart theme={VictoryTheme.material} domainPadding={15} height={260} padding={{ top: 16, bottom: 60, left: 60, right: 24 }}>
-        <VictoryAxis style={{ axis: { stroke: 'rgba(148, 163, 184, 0.4)' }, tickLabels: { fill: '#cbd5f5', angle: -35, fontSize: 10 } }} />
-        <VictoryAxis dependentAxis style={{ axis: { stroke: 'rgba(148, 163, 184, 0.4)' }, tickLabels: { fill: '#cbd5f5', fontSize: 10 }, grid: { stroke: 'rgba(148, 163, 184, 0.2)' } }} />
-        <VictoryBar
-          data={data}
-          style={{ data: { fill: '#38bdf8', width: 16 }, labels: { fill: '#e2e8f0', fontSize: 11 } }}
-          cornerRadius={{ top: 4 }}
-          labels={({ datum }) => datum.y }
-        />
-      </VictoryChart>
-    );
+
+    return <EstadisticaBarra data={data} />;
   };
 
   if (estado.loading) {
