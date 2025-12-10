@@ -29,10 +29,14 @@ export const FastFactForm = () => {
     setHecho((prev) => ({ ...prev, ubicacion: coords }));
   };
 
-  const handleArchivoChange = (event) => {
-    const file = event.target.files?.[0] ?? null;
-    setArchivo(file);
-  };
+const handleArchivoChange = (event) => {
+  const file = event.target.files?.[0];
+  if (file && file.size > 10 * 1024 * 1024) { 
+     setError("El archivo es demasiado pesado (Max 10MB)");
+     return;
+  }
+  setArchivo(file);
+};
 
   const resetForm = () => {
     setHecho(buildDefaultHecho());
@@ -125,6 +129,7 @@ export const FastFactForm = () => {
                 value={hecho.descripcion}
                 onChange={handleHechoChange}
                 placeholder="Relatá qué ocurrió y actores involucrados."
+                maxLength={1000}
                 required
               />
             </label>

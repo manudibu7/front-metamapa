@@ -58,24 +58,28 @@ export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo
 
   try {
     // The backend returns the ID directly, e.g. 10
-    const response = await axios.post(`${API_BASE_URL}/contribuciones`, contribucionPayload, { headers });
+    const response = await axios.post(`${API_BASE_URL}/contribuciones`, 
+      {idContribuyente: contribuyenteId,
+        hecho:hechoDto
+    },{ headers });
     const contribucionId = response.data;
 
     if (archivo) {
-      const dataUrl = await fileToDataUrl(archivo);
       let tipo = 'TEXTO';
       if (archivo.type.startsWith('image/')) tipo = 'IMAGEN';
       else if (archivo.type.startsWith('video/')) tipo = 'VIDEO';
       else if (archivo.type.startsWith('audio/')) tipo = 'AUDIO';
 
+      const formData = new FormData();
+      formData.append('file', archivo)
+      formData.append('tipo', tipo)
+
       await axios.patch(
-        `${API_BASE_URL}/contribuciones/${contribucionId}`,
-        {
-          id: null,
-          tipo: tipo,
-          url: dataUrl,
-        },
-        { headers }
+        `${API_BASE_URL}/contribuciones/${contribucionId}`,formData,
+        { headers: {
+          ...headers,
+          'Content-Type': 'multipart/form-data'
+        } }
       );
     }
 
