@@ -9,6 +9,7 @@ import {
   fuentesDisponibles,
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
+import { obtenerFuentes } from '../../services/collectionsService';
 
 
 const buildEmptyForm = () => ({
@@ -26,6 +27,7 @@ export const GestionColecciones = () => {
   const [colecciones, setColecciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [fuentes, setFuentes] = useState([]);
 
   // Modal / form state
   const [modalOpen, setModalOpen] = useState(false);
@@ -49,6 +51,19 @@ export const GestionColecciones = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchFuentes = async () => {
+      try {
+        const fuentesResponse = await obtenerFuentes();
+
+        setFuentes(fuentesResponse.map(f => f.nombre));
+      } catch (error) {
+        setError(error?.message ?? "No se pudo obtener las categorias.");
+      }
+    };
+      fetchFuentes();
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
@@ -161,12 +176,15 @@ export const GestionColecciones = () => {
       alert('No pudimos eliminar la colección.');
     }
   };
-  
+
+ const algoritmosDisponibles = [
+  "MAYORIA SIMPLE",
+  "ABSOLUTA",
+  "DEFAULT",
+  "MULTIPLES MENCIONES"
+  ];
+
   const configCriterios = {
-    fuente: { 
-      inputType: 'select', 
-      options: fuentesDisponibles // Usamos la lista que importas
-    },
     fechaAntes: { 
       inputType: 'date', 
       options: [] 
@@ -309,13 +327,24 @@ export const GestionColecciones = () => {
               </label>
               <label>
                 Algoritmo de consenso
-                <input
-                  type="text"
-                  name="algoritmoConcenso"
-                  value={form.algoritmoConcenso}
-                  onChange={handleFormChange}
-                  placeholder="Ej: Mayoría simple"
-                />
+                <select 
+                value={form.algoritmoConcenso}
+                onChange={(e) => {
+                    const value = e.target.value;
+
+                    setForm(prev => ({
+                      ...prev,
+                      algoritmoConcenso: value,
+                    }));
+                  }}
+                >
+                  <option value={""}>Selecciona un algoritmo</option>
+                  {algoritmosDisponibles.map(algoritmo => (
+                    <option key={algoritmo} value={algoritmo}>
+                      {algoritmo}
+                    </option>
+                  ))}
+                </select>
               </label>
               {/* LO COMENTO POR QUE NO APLICAMOS EN NINGUN MOMENTO LAS ETIQUETAS
               <label>
@@ -330,21 +359,27 @@ export const GestionColecciones = () => {
               </label> */}
 
               <fieldset className="gestion-colecciones__fuentes">
-                <legend>Fuentes</legend>
-                <div className="gestion-colecciones__fuentes-grid">
-                  {fuentesDisponibles.map((fuente) => (
-                    <label key={fuente} className="gestion-colecciones__fuente-option">
-                      <input
-                        type="checkbox"
-                        checked={form.fuentes?.includes(fuente)}
-                        onChange={() => handleFuenteToggle(fuente)}
-                      />
-                      <span>{fuente}</span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
+                <label>Fuente
+                <select
+                  value={form.fuentes}
+                  onChange={(e) => {
+                    const value = e.target.value;
 
+                    setForm(prev => ({
+                      ...prev,
+                      fuentes: value,
+                    }));
+                  }}
+                  >
+                  <option value={""}>Selecciona una fuente</option>
+                {fuentes.map(fuente => (
+                    <option key={fuente} value={fuente}>
+                      {fuente}
+                    </option>
+                  ))}
+                  </select>
+                </label>
+              </fieldset>
               <fieldset className="gestion-colecciones__criterios">
                 <legend>Criterios / Condiciones de Pertenencia</legend>
                   {form.criterios.map((criterio, idx) => {
