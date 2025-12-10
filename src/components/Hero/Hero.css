@@ -98,10 +98,6 @@
   box-shadow: 0 20px 35px rgba(255, 193, 7, 0.25);
 }
 
-.btn {
-
-}
-
 @media (max-width: 768px) {
   .hero__cta {
     flex-direction: column;
