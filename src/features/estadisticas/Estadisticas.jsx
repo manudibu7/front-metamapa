@@ -85,7 +85,7 @@ export const Estadisticas = () => {
     <section className="estadisticas">
       <header className="estadisticas__encabezado">
         <div>
-          <h1>Panel de estadísticas</h1>
+          <h1>Estadisticas de Metamapa</h1>
         </div>
         <button type="button" className="btn btn--primary" onClick={handleDownload} disabled={downloading}>
           {downloading ? 'Generando CSV...' : 'Descargar CSV'}
@@ -96,11 +96,18 @@ export const Estadisticas = () => {
         {estadisticas.map((estadistica, index) => (
           <article key={`${estadistica?.discriminante?.valor ?? 'estadistica'}-${index}`} className="estadisticas__card">
             <div className="estadisticas__card-header">
-              <p className="estadisticas__tag">{estadistica?.discriminante?.tipo ?? 'ESTADISTICA'}</p>
-              <h2>{estadistica?.discriminante?.valor ?? 'Estadística'}</h2>
+              <div className="estadisticas__tag">
+                <span className="estadisticas__label">
+                  {estadistica?.descripcion ?? 'ESTADISTICA'}
+                  <b className="estadisticas__value">
+                  {estadistica?.discriminante?.valor ?? 'Estadística'}
+                </b>
+                </span>
+                
+              </div>              
               {estadistica?.resultado && (
                 <p className="estadisticas__resumen">
-                  Resultado destacado: <strong>{estadistica.resultado.nombre}</strong> ({estadistica.resultado.cantidad})
+                  Resultado con mas hechos: <strong>{estadistica.resultado.nombre + " con " + estadistica.resultado.cantidad + " hechos"}</strong> 
                 </p>
               )}
             </div>
