@@ -5,6 +5,7 @@ export let fuentesDisponibles = [];
 
 export const cargarFuentes = async () => {
   fuentesDisponibles = await obtenerFuentes();
+  console.log(fuentesDisponibles);
 };
 
 

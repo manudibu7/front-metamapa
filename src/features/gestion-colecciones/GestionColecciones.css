@@ -67,7 +67,6 @@
 }
 
 .gestion-colecciones__condiciones {
-  margin-top: 0.75rem;
   padding-left: 1.25rem;
   font-size: 0.9rem;
   color: var(--color-muted);
@@ -178,6 +177,11 @@
 .gestion-colecciones__criterios legend {
   font-weight: 600;
   padding: 0 0.5rem;
+}
+
+.gestion-colecciones-titulo-condiciones {
+  margin: 0px;
+  margin-top: 5px;
 }
 
 .gestion-colecciones__criterio-row {

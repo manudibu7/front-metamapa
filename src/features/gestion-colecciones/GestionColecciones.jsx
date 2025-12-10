@@ -162,11 +162,36 @@ export const GestionColecciones = () => {
     }
   };
   
+  const configCriterios = {
+    fuente: { 
+      inputType: 'select', 
+      options: fuentesDisponibles // Usamos la lista que importas
+    },
+    fechaAntes: { 
+      inputType: 'date', 
+      options: [] 
+    },
+    fechaDespues: { 
+      inputType: 'date', 
+      options: [] 
+    },
+    Categoria: { 
+      inputType: 'text', // Texto libre como pediste
+      options: [] 
+    },
+    etiqueta: { 
+      inputType: 'text', 
+      options: [] 
+    },
+    titulo: { 
+      inputType: 'text', 
+      options: [] 
+    }
+  };
+
+  const criterioTipos = Object.keys(configCriterios);
+
 //MEJORA : DEBERIAOS CREAR TIPOS DE ALGORITMOS.
-  const criterioTipos = ['FechaAntes', 'FechaDespues', 'Provincia',"Categoria","Titulo",];
-
-
-  const getValoresForTipo = (tipo) => criterioTipos.find((opt) => opt === tipo) ?? [];
 
   if (!isAuthenticated || !isAdmin) {
     return (
@@ -221,17 +246,16 @@ export const GestionColecciones = () => {
           <p className="gestion-colecciones__vacio">No hay colecciones registradas.</p>
         ) : (
           colecciones.map((col) => (
-            <article key={col.id} className="gestion-colecciones__card">
+            <article key={col.id_coleccion} className="gestion-colecciones__card">
               <div className="gestion-colecciones__card-info">
                 <h2>{col.titulo}</h2>
                 <p>{col.descripcion}</p>
-                {col.criterios?.length > 0 && (
+                  <h4 className='gestion-colecciones-titulo-condiciones'>Condiciones: </h4>
                   <ul className="gestion-colecciones__condiciones">
                     {col.criterios.map((cond) => (
                       <li key={cond.id}>{cond.tipo} = {cond.valor}</li>
                     ))}
                   </ul>
-                )}
               </div>
               <div className="gestion-colecciones__card-actions">
                 <button type="button" className="btn btn--ghost" onClick={() => openEditModal(col)}>
@@ -323,53 +347,61 @@ export const GestionColecciones = () => {
 
               <fieldset className="gestion-colecciones__criterios">
                 <legend>Criterios / Condiciones de Pertenencia</legend>
-                {form.criterios.map((criterio, idx) => (
-                  <div key={idx} className="gestion-colecciones__criterio-row">
-                    <select
-                      value={criterio.tipo}
-                      onChange={(e) => {
-                        const nuevoTipo = e.target.value;
-                        const valores = getValoresForTipo(nuevoTipo);
-                        handleCriterioChange(idx, 'tipo', nuevoTipo);
-                        if (valores.length) {
-                          handleCriterioChange(idx, 'valor', valores);
-                        }
-                      }}
-                    >
-                      <option value="" disabled>
-                        Seleccionar criterio
-                      </option>
-                      {criterioTipos.map((tipo) => (
-                        <option key={tipo} value={tipo}>
-                          {tipo}
-                        </option>
-                      ))}
-                    </select>
-                    {getValoresForTipo(criterio.tipo).length ? (
+                  {form.criterios.map((criterio, idx) => {
+                  // 1. Obtenemos la config para este criterio actual
+                  const config = configCriterios[criterio.tipo] || { inputType: 'text', options: [] };
+                  return(
+                    <div key={idx} className="gestion-colecciones__criterio-row">
+                      {/* SELECTOR DE TIPO (Fecha, Fuente, etc.) */}
                       <select
-                        value={criterio.valor}
-                        onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
+                        value={criterio.tipo}
+                        onChange={(e) => {
+                          const nuevoTipo = e.target.value;
+                          // Al cambiar el tipo, limpiamos el valor para evitar errores
+                          handleCriterioChange(idx, 'tipo', nuevoTipo);
+                          handleCriterioChange(idx, 'valor', ''); 
+                        }}
                       >
-                        {getValoresForTipo(criterio.tipo).map((valor) => (
-                          <option key={valor} value={valor}>
-                            {valor}
+                        {criterioTipos.map((tipo) => (
+                          <option key={tipo} value={tipo}>
+                            {tipo}
                           </option>
                         ))}
                       </select>
-                    ) : (
-                      <input
-                        type="text"
-                        placeholder="Valor"
-                        value={criterio.valor}
-                        onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
-                      />
-                    )}
-                    <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>
-                      ✕
-                    </button>
-                  </div>
-                ))}
-                <button type="button" className="btn btn--ghost btn--sm" onClick={addCriterio}>
+                      {config.inputType === 'select' ? (
+                        /* CASO: DESPLEGABLE (Solo para Fuente) */
+                        <select
+                          value={criterio.valor}
+                          onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
+                        >
+                          <option value="" disabled>Seleccionar...</option>
+                          {config.options.map((opcion) => (
+                            <option key={opcion} value={opcion}>
+                              {opcion}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        /* CASO: INPUT (Fecha o Texto) */
+                        <input
+                          type={config.inputType} // Aquí se convierte en 'date' o 'text' automágicamente
+                          placeholder="Valor"
+                          value={criterio.valor}
+                          onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
+                        />
+                      )}
+
+                      <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>
+                        ✕
+                      </button>
+                    </div>
+                    );
+                  })}
+                <button 
+                  type="button" 
+                  className="btn btn--ghost btn--sm" 
+                  onClick={() => addCriterio(criterioTipos[0], '')}
+                >
                   + Agregar criterio
                 </button>
               </fieldset>
