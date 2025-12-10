@@ -7,14 +7,33 @@ import { getCategorias } from "../../services/contribucionesService";
 
 const buildDefaultHecho = () => ({
   titulo: "",
-  categoria: { id: null, nombre: "" }, // <--- CAMBIO AQUÍ (era "")
+  categoria: "",  // ← ahora es solo string
   descripcion: "",
   fecha: new Date().toISOString().split("T")[0],
   ubicacion: null,
 });
 
+
+const mockAuth = {
+    isAuthenticated: true,
+    login: () => console.log("login mock ejecutado"),
+    contribuyenteId: "123",
+    token: "mock-token",
+    loading: false,
+    user: { nombre: "Usuario Mock" },
+  };
+
+  const {
+    isAuthenticated,
+    login,
+    contribuyenteId,
+    token,
+    loading: authLoading,
+    user,
+  } = mockAuth;
+
 export const FastFactForm = () => {
-  const { isAuthenticated, login, contribuyenteId, token, loading: authLoading, user } = useAuth();
+ // const { isAuthenticated, login, contribuyenteId, token, loading: authLoading, user } = useAuth();
 
   const [hecho, setHecho] = useState(() => buildDefaultHecho());
   const [archivo, setArchivo] = useState(null);
@@ -22,8 +41,7 @@ export const FastFactForm = () => {
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
   const [categorias, setCategorias] = useState([]);
-  const [nuevaCategoria, setNuevaCategoria] = useState({
-  categoria: { id: null, nombre: "" },});
+  const [nuevaCategoria, setNuevaCategoria] = useState("");
 
 
   const handleHechoChange = (event) => {
@@ -53,6 +71,13 @@ const handleArchivoChange = (event) => {
  ///SI
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const categoriaFinal =
+    hecho.categoria === "__agregar__"
+      ? nuevaCategoria   // Usuario escribió una categoría nueva
+      : hecho.categoria; // Categoría ya existente
+
+
     if (!hecho.ubicacion) {
       setStatus("error");
       setError("Seleccioná una ubicación desde el mapa o la búsqueda.");
@@ -70,7 +95,10 @@ const handleArchivoChange = (event) => {
     try {
       await enviarContribucionRapida({
         contribuyenteId,
-        hecho,
+         hecho: {
+        ...hecho,
+        categoria: categoriaFinal, // <-- SOLO STRING
+        },
         archivo,
         token,
       });
@@ -84,18 +112,20 @@ const handleArchivoChange = (event) => {
   };
 
   useEffect(() => {
-    const fetchCategorias = async () => {
-      try {
-        const categorias = await getCategorias();
-        setCategorias(categorias);
-      } catch (error) {
-        setStatus("error");
-        setError(error?.message ?? "No se pudo obtener las categorias.");
-      }
-    };
+  const fetchCategorias = async () => {
+    try {
+      const categoriasResponse = await getCategorias();
 
-    fetchCategorias();
-  }, []);
+      setCategorias(categoriasResponse.map(c => c.nombre));
+    } catch (error) {
+      setStatus("error");
+      setError(error?.message ?? "No se pudo obtener las categorias.");
+    }
+  };
+
+  fetchCategorias();
+}, []);
+
 
 
   let bodyContent = null;
@@ -133,65 +163,41 @@ const handleArchivoChange = (event) => {
 
           <div className="fast-fact__grid fast-fact__grid--three">
             <label>
-              Categoría
-              <select
-                value={hecho.categoria.nombre || ""}
-                onChange={(e) => {
-                  const value = e.target.value;
+                Categoría
+                <select
+                  value={hecho.categoria}
+                  onChange={(e) => {
+                    const value = e.target.value;
 
-                  if (value !== "__agregar__") {
-                    // Buscar la categoría existente por el nombre
-                    const categoriaSeleccionada = categorias.find(
-                      c => c.nombre === value
-                    );
-
-                    setHecho((prev) => ({
-                      ...prev, // Mantiene el título, descripción, etc.
-                      categoria: {
-                        id: categoriaSeleccionada.id,
-                        nombre: categoriaSeleccionada.nombre,
-                      },
-                    }));
-                  } else {
-                    // Nueva categoría: nombre vacío + id null
-                    setHecho((prev) => ({
-                      ...prev, // Mantiene el resto de los datos
-                      categoria: {
-                        id: null,
-                        nombre: "",
-                      },
-                    }));
-                  }
-                }}
-              >
-                <option value="">Seleccioná una categoría</option>
-
-                {categorias.map(cat => (
-                  <option key={cat.id} value={cat.nombre}>
-                    {cat.nombre}
-                  </option>
-                ))}
-
-                <option value="__agregar__">Otra</option>
-              </select>
-
-              {/* Campo visible si elige "Otra" */}
-              {hecho.categoria.id === null && (
-                <input
-                  type="text"
-                  placeholder="Ingresá nueva categoría"
-                  value={hecho.categoria.nombre}
-                  onChange={(e) =>
-                    setHecho((prev) => ({
+                    setHecho(prev => ({
                       ...prev,
-                      categoria: {
-                        id: null,
-                        nombre: e.target.value
-                      }
-                    }))
-                  }
-                />
-              )}
+                      categoria: value,
+                    }));
+
+                    // Si eligió "otra", limpiamos el input
+                    if (value === "__agregar__") {
+                      setNuevaCategoria("");
+                    }
+                  }}
+                >
+                  <option value="">Seleccioná una categoría</option>
+
+                  {categorias.map(cat => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+
+                  <option value="__agregar__">Otra</option>
+                </select>
+                  {hecho.categoria === "__agregar__" && (
+                  <input
+                    type="text"
+                    placeholder="Ingresá nueva categoría"
+                    value={nuevaCategoria}
+                    onChange={(e) => setNuevaCategoria(e.target.value)}
+                  />
+                )} 
             </label>
             <label>
               Fecha del hecho
