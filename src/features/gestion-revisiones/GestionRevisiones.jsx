@@ -52,13 +52,24 @@ export const GestionRevisiones = () => {
   const handleAction = async (id, actionType, tituloHecho) => {
   setProcessingId(id);
   const comentario = comentarios[id] || '';
-
+  
+  let texto = "";
   try {
     if (actionType === 'ACEPTAR') {
+      texto = `✔️  ${tituloHecho} fue aceptado.`;
+      setMensaje(texto);
+      setTimeout(() => setMensaje(""), 3000);
       await aceptarRevision(id, comentario);
+
     } else if (actionType === 'CAMBIOS') {
+      texto = `⚠️  ${tituloHecho} requiere cambios.`
+      setMensaje(texto);
+      setTimeout(() => setMensaje(""), 3000);
       await aceptarConCambios(id, comentario);
     } else if (actionType === 'RECHAZAR') {
+      texto = `❌  ${tituloHecho} fue rechazado.`
+      setMensaje(texto);
+      setTimeout(() => setMensaje(""), 3000);
       await rechazarRevision(id, comentario);
     }
 
@@ -70,14 +81,6 @@ export const GestionRevisiones = () => {
       return updated;
     });
 
-    // 🔥 Ahora el mensaje trae el nombre del hecho
-    let texto = "";
-    if (actionType === "ACEPTAR") texto = `✔️ " ${tituloHecho}" fue aceptado.`;
-    if (actionType === "CAMBIOS") texto = `⚠️ " ${tituloHecho}" requiere cambios.`;
-    if (actionType === "RECHAZAR") texto = `❌ " ${tituloHecho}" fue rechazado.`;
-
-    setMensaje(texto);
-    setTimeout(() => setMensaje(""), 4000);
 
   } catch (err) {
     console.error('Error al procesar revisión:', err);
