@@ -109,7 +109,7 @@ export const ColeccionDetalle = () => {
                   <p className="hecho-card__descripcion">{hecho.descripcion}</p>
                   <div className="hecho-card__footer">
                     <span className="hecho-card__provincia">{hecho.ubicacion.provincia}</span>
-                    <span className="hecho-card__fuente">Fuente: {hecho.fuente.nombre}</span>
+                    <span className="hecho-card__fuente">Fuente: {hecho.fuente}</span>
                   </div>
                 </article>
               ))}

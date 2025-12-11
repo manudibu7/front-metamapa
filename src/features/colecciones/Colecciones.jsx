@@ -67,7 +67,7 @@ export const Colecciones = () => {
 
                 <div className="coleccion-card__footer">
                   <div className="coleccion-card__stat">
-                    <strong>{collection.totalHechos}</strong>
+                    <strong>{collection.cantidadHechos}</strong>
                     <span>hechos</span>
                   </div>
                   <div className="coleccion-card__stat">

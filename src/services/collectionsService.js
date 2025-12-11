@@ -26,7 +26,7 @@ export const obtenerFuentes = async () => {
 export const collectionsService = {
   async getCollections() {
     try {
-      let url = `${API_ADMINISTRATIVA_URL}/colecciones`;
+      let url = `${API_PUBLICA_URL}/colecciones`;
       const response = await axios.get(url, {
         headers: { "Cache-Control": "no-cache" },
       });
