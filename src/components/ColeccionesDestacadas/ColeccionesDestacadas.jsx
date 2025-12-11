@@ -22,10 +22,9 @@ const destacadas = Array.isArray(colecciones) ? colecciones.slice(0, 3) : [];
   return (
     <section className="colecciones-destacadas" id="colecciones-destacadas">
       <header>
-        <p className="section-eyebrow">Colecciones destacadas</p>
         <div>
-          <h2>Lo más confiable del ecosistema</h2>
-          <p>Panel rápido con las colecciones que concentran más hechos, últimas sincronizaciones y loaders conectados.</p>
+          <h2>Colecciones Destacadas</h2>
+          <p>Algunas de las colecciones que concentran más hechos...</p>
         </div>
         <button type="button" className="btn btn--ghost" onClick={onExplorar}>
           Ver explorador completo
@@ -53,16 +52,12 @@ const destacadas = Array.isArray(colecciones) ? colecciones.slice(0, 3) : [];
 
               <div className="coleccion-card__stats">
                 <div>
-                  <strong>{coleccion.totalHechos}</strong>
+                  <strong>{coleccion.cantidadHechos}</strong>
                   <span>hechos</span>
                 </div>
                 <div>
                   <strong>{coleccion.fuentes?.length || 0}</strong>
                   <span>loaders</span>
-                </div>
-                <div>
-                  <strong>{formatearFecha(coleccion.ultimaActualizacion)}</strong>
-                  <span>última sync</span>
                 </div>
               </div>
             </article>

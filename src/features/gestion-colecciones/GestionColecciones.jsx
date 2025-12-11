@@ -6,9 +6,9 @@ import {
   crearColeccion,
   actualizarColeccion,
   eliminarColeccion,
+  obtenerFuentes
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
-import { obtenerFuentes } from '../../services/collectionsService';
 import { getCategorias } from '../../services/contribucionesService';
 
 const buildEmptyForm = () => ({

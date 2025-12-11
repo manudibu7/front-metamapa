@@ -1,77 +1,33 @@
-import { mockCollections } from '../constants/mockCollections';
-import { collectionsService,obtenerFuentes } from './collectionsService';
+// services/coleccionesAdminService.js
+import axios from "axios";
 
-export let fuentesDisponibles = [];
+const API_ADMINISTRATIVA_URL = "http://localhost:8084";
 
-export const cargarFuentes = async () => {
-  fuentesDisponibles = await obtenerFuentes();
-  console.log(fuentesDisponibles);
+// 1. Obtener Fuentes (Movido aquí para que sea exclusivo de Admin)
+export const obtenerFuentes = async () => {
+  const response = await axios.get(`${API_ADMINISTRATIVA_URL}/fuentes`);
+  return response.data;
 };
 
-
-const ensureCondiciones = (coleccion) =>
-  coleccion.Condiciones && coleccion.Condiciones.length
-    ? coleccion.Condiciones: [];
-    /*: (coleccion.tags ?? []).map((tag, index) => ({
-        id: `${coleccion.id}-tag-${index}`,
-        detail: `Tag = ${tag}`,
-      })); */
-
-const normalizeInput = (coleccionInput) => {
- /* const tags = coleccionInput.tagsInput
-    ? coleccionInput.tagsInput
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean)
-    : []; */
-  const fuentes = (coleccionInput.fuentes ?? []).filter((fuente) => fuentesDisponibles.includes(fuente));
-
-  return {
-    titulo: coleccionInput.titulo?.trim() ?? '',
-    descripcion: coleccionInput.descripcion?.trim() ?? '',
-    fuentes,
-    //tags,
-    criterios: (coleccionInput.criterios ?? []).map((criterio,index) => ({
-      //id: `${Date.now()}-${index}`,
-      id : null,
-      tipo: `${criterio.tipo}`,
-      valor: `${criterio.valor}`,
-    })),
-     consenso: coleccionInput.algoritmoConcenso?.trim() ?? '',
-  };
-};
-
-let adminCollections = []; // se carga luego de forma ASÍNCRONA
-
-export const cargarAdminCollections = async () => {
-    const response = await collectionsService.getCollections();
-    adminCollections=response;
-
-};
-
+// 2. Obtener Colecciones Admin
 export const obtenerColeccionesAdmin = async () => {
-  if (adminCollections.length === 0) {
-    await cargarAdminCollections();
-    
-  }
-  return await cargarAdminCollections().then(() => adminCollections);
+  const response = await axios.get(`${API_ADMINISTRATIVA_URL}/colecciones`);
+  return response.data;
 };
 
-export const crearColeccion = async (coleccionInput) => {
-  //const nuevaColeccion = normalizeInput(coleccionInput);
-  //console.log("Input dps de a normalizar:", nuevaColeccion);
-  await collectionsService.createCollection(coleccionInput);
-
+// 3. Crear
+export const crearColeccion = async (payload) => {
+  const response = await axios.post(`${API_ADMINISTRATIVA_URL}/colecciones`, payload);
+  return response.data;
 };
 
-export const actualizarColeccion = async (id, coleccionInput) => {
- 
-  //const coleccionActualizada = normalizeInput(coleccionInput);
-  
-  await collectionsService.updateCollection(id,coleccionInput);
+// 4. Actualizar
+export const actualizarColeccion = async (id, payload) => {
+  const response = await axios.put(`${API_ADMINISTRATIVA_URL}/colecciones/${id}`, payload);
+  return response.data;
 };
 
+// 5. Eliminar
 export const eliminarColeccion = async (id) => {
-  
-  await collectionsService.deleteById(id);
+  return await axios.delete(`${API_ADMINISTRATIVA_URL}/colecciones/${id}`);
 };

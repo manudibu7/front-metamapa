@@ -6,24 +6,10 @@ const simulateLatency = (payload) =>
   new Promise((resolve) => {
     setTimeout(() => resolve(deepClone(payload)), 550);
   });
-//API ADMINISTRATIVA
-const API_ADMINISTRATIVA_URL = "http://localhost:8084";
 const API_PUBLICA_URL = "http://localhost:8100";
 
-export const obtenerFuentes = async () => {
-  try {
-    let url = `${API_ADMINISTRATIVA_URL}/fuentes`;
-    const response = await axios.get(url, {
-      headers: { "Cache-Control": "no-cache" },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error obteniendo los productos", error);
-    throw error;
-  }
-};
-
 export const collectionsService = {
+
   async getCollections() {
     try {
       let url = `${API_PUBLICA_URL}/colecciones`;
@@ -56,70 +42,6 @@ export const collectionsService = {
     throw error;
   }
 },
-  async getCollectionByIdADMIN(idOrHandle) {
-    //SOLO CONSIDERO PARA ID
-    if (idOrHandle) {
-      let url = `${API_ADMINISTRATIVA_URL}/colecciones/${idOrHandle}`;
-
-      const response = await axios.get(url, {
-        headers: { "Cache-Control": "no-cache" },
-      });
-      return response.data;
-    }
-  },
-  async createCollection(collectionInput) {
-    try {
-      const response = await axios.post(
-        `${API_ADMINISTRATIVA_URL}/colecciones`,
-        collectionInput,
-        {
-          headers: { "Cache-Control": "no-cache" },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error creando el Coleccion", error);
-      throw error;
-    }
-  },
-    async updateCollection(id ,collection) {
-      console.log("Service - Collection a actualizar:", collection);
-      console.log("Service - ID a actualizar:", id);
-    try {
-      const response = await axios.put(
-        `${API_ADMINISTRATIVA_URL}/colecciones/${id}`,
-        collection,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error actualizando el Coleccion", error);
-      throw error;
-    }
-
-
-  },
-
-  async deleteById(id) {
-    try {
-      const response = await axios.delete(
-        `${API_ADMINISTRATIVA_URL}/colecciones/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error borrando la colleccion", error);
-      throw error;
-    }
-  },
   async getHechosDeColeccion(coleccionID) {
     try {
       const url = `${API_PUBLICA_URL}/colecciones/${coleccionID}/hechos`;
