@@ -54,7 +54,7 @@ export const obtenerColeccionesAdmin = async () => {
     await cargarAdminCollections();
     
   }
-  return adminCollections;
+  return await cargarAdminCollections().then(() => adminCollections);
 };
 
 export const crearColeccion = async (coleccionInput) => {
@@ -66,9 +66,9 @@ export const crearColeccion = async (coleccionInput) => {
 
 export const actualizarColeccion = async (id, coleccionInput) => {
  
-  const coleccionActualizada = normalizeInput(coleccionInput);
+  //const coleccionActualizada = normalizeInput(coleccionInput);
   
-  await collectionsService.updateCollection(id,coleccionActualizada);
+  await collectionsService.updateCollection(id,coleccionInput);
 };
 
 export const eliminarColeccion = async (id) => {

@@ -83,6 +83,8 @@ export const collectionsService = {
     }
   },
     async updateCollection(id ,collection) {
+      console.log("Service - Collection a actualizar:", collection);
+      console.log("Service - ID a actualizar:", id);
     try {
       const response = await axios.put(
         `${API_ADMINISTRATIVA_URL}/colecciones/${id}`,

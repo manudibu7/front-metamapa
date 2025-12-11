@@ -9,8 +9,7 @@ import {
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
 import { obtenerFuentes } from '../../services/collectionsService';
-import { getCategorias } from '../../services/contribucionesService'; // <--- AGREGAR
-
+import { getCategorias } from '../../services/contribucionesService';
 
 const buildEmptyForm = () => ({
   titulo: '',
@@ -18,66 +17,87 @@ const buildEmptyForm = () => ({
   fuentes: [],
   criterios: [],
   algoritmoConcenso: '',
-  //tagsInput: '',
 });
 
 export const GestionColecciones = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin } = useAuth();
+  
+  // Datos
   const [colecciones, setColecciones] = useState([]);
+  const [fuentes, setFuentes] = useState([]);
+  const [categoriasOptions, setCategoriasOptions] = useState([]);
+
+  // Estados de carga/error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [fuentes, setFuentes] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
 
-  const [categoriasOptions, setCategoriasOptions] = useState([]);
-  
-  // Modal / form state
+  // Modal / Form state
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(buildEmptyForm());
-  const [submitting, setSubmitting] = useState(false);
-
-  // Confirmación de eliminación
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
-  const fetchColecciones = async () => {
-    try {
-      setLoading(true);
-      const data = await obtenerColeccionesAdmin();
-      setColecciones(data ?? []);
-      setError('');
-    } catch (err) {
-      console.error('[GestionColecciones] Error cargando colecciones', err);
-      setError('No pudimos cargar las colecciones.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Estado para el Resumen del Popup
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [summaryData, setSummaryData] = useState(null); 
+
+  // Función para traer datos. 
+  // background=true: actualiza sin borrar la pantalla (silencioso).
+  // background=false: muestra el "Cargando..." (pantalla completa).
+  const fetchColecciones = async (background = false) => {
+  try {
+    console.log('[GestionColecciones] fetchColecciones called, background=', background);
+    if (!background) setLoading(true);
+
+    const data = await obtenerColeccionesAdmin();
+    console.log('[GestionColecciones] obtenerColeccionesAdmin response:', data);
+    setColecciones(data ?? []);
+    setError('');
+  } catch (err) {
+    console.error('[GestionColecciones] Error cargando colecciones', err);
+    setError('No pudimos cargar las colecciones.');
+  } finally {
+    if (!background) setLoading(false);
+  }
+};
 
   useEffect(() => {
     const fetchDatosExternos = async () => {
       try {
         const fuentesResponse = await obtenerFuentes();
-
         setFuentes(fuentesResponse.map(f => f.nombre));
+        
         const categoriasResponse = await getCategorias(); 
         const listaCategorias = Array.isArray(categoriasResponse) ? categoriasResponse : (categoriasResponse?.datos || []);
-        // Guardamos solo los nombres en el estado
         setCategoriasOptions(listaCategorias.map(c => c.nombre || c)); 
       } catch (error) {
         setError(error?.message ?? "No se pudo obtener las categorias.");
       }
     };
-      fetchDatosExternos();
+    fetchDatosExternos();
   }, []);
 
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
+
       setLoading(false);
       return;
     }
     fetchColecciones();
   }, [isAuthenticated, isAdmin]);
+
+  // --- NUEVA FUNCIÓN: Maneja el cierre del popup y la recarga ---
+ const handleClosePopup = async () => {
+  console.log('[GestionColecciones] handleClosePopup - cerrando popup y recargando colecciones');
+  setPopupOpen(false);
+  try {
+    await fetchColecciones(false); // recarga visible
+  } catch (err) {
+    console.error('[GestionColecciones] error en handleClosePopup fetchColecciones', err);
+  }
+};
 
   const openCreateModal = () => {
     setEditingId(null);
@@ -89,10 +109,9 @@ export const GestionColecciones = () => {
     setEditingId(coleccion.id_coleccion);
     const fuentesMapeadas = (coleccion.fuentes ?? []).map(f => {
         if (typeof f === 'string') return f;
-        return f.nombre || f.name || f; // Intenta propiedades comunes
+        return f.nombre || f.name || f; 
     });
 
-    // Recuperar algoritmo considerando posibles nombres (typo vs correcto)
     const alg = coleccion.algoritmoConcenso || coleccion.algoritmoDeConsenso || '';
     setForm({
       titulo: coleccion.titulo ?? '',
@@ -103,9 +122,7 @@ export const GestionColecciones = () => {
         tipo: c.tipo,
         valor: c.valor
       })) ?? [],
-
-      algoritmoConcenso:alg,
-      //tagsInput: (coleccion.tags ?? []).join(', '),
+      algoritmoConcenso: alg,
     });
     setModalOpen(true);
   };
@@ -144,6 +161,7 @@ export const GestionColecciones = () => {
       criterios: prev.criterios.filter((_, i) => i !== index),
     }));
   };
+
   const removeFuente = (fuenteAEliminar) => {
      setForm((prev) => ({
        ...prev,
@@ -151,52 +169,87 @@ export const GestionColecciones = () => {
      }));
   };
 
-  const handleFuenteToggle = (fuente) => {
-    setForm((prev) => {
-      const actual = prev.fuentes ?? [];
-      const existe = actual.includes(fuente);
-      return {
-        ...prev,
-        fuentes: existe ? actual.filter((item) => item !== fuente) : [...actual, fuente],
-      };
-    });
-  };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!form.titulo.trim()) {
+    alert('El título es obligatorio.');
+    return;
+  }
+  setSubmitting(true);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.titulo.trim()) {
-      alert('El título es obligatorio.');
+  let oldData = null;
+  if (editingId) {
+    const original = colecciones.find(c => c.id_coleccion === editingId);
+    if (original) {
+      oldData = {
+        titulo: original.titulo,
+        descripcion: original.descripcion,
+        algoritmoConcenso: original.algoritmoConcenso || original.algoritmoDeConsenso,
+        fuentes: (original.fuentes || []).map(f => typeof f === 'string' ? f : f.nombre),
+        criterios: original.criterios || []
+      };
+    }
+  }
+
+  try {
+    if (editingId) {
+      console.log('[GestionColecciones] actualizarColeccion -> id:', editingId, 'payload:', form);
+      const updated = await actualizarColeccion(editingId, form); // idealmente el back devuelve el objeto actualizado
+      console.log('[GestionColecciones] actualizarColeccion response:', updated);
+
+      // Actualizo la lista localmente (optimistic + seguro)
+      setColecciones(prev => prev.map(c => c.id_coleccion === editingId ? (updated ?? { ...c, ...form }) : c));
+
+      setSummaryData({ type: 'UPDATE', newData: { ...form }, oldData: oldData });
+    } else {
+      console.log('[GestionColecciones] crearColeccion payload:', form);
+      const created = await crearColeccion(form); // idealmente devuelve objeto creado con id_coleccion
+      console.log('[GestionColecciones] crearColeccion response:', created);
+
+      // Si el backend devuelve el objeto creado, lo agrego; si no, hago refetch más abajo.
+      if (created && (created.id_coleccion || created.id)) {
+        const idCreated = created.id_coleccion ?? created.id;
+        const objeto = { ...(created.titulo ? created : form), id_coleccion: idCreated };
+        setColecciones(prev => [objeto, ...prev]);
+        setSummaryData({ type: 'CREATE', newData: objeto, oldData: null });
+      } else {
+        // fallback: no vino el objeto, pedimos recarga al cerrar popup
+        setSummaryData({ type: 'CREATE', newData: { ...form }, oldData: null });
+      }
+    }
+
+    closeModal();
+    setPopupOpen(true);
+  } catch (err) {
+    console.error('[GestionColecciones] Error guardando colección', err);
+    alert("Ocurrió un error al guardar la colección.");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+const handleDelete = async (id_coleccion) => {
+  try {
+    if (!id_coleccion) {
+      console.warn('[GestionColecciones] handleDelete called with falsy id:', id_coleccion);
       return;
     }
-    setSubmitting(true);
-    try {
-      if (editingId) {
-        await actualizarColeccion(editingId, form);
-      } else {
-        await crearColeccion(form);
-      }
-      closeModal();
-      fetchColecciones();
-    } catch (err) {
-      console.error('[GestionColecciones] Error guardando colección', err);
-      alert('No pudimos guardar la colección. Intentá de nuevo.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    console.log('[GestionColecciones] eliminarColeccion id:', id_coleccion);
+    await eliminarColeccion(id_coleccion);
+    setConfirmDeleteId(null);
 
-  const handleDelete = async (id) => {
-    try {
-      await eliminarColeccion(id);
-      setConfirmDeleteId(null);
-      fetchColecciones();
-    } catch (err) {
-      console.error('[GestionColecciones] Error eliminando colección', err);
-      alert('No pudimos eliminar la colección.');
-    }
-  };
+    // Actualizo localmente sin refetch
+    setColecciones(prev => prev.filter(c => c.id_coleccion !== id_coleccion));
 
-const algoritmosDisponibles = [
+    // y por si acaso, dispara un fetch silencioso para asegurar consistencia
+    await fetchColecciones(true);
+  } catch (err) {
+    console.error('[GestionColecciones] Error eliminando colección', err);
+    alert('No pudimos eliminar la colección.');
+  }
+};
+
+  const algoritmosDisponibles = [
     { label: "Mayoría Simple", value: "MAYORIA_SIMPLE" },
     { label: "Absoluta", value: "ABSOLUTA" },
     { label: "Default", value: "DEFAULT" },
@@ -204,30 +257,53 @@ const algoritmosDisponibles = [
   ];
 
   const configCriterios = {
-    fechaAntes: { 
-      inputType: 'date', 
-      options: [] 
-    },
-    fechaDespues: { 
-      inputType: 'date', 
-      options: [] 
-    },
-    Categoria: { 
-      inputType: 'select',        
-      options: categoriasOptions  
-    },
-    etiqueta: { 
-      inputType: 'text', 
-      options: [] 
-    },
-    titulo: { 
-      inputType: 'text', 
-      options: [] 
-    }
+    fechaAntes: { inputType: 'date', options: [] },
+    fechaDespues: { inputType: 'date', options: [] },
+    categoria: { inputType: 'select', options: categoriasOptions },
+    etiqueta: { inputType: 'text', options: [] },
+    titulo: { inputType: 'text', options: [] }
   };
 
   const criterioTipos = Object.keys(configCriterios);
 
+  const renderSummary = () => {
+    if (!summaryData) return null;
+    const { type, newData, oldData } = summaryData;
+    const isUpdate = type === 'UPDATE';
+    const hasChanged = (field) => isUpdate && oldData && newData[field] !== oldData[field];
+
+    return (
+        <div className="summary-content">
+            <p className="summary-row">
+                <strong>Título:</strong> {newData.titulo}
+                {hasChanged('titulo') && <span className="changed-badge">(Antes: {oldData.titulo})</span>}
+            </p>
+            <p className="summary-row">
+                <strong>Descripción:</strong> {newData.descripcion || <em>Sin descripción</em>}
+                {hasChanged('descripcion') && <span className="changed-badge changed-badge--sm">Modificado</span>}
+            </p>
+            <p className="summary-row">
+                <strong>Algoritmo:</strong> {newData.algoritmoConcenso || <em>No seleccionado</em>}
+                {hasChanged('algoritmoConcenso') && <span className="changed-badge changed-badge--sm">Modificado</span>}
+            </p>
+            <div className="summary-block">
+                <strong>Fuentes ({newData.fuentes.length}):</strong>
+                <div className="tags-container">
+                    {newData.fuentes.map(f => <span key={f} className="tag">{f}</span>)}
+                </div>
+            </div>
+            <div className="summary-block">
+                <strong>Criterios ({newData.criterios.length}):</strong>
+                <ul className="criteria-list">
+                    {newData.criterios.map((c, i) => (
+                        <li key={i}>{c.tipo}: <b>{c.valor}</b></li>
+                    ))}
+                </ul>
+            </div>
+            {isUpdate && <p className="summary-footer-note"><i>* Se muestran los valores actuales guardados.</i></p>}
+        </div>
+    );
+  };
 
   if (!isAuthenticated || !isAdmin) {
     return (
@@ -235,7 +311,6 @@ const algoritmosDisponibles = [
         <div className="gestion-colecciones__denied">
           <span className="gestion-colecciones__denied-icon">🔒</span>
           <h2>Acceso restringido</h2>
-          <p>Necesitás ser administrador para gestionar colecciones.</p>
           <button type="button" className="btn btn--primary" onClick={() => navigate('/') }>
             Volver al inicio
           </button>
@@ -244,21 +319,8 @@ const algoritmosDisponibles = [
     );
   }
 
-  if (loading) {
-    return (
-      <section className="gestion-colecciones">
-        <p className="gestion-colecciones__estado">Cargando colecciones...</p>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="gestion-colecciones">
-        <p className="gestion-colecciones__estado gestion-colecciones__estado--error">{error}</p>
-      </section>
-    );
-  }
+  if (loading) return <section className="gestion-colecciones"><p>Cargando colecciones...</p></section>;
+  if (error) return <section className="gestion-colecciones"><p className="error">{error}</p></section>;
 
   return (
     <section className="gestion-colecciones">
@@ -347,34 +409,14 @@ const algoritmosDisponibles = [
                 Algoritmo de concenso
                 <select 
                 value={form.algoritmoConcenso}
-                onChange={(e) => {
-                    const value = e.target.value;
-                    setForm(prev => ({
-                      ...prev,
-                      algoritmoConcenso: value, // Aquí ya se asigna el VALUE (con guion bajo)
-                    }));
-                  }}
+                onChange={(e) => setForm(prev => ({ ...prev, algoritmoConcenso: e.target.value }))}
                 >
                   <option value={""}>Selecciona un algoritmo</option>
-                  {algoritmosDisponibles.map(algoritmo => (
-                    // Usamos objeto {label, value} para que Java reciba el formato correcto
-                    <option key={algoritmo.value} value={algoritmo.value}>
-                      {algoritmo.label}
-                    </option>
+                  {algoritmosDisponibles.map(alg => (
+                    <option key={alg.value} value={alg.value}>{alg.label}</option>
                   ))}
                 </select>
               </label>
-              {/* LO COMENTO POR QUE NO APLICAMOS EN NINGUN MOMENTO LAS ETIQUETAS
-              <label>
-                Tags (separados por coma)
-                <input
-                  type="text"
-                  name="tagsInput"
-                  value={form.tagsInput}
-                  onChange={handleFormChange}
-                  placeholder="Ej: Incendios, Bosques"
-                />
-              </label> */}
 
               <fieldset className="gestion-colecciones__fuentes">
                 <label>Fuente
@@ -383,21 +425,16 @@ const algoritmosDisponibles = [
                     onChange={(e) => {
                       const val = e.target.value;
                       if (!val) return;
-                    
                       setForm((prev) => ({
                         ...prev,
-                        fuentes: [...(prev.fuentes || []), val] // asegura que sea siempre array
+                        fuentes: [...(prev.fuentes || []), val]
                       }));
-                    
-                      // Resetear el select
                       e.target.selectedIndex = 0;
                     }}
                   >
                   <option value="">Agregar fuente...</option>
                   {fuentes.map((f) => (
-                    <option key={f} value={f.nombre}>
-                      {f}
-                    </option>
+                    <option key={f} value={f}>{f}</option>
                   ))}
                 </select>
 
@@ -417,55 +454,43 @@ const algoritmosDisponibles = [
                   ))}
                 </div>
               </fieldset>
+              
               <fieldset className="gestion-colecciones__criterios">
                 <legend>Criterios / Condiciones de Pertenencia</legend>
                   {form.criterios.map((criterio, idx) => {
-                  // 1. Obtenemos la config para este criterio actual
                   const config = configCriterios[criterio.tipo] || { inputType: 'text', options: [] };
                   return(
                     <div key={idx} className="gestion-colecciones__criterio-row">
-                      {/* SELECTOR DE TIPO (Fecha, Fuente, etc.) */}
                       <select
                         value={criterio.tipo}
                         onChange={(e) => {
-                          const nuevoTipo = e.target.value;
-                          // Al cambiar el tipo, limpiamos el valor para evitar errores
-                          handleCriterioChange(idx, 'tipo', nuevoTipo);
+                          handleCriterioChange(idx, 'tipo', e.target.value);
                           handleCriterioChange(idx, 'valor', ''); 
                         }}
                       >
                         {criterioTipos.map((tipo) => (
-                          <option key={tipo} value={tipo}>
-                            {tipo}
-                          </option>
+                          <option key={tipo} value={tipo}>{tipo}</option>
                         ))}
                       </select>
                       {config.inputType === 'select' ? (
-                        /* CASO: DESPLEGABLE (Solo para Fuente) */
                         <select
                           value={criterio.valor}
                           onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
                         >
                           <option value="" disabled>Seleccionar...</option>
                           {config.options.map((opcion) => (
-                            <option key={opcion} value={opcion}>
-                              {opcion}
-                            </option>
+                            <option key={opcion} value={opcion}>{opcion}</option>
                           ))}
                         </select>
                       ) : (
-                        /* CASO: INPUT (Fecha o Texto) */
                         <input
-                          type={config.inputType} // Aquí se convierte en 'date' o 'text' automágicamente
+                          type={config.inputType}
                           placeholder="Valor"
                           value={criterio.valor}
                           onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
                         />
                       )}
-
-                      <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>
-                        ✕
-                      </button>
+                      <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>✕</button>
                     </div>
                     );
                   })}
@@ -490,6 +515,36 @@ const algoritmosDisponibles = [
           </div>
         </div>
       )}
+
+      {/* --- POPUP DE ÉXITO CON RESUMEN --- */}
+      {/* Usamos handleClosePopup al hacer clic en el botón o en el fondo */}
+      {popupOpen && summaryData && (
+        <div className="modal-overlay" onClick={handleClosePopup}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            
+            <div className="modal-success-icon">✓</div>
+            
+            <h3>
+                {summaryData.type === 'CREATE' ? '¡Colección Creada!' : '¡Colección Actualizada!'}
+            </h3>
+            <p style={{ color: '#666' }}>
+               La operación se realizó con éxito.
+            </p>
+            
+            {renderSummary()}
+
+            <div className="modal-actions">
+                <button 
+                  className="btn btn--primary" 
+                  onClick={handleClosePopup}
+                >
+                  Cerrar
+                </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </section>
   );
 };
