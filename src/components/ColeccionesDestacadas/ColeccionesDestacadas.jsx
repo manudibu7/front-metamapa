@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import './ColeccionesDestacadas.css';
 
 const formatearFecha = (valor) => {
@@ -18,6 +19,7 @@ const formatearFecha = (valor) => {
 
 
 export const ColeccionesDestacadas = ({ colecciones = [], cargando, onExplorar }) => {
+const navigate = useNavigate();
 const destacadas = Array.isArray(colecciones) ? colecciones.slice(0, 3) : [];
   return (
     <section className="colecciones-destacadas" id="colecciones-destacadas">
@@ -36,7 +38,8 @@ const destacadas = Array.isArray(colecciones) ? colecciones.slice(0, 3) : [];
       ) : destacadas.length ? (
         <div className="colecciones-destacadas__grid">
           {destacadas.map((coleccion) => (
-            <article key={coleccion.id_coleccion} className="coleccion-card">
+            <article key={coleccion.id_coleccion} className="coleccion-card" onClick={() => navigate(`/colecciones/${coleccion.id_coleccion}/hechos`)}
+          style={{ cursor: "pointer" }}>
               <div className="coleccion-card__meta">
                 <span className="coleccion-card__estado">{coleccion.estado}</span>
                 <span>{coleccion.consenso}</span>
