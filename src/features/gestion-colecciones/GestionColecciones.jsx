@@ -93,7 +93,7 @@ export const GestionColecciones = () => {
   console.log('[GestionColecciones] handleClosePopup - cerrando popup y recargando colecciones');
   setPopupOpen(false);
   try {
-    await fetchColecciones(false); // recarga visible
+    await fetchColecciones(true); // recarga visible
   } catch (err) {
     console.error('[GestionColecciones] error en handleClosePopup fetchColecciones', err);
   }
