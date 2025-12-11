@@ -30,6 +30,7 @@ export const GestionColecciones = () => {
 
   // Estados de carga/error
   const [loading, setLoading] = useState(true);
+  const [loadingDelete, setLoadingDelete] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -91,9 +92,11 @@ export const GestionColecciones = () => {
   // --- NUEVA FUNCIÓN: Maneja el cierre del popup y la recarga ---
  const handleClosePopup = async () => {
   console.log('[GestionColecciones] handleClosePopup - cerrando popup y recargando colecciones');
-  setPopupOpen(false);
+        setPopupOpen(false);
+
   try {
-    await fetchColecciones(true); // recarga visible
+    await fetchColecciones(true);
+ // recarga visible
   } catch (err) {
     console.error('[GestionColecciones] error en handleClosePopup fetchColecciones', err);
   }
@@ -229,22 +232,55 @@ export const GestionColecciones = () => {
 
 const handleDelete = async (id_coleccion) => {
   try {
+    setLoadingDelete(true);
     if (!id_coleccion) {
       console.warn('[GestionColecciones] handleDelete called with falsy id:', id_coleccion);
       return;
     }
     console.log('[GestionColecciones] eliminarColeccion id:', id_coleccion);
+    const colToDelete = colecciones.find(c => c.id_coleccion === id_coleccion);
+      
+      // 2. Normalizamos los datos (igual que en openEditModal) para que renderSummary los entienda
+      const datosNormalizados = {
+        titulo: colToDelete.titulo,
+        descripcion: colToDelete.descripcion,
+        algoritmoConcenso: colToDelete.algoritmoConcenso || colToDelete.algoritmoDeConsenso || '',
+        fuentes: (colToDelete.fuentes ?? []).map(f => {
+            if (typeof f === 'string') return f;
+            return f.nombre || f.name || f; 
+        }),
+        criterios: colToDelete.criterios?.map(c => ({
+            id: c.id,
+            tipo: c.tipo,
+            valor: c.valor
+        })) ?? []
+      };
     await eliminarColeccion(id_coleccion);
     setConfirmDeleteId(null);
+    
+    setSummaryData({ 
+        type: 'DELETE', 
+        newData: datosNormalizados, // Usamos newData para mostrar lo que había
+        oldData: null 
+      });
+
+    
 
     // Actualizo localmente sin refetch
     setColecciones(prev => prev.filter(c => c.id_coleccion !== id_coleccion));
 
+     setPopupOpen(true);
     // y por si acaso, dispara un fetch silencioso para asegurar consistencia
     await fetchColecciones(true);
+       
+
+    
   } catch (err) {
     console.error('[GestionColecciones] Error eliminando colección', err);
     alert('No pudimos eliminar la colección.');
+  }
+  finally {
+    setLoadingDelete(false);
   }
 };
 
@@ -312,7 +348,12 @@ const handleDelete = async (id_coleccion) => {
                 </ul>
             </div>
             
-            {isUpdate && <p className="summary-footer-note"><i>* Los valores resaltados indican cambios recientes.</i></p>}
+            {isUpdate && (<p className="summary-footer-note"><i>* Los valores resaltados indican cambios recientes.</i></p>)}
+            {summaryData.type === 'DELETE' && (
+                <p className="summary-footer-note" style={{color: 'var(--color-danger)'}}>
+                    <i>* Esta colección ha sido eliminada permanentemente.</i>
+                </p>
+            )}
         </div>
     );
   };
@@ -374,7 +415,7 @@ const handleDelete = async (id_coleccion) => {
                 {confirmDeleteId === col.id_coleccion ? (
                   <>
                     <button type="button" className="btn btn--danger" onClick={() => handleDelete(col.id_coleccion)}>
-                      Confirmar
+                    {loadingDelete ?  "Eliminando..." : "¿Confirmar?"}
                     </button>
                     <button type="button" className="btn btn--ghost" onClick={() => setConfirmDeleteId(null)}>
                       Cancelar
@@ -585,7 +626,9 @@ const handleDelete = async (id_coleccion) => {
             <div className="modal-success-icon">✓</div>
             
             <h3>
-                {summaryData.type === 'CREATE' ? '¡Colección Creada!' : '¡Colección Actualizada!'}
+                {summaryData.type === 'CREATE' ? '¡Colección Creada!' : 
+                 summaryData.type === 'UPDATE' ? '¡Colección Actualizada!':
+                 '¡Colección Eliminada!'}
             </h3>
             <p style={{ color: '#666' }}>
                La operación se realizó con éxito.
