@@ -371,9 +371,9 @@ const handleDelete = async (id_coleccion) => {
                 <button type="button" className="btn btn--ghost" onClick={() => openEditModal(col)}>
                   Editar
                 </button>
-                {confirmDeleteId === col.id ? (
+                {confirmDeleteId === col.id_coleccion ? (
                   <>
-                    <button type="button" className="btn btn--danger" onClick={() => handleDelete(col.id)}>
+                    <button type="button" className="btn btn--danger" onClick={() => handleDelete(col.id_coleccion)}>
                       Confirmar
                     </button>
                     <button type="button" className="btn btn--ghost" onClick={() => setConfirmDeleteId(null)}>
@@ -381,7 +381,7 @@ const handleDelete = async (id_coleccion) => {
                     </button>
                   </>
                 ) : (
-                  <button type="button" className="btn btn--danger-outline" onClick={() => setConfirmDeleteId(col.id)}>
+                  <button type="button" className="btn btn--danger-outline" onClick={() => setConfirmDeleteId(col.id_coleccion)}>
                     Eliminar
                   </button>
                 )}
