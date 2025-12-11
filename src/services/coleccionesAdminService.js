@@ -58,9 +58,9 @@ export const obtenerColeccionesAdmin = async () => {
 };
 
 export const crearColeccion = async (coleccionInput) => {
-  const nuevaColeccion = normalizeInput(coleccionInput);
-  
-  await collectionsService.createCollection(nuevaColeccion);
+  //const nuevaColeccion = normalizeInput(coleccionInput);
+  //console.log("Input dps de a normalizar:", nuevaColeccion);
+  await collectionsService.createCollection(coleccionInput);
 
 };
 

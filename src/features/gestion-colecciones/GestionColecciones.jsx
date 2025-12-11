@@ -6,10 +6,10 @@ import {
   crearColeccion,
   actualizarColeccion,
   eliminarColeccion,
-  fuentesDisponibles,
 } from '../../services/coleccionesAdminService';
 import { useAuth } from '../../hooks/useAuth';
 import { obtenerFuentes } from '../../services/collectionsService';
+import { getCategorias } from '../../services/contribucionesService'; // <--- AGREGAR
 
 
 const buildEmptyForm = () => ({
@@ -29,6 +29,8 @@ export const GestionColecciones = () => {
   const [error, setError] = useState('');
   const [fuentes, setFuentes] = useState([]);
 
+  const [categoriasOptions, setCategoriasOptions] = useState([]);
+  
   // Modal / form state
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -53,16 +55,20 @@ export const GestionColecciones = () => {
   };
 
   useEffect(() => {
-    const fetchFuentes = async () => {
+    const fetchDatosExternos = async () => {
       try {
         const fuentesResponse = await obtenerFuentes();
 
         setFuentes(fuentesResponse.map(f => f.nombre));
+        const categoriasResponse = await getCategorias(); 
+        const listaCategorias = Array.isArray(categoriasResponse) ? categoriasResponse : (categoriasResponse?.datos || []);
+        // Guardamos solo los nombres en el estado
+        setCategoriasOptions(listaCategorias.map(c => c.nombre || c)); 
       } catch (error) {
         setError(error?.message ?? "No se pudo obtener las categorias.");
       }
     };
-      fetchFuentes();
+      fetchDatosExternos();
   }, []);
 
   useEffect(() => {
@@ -81,17 +87,24 @@ export const GestionColecciones = () => {
 
   const openEditModal = (coleccion) => {
     setEditingId(coleccion.id_coleccion);
+    const fuentesMapeadas = (coleccion.fuentes ?? []).map(f => {
+        if (typeof f === 'string') return f;
+        return f.nombre || f.name || f; // Intenta propiedades comunes
+    });
+
+    // Recuperar algoritmo considerando posibles nombres (typo vs correcto)
+    const alg = coleccion.algoritmoConcenso || coleccion.algoritmoDeConsenso || '';
     setForm({
       titulo: coleccion.titulo ?? '',
       descripcion: coleccion.descripcion ?? '',
-      fuentes: coleccion.fuentes ?? [],
+      fuentes: fuentesMapeadas,
       criterios: coleccion.criterios?.map(c => ({
         id: c.id ?? null,
         tipo: c.tipo,
         valor: c.valor
       })) ?? [],
 
-      algoritmoConcenso: coleccion.algoritmoDeConsenso ?? '',
+      algoritmoConcenso:alg,
       //tagsInput: (coleccion.tags ?? []).join(', '),
     });
     setModalOpen(true);
@@ -130,6 +143,12 @@ export const GestionColecciones = () => {
       ...prev,
       criterios: prev.criterios.filter((_, i) => i !== index),
     }));
+  };
+  const removeFuente = (fuenteAEliminar) => {
+     setForm((prev) => ({
+       ...prev,
+       fuentes: prev.fuentes.filter(f => f !== fuenteAEliminar)
+     }));
   };
 
   const handleFuenteToggle = (fuente) => {
@@ -177,11 +196,11 @@ export const GestionColecciones = () => {
     }
   };
 
- const algoritmosDisponibles = [
-  "MAYORIA SIMPLE",
-  "ABSOLUTA",
-  "DEFAULT",
-  "MULTIPLES MENCIONES"
+const algoritmosDisponibles = [
+    { label: "Mayoría Simple", value: "MAYORIA_SIMPLE" },
+    { label: "Absoluta", value: "ABSOLUTA" },
+    { label: "Default", value: "DEFAULT" },
+    { label: "Múltiples Menciones", value: "MULTIPLES_MENCIONES" }
   ];
 
   const configCriterios = {
@@ -194,8 +213,8 @@ export const GestionColecciones = () => {
       options: [] 
     },
     Categoria: { 
-      inputType: 'text', // Texto libre como pediste
-      options: [] 
+      inputType: 'select',        
+      options: categoriasOptions  
     },
     etiqueta: { 
       inputType: 'text', 
@@ -209,7 +228,6 @@ export const GestionColecciones = () => {
 
   const criterioTipos = Object.keys(configCriterios);
 
-//MEJORA : DEBERIAOS CREAR TIPOS DE ALGORITMOS.
 
   if (!isAuthenticated || !isAdmin) {
     return (
@@ -326,22 +344,22 @@ export const GestionColecciones = () => {
                 />
               </label>
               <label>
-                Algoritmo de consenso
+                Algoritmo de concenso
                 <select 
                 value={form.algoritmoConcenso}
                 onChange={(e) => {
                     const value = e.target.value;
-
                     setForm(prev => ({
                       ...prev,
-                      algoritmoConcenso: value,
+                      algoritmoConcenso: value, // Aquí ya se asigna el VALUE (con guion bajo)
                     }));
                   }}
                 >
                   <option value={""}>Selecciona un algoritmo</option>
                   {algoritmosDisponibles.map(algoritmo => (
-                    <option key={algoritmo} value={algoritmo}>
-                      {algoritmo}
+                    // Usamos objeto {label, value} para que Java reciba el formato correcto
+                    <option key={algoritmo.value} value={algoritmo.value}>
+                      {algoritmo.label}
                     </option>
                   ))}
                 </select>
@@ -361,24 +379,43 @@ export const GestionColecciones = () => {
               <fieldset className="gestion-colecciones__fuentes">
                 <label>Fuente
                 <select
-                  value={form.fuentes}
-                  onChange={(e) => {
-                    const value = e.target.value;
-
-                    setForm(prev => ({
-                      ...prev,
-                      fuentes: value,
-                    }));
-                  }}
+                    value=""
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (!val) return;
+                    
+                      setForm((prev) => ({
+                        ...prev,
+                        fuentes: [...(prev.fuentes || []), val] // asegura que sea siempre array
+                      }));
+                    
+                      // Resetear el select
+                      e.target.selectedIndex = 0;
+                    }}
                   >
-                  <option value={""}>Selecciona una fuente</option>
-                {fuentes.map(fuente => (
-                    <option key={fuente} value={fuente}>
-                      {fuente}
+                  <option value="">Agregar fuente...</option>
+                  {fuentes.map((f) => (
+                    <option key={f} value={f.nombre}>
+                      {f}
                     </option>
                   ))}
-                  </select>
+                </select>
+
                 </label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  {form.fuentes.map((f) => (
+                    <span key={f} style={{ background: '#e0e7ff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      {f}
+                      <button 
+                        type="button" 
+                        onClick={() => removeFuente(f)}
+                        style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#666', fontWeight: 'bold' }}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
               </fieldset>
               <fieldset className="gestion-colecciones__criterios">
                 <legend>Criterios / Condiciones de Pertenencia</legend>

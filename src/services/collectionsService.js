@@ -73,9 +73,7 @@ export const collectionsService = {
         `${API_ADMINISTRATIVA_URL}/colecciones`,
         collectionInput,
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Cache-Control": "no-cache" },
         }
       );
       return response.data;
