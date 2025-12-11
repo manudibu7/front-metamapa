@@ -63,7 +63,7 @@ export const GestionSolicitudes = () => {
       </div>
     );
   }
-
+  console.log("Solicitud recibida:", solicitudes);
   return (
     <div className="gestion-solicitudes">
       <header className="gestion-solicitudes__header">
@@ -119,23 +119,28 @@ export const GestionSolicitudes = () => {
               </div>
 
               <div className="solicitud-card__actions">
-                {solicitud.estado === 'PENDIENTE' ? (
+                {solicitud.estadoSolicitud === 'PENDIENTE' ? (
                   <>
-                    <button
-                      className="btn-action btn-accept"
-                      onClick={() => handleAction(solicitud.id, 'ACEPTADA')}
-                      disabled={processingId === solicitud.id}
-                    >
-                      {processingId === solicitud.id ? 'Procesando...' : '✅ Aceptar Eliminación'}
-                    </button>
-                    <button
-                      className="btn-action btn-reject"
-                      onClick={() => handleAction(solicitud.id, 'RECHAZADA')}
-                      disabled={processingId === solicitud.id}
-                    >
-                      {processingId === solicitud.id ? 'Procesando...' : '❌ Rechazar Solicitud'}
-                    </button>
-                  </>
+                <button className="btn-action btn-accept" onClick={() => {
+                   if (window.confirm("¿Confirmás aceptar esta solicitud de eliminación?")) {
+                      handleAction(solicitud.id_solicitud, 'ACEPTADA');
+                    }
+                    }}
+                  disabled={processingId === solicitud.id_solicitud}
+                  >{processingId === solicitud.id_solicitud ? 'Procesando...' : '✅ Aceptar Eliminación'}
+                </button>
+
+                  <button className="btn-action btn-reject"
+                    onClick={() => {
+                    if (window.confirm("¿Confirmás rechazar esta solicitud?")) {
+                    handleAction(solicitud.id_solicitud, 'RECHAZADA');
+                  }
+                  }}
+                  disabled={processingId === solicitud.id_solicitud}
+                  >
+                  {processingId === solicitud.id_solicitud ? 'Procesando...' : '❌ Rechazar Solicitud'}
+                </button>
+                </>
                 ) : (
                   <div className="action-completed">
                     Solicitud {solicitud.estadoSolicitud != null? solicitud.estadoSolicitud.toLowerCase(): "sinestado"}

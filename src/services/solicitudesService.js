@@ -6,15 +6,13 @@ const simulateDelay = (data, delay = 400) =>
     setTimeout(() => resolve(JSON.parse(JSON.stringify(data))), delay);
   });
 
-// Generate some mock requests based on existing facts
+//solicitudes mockeadas
 const generateMockSolicitudes = () => {
   const solicitudes = [];
   let reqId = 1;
 
-  // Pick a few facts from the first collection
   const collection = mockCollections[0];
   if (collection && collection.hechos) {
-    // Request 1
     if (collection.hechos[0]) {
       solicitudes.push({
         id: `SOL-${reqId++}`,
@@ -25,7 +23,6 @@ const generateMockSolicitudes = () => {
         estado: 'PENDIENTE',
       });
     }
-    // Request 2
     if (collection.hechos[1]) {
       solicitudes.push({
         id: `SOL-${reqId++}`,
@@ -38,7 +35,6 @@ const generateMockSolicitudes = () => {
     }
   }
 
-  // Pick a fact from another collection if available
   const collection2 = mockCollections[1];
   if (collection2 && collection2.hechos && collection2.hechos[0]) {
     solicitudes.push({
@@ -78,7 +74,6 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
 */
 const BASE_URL = "http://localhost:8100/solicitudes";
 const ADMINISTRATIVA_URL = "http://localhost:8084/solicitudes";
-// Cambiá esta URL si tu backend corre en otro puerto/path
 
 // GET /solicitudes
 export const obtenerSolicitudes = async () => {
@@ -117,24 +112,15 @@ export const crearSolicitud = async (solicitud) => {
   }
 };
 
-// PUT o PATCH (dependiendo del back) — si solo querés cambiar el estado
-// Si tu backend no tiene endpoint para actualizar estado, avisame y lo adaptamos
 export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
-  try {
-    const response = await (`${ADMINISTRATIVA_URL}/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estado: nuevoEstado }),
-    });
+  const response = await fetch(`${ADMINISTRATIVA_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ estado: nuevoEstado }),
+  });
 
-    if (!response.ok) {
-      throw new Error("Error al actualizar estado");
-    }
+  if (!response.ok) throw new Error("Error al actualizar estado");
 
-    return await response.json();
-  } catch (error) {
-    console.error("Error en actualizarEstadoSolicitud:", error);
-    throw error;
-  }
+  return await response.json(); // ← ahora sí existe y funciona
 };
 
