@@ -146,12 +146,11 @@ export const GestionColecciones = () => {
     });
   };
 
-  const addCriterio = (tipo, valor) => {
-    const defaultTipo = tipo ?? '';
-    const defaultValor = valor ?? '';
+ const addCriterio = () => {
     setForm((prev) => ({
       ...prev,
-      criterios: [...prev.criterios, { tipo: defaultTipo, valor: defaultValor }],
+      // Inicializamos tipo en vacío para forzar la selección
+      criterios: [...prev.criterios, { tipo: "", valor: "" }], 
     }));
   };
 
@@ -273,25 +272,37 @@ const handleDelete = async (id_coleccion) => {
     const hasChanged = (field) => isUpdate && oldData && newData[field] !== oldData[field];
 
     return (
-        <div className="summary-content">
+        <div className="modal-summary">
             <p className="summary-row">
-                <strong>Título:</strong> {newData.titulo}
-                {hasChanged('titulo') && <span className="changed-badge">(Antes: {oldData.titulo})</span>}
+                <strong>Título:</strong>{' '}
+                <span className={hasChanged('titulo') ? 'value-modified' : ''}>
+                    {newData.titulo}
+                </span>
+                {/* Mantenemos el "Antes" solo para el título por contexto, pero sin la etiqueta "Modificado" */}
+                {hasChanged('titulo') && <span className="old-value-badge"> (Antes: {oldData.titulo})</span>}
             </p>
+            
             <p className="summary-row">
-                <strong>Descripción:</strong> {newData.descripcion || <em>Sin descripción</em>}
-                {hasChanged('descripcion') && <span className="changed-badge changed-badge--sm">Modificado</span>}
+                <strong>Descripción:</strong>{' '}
+                <span className={hasChanged('descripcion') ? 'value-modified' : ''}>
+                    {newData.descripcion || <em>Sin descripción</em>}
+                </span>
             </p>
+
             <p className="summary-row">
-                <strong>Algoritmo:</strong> {newData.algoritmoConcenso || <em>No seleccionado</em>}
-                {hasChanged('algoritmoConcenso') && <span className="changed-badge changed-badge--sm">Modificado</span>}
+                <strong>Algoritmo:</strong>{' '}
+                <span className={hasChanged('algoritmoConcenso') ? 'value-modified' : ''}>
+                    {newData.algoritmoConcenso || <em>No seleccionado</em>}
+                </span>
             </p>
+
             <div className="summary-block">
                 <strong>Fuentes ({newData.fuentes.length}):</strong>
                 <div className="tags-container">
                     {newData.fuentes.map(f => <span key={f} className="tag">{f}</span>)}
                 </div>
             </div>
+
             <div className="summary-block">
                 <strong>Criterios ({newData.criterios.length}):</strong>
                 <ul className="criteria-list">
@@ -300,7 +311,8 @@ const handleDelete = async (id_coleccion) => {
                     ))}
                 </ul>
             </div>
-            {isUpdate && <p className="summary-footer-note"><i>* Se muestran los valores actuales guardados.</i></p>}
+            
+            {isUpdate && <p className="summary-footer-note"><i>* Los valores resaltados indican cambios recientes.</i></p>}
         </div>
     );
   };
@@ -433,9 +445,18 @@ const handleDelete = async (id_coleccion) => {
                     }}
                   >
                   <option value="">Agregar fuente...</option>
-                  {fuentes.map((f) => (
-                    <option key={f} value={f}>{f}</option>
-                  ))}
+                  {fuentes.map((f) =>{const isSelected = form.fuentes.includes(f);
+                    return (
+                      <option 
+                        key={f} 
+                        value={f} 
+                        disabled={isSelected} // Deshabilitamos si ya está seleccionada
+                        style={isSelected ? { color: '#999', fontStyle: 'italic', background: '#f5f5f5' } : {}}
+                      >
+                        {f} {isSelected ? '(Seleccionado)' : ''}
+                      </option>
+                    );
+                  })}
                 </select>
 
                 </label>
@@ -459,19 +480,56 @@ const handleDelete = async (id_coleccion) => {
                 <legend>Criterios / Condiciones de Pertenencia</legend>
                   {form.criterios.map((criterio, idx) => {
                   const config = configCriterios[criterio.tipo] || { inputType: 'text', options: [] };
-                  return(
+                    // --- VARIABLES NUEVAS ---
+                    // A. Si tiene ID, significa que vino del Backend (es viejo)
+                    const isExisting = !!criterio.id; 
+
+                    // B. Chequeamos si es tipo fecha
+                    const isDate = config.inputType === 'date';
+
+                    // C. Calculamos si el VALOR debe estar bloqueado:
+                    const showAsLabel = isExisting && !isDate;
+                    const existeCategoria = form.criterios.some(c => c.tipo === 'categoria');
+                    const existeFechaAntes = form.criterios.some(c => c.tipo === 'fechaAntes');
+                    const existeFechaDespues = form.criterios.some(c => c.tipo === 'fechaDespues');
+                    if (showAsLabel) {
+                    return (
+                      <div key={idx} className="gestion-colecciones__criterio-row criterio-label-mode">
+                        <span className="criterio-label-text">
+                          <strong>{criterio.tipo}:</strong> {criterio.valor}
+                        </span>
+                        <span title="Condición guardada (Solo lectura)" style={{ cursor: 'help', marginRight: 'auto', marginLeft: '8px' }}>
+                           💾
+                        </span>
+                        <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>✕</button>
+                      </div>
+                    );
+                  }
+                 return(
                     <div key={idx} className="gestion-colecciones__criterio-row">
                       <select
                         value={criterio.tipo}
+                        // Si es viejo (y es fecha, porque cayó aquí), bloqueamos el tipo para no cambiar "Fecha" por "Titulo"
+                        disabled={isExisting} 
                         onChange={(e) => {
                           handleCriterioChange(idx, 'tipo', e.target.value);
                           handleCriterioChange(idx, 'valor', ''); 
                         }}
                       >
+                        <option value="" disabled>Seleccionar criterio...</option>
                         {criterioTipos.map((tipo) => (
-                          <option key={tipo} value={tipo}>{tipo}</option>
+                          <option 
+                            key={tipo} 
+                            value={tipo}
+                            disabled={tipo === 'categoria' && existeCategoria && criterio.tipo !== 'categoria' || 
+                              tipo === 'fechaAntes' && existeFechaAntes && criterio.tipo !== 'fechaAntes' ||
+                              tipo === 'fechaDespues' && existeFechaDespues && criterio.tipo !== 'fechaDespues'}
+                          >
+                            {tipo}
+                          </option>
                         ))}
                       </select>
+
                       {config.inputType === 'select' ? (
                         <select
                           value={criterio.valor}
@@ -487,9 +545,11 @@ const handleDelete = async (id_coleccion) => {
                           type={config.inputType}
                           placeholder="Valor"
                           value={criterio.valor}
+                          // Aquí NO ponemos disabled, porque si cayó en este return es porque es editable (o es nuevo o es fecha)
                           onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
                         />
                       )}
+                      
                       <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>✕</button>
                     </div>
                     );
