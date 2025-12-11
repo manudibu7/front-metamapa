@@ -123,4 +123,13 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
 
   return await response.json(); // ← ahora sí existe y funciona
 };
+// DELETE solicitudes
+export const eliminarSolicitud = async (id) => {
+  const response = await fetch(`${ADMINISTRATIVA_URL}/${id}`, {
+    method: "DELETE"
+  });
 
+  if (!response.ok) {
+    throw new Error("Error eliminando solicitud");
+  }
+};
