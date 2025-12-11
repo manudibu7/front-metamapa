@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { obtenerSolicitudes, actualizarEstadoSolicitud } from '../../services/solicitudesService';
+import { obtenerSolicitudes, actualizarEstadoSolicitud, eliminarSolicitud } from '../../services/solicitudesService';
 import './GestionSolicitudes.css';
 
 export const GestionSolicitudes = () => {
@@ -34,19 +34,26 @@ export const GestionSolicitudes = () => {
   }, [isAdmin, navigate]);
 
   const handleAction = async (id, nuevoEstado) => {
-    setProcessingId(id);
-    try {
-      const updatedSolicitud = await actualizarEstadoSolicitud(id, nuevoEstado);
-      setSolicitudes((prev) =>
-        prev.map((s) => (s.id === id ? updatedSolicitud : s))
-      );
-    } catch (err) {
-      console.error('Error al actualizar solicitud:', err);
-      alert('No se pudo actualizar la solicitud');
-    } finally {
-      setProcessingId(null);
+  setProcessingId(id);
+  try {
+    await actualizarEstadoSolicitud(id, nuevoEstado);
+
+    if (nuevoEstado === "RECHAZADA") {
+      await eliminarSolicitud(id);
     }
-  };
+
+    // Quita la solicitud de la UI
+    setSolicitudes((prev) =>
+      prev.filter((s) => s.id_solicitud !== id)
+    );
+
+  } catch (err) {
+    console.error("Error al actualizar solicitud:", err);
+    alert("No se pudo actualizar la solicitud");
+  } finally {
+    setProcessingId(null);
+  }
+};
 
   if (loading) {
     return (
