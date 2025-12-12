@@ -22,27 +22,27 @@ export const getDetalleRevision = async (idContribucion) => {
   }
 };
 
-export const aceptarRevision = async (idContribucion, comentarios) => {
+export const aceptarRevision = async (idContribucion, comentarios,contribuyenteId) => {
   try {
-    await axios.post(`${API_BASE_URL}/revisiones/${idContribucion}/aceptar`, { comentarios });
+    await axios.post(`${API_BASE_URL}/revisiones/${idContribucion}/aceptar`, { comentarios,contribuyenteId});
   } catch (error) {
     console.error('Error aceptando contribución:', error);
     throw new Error('Error aceptando contribución');
   }
 };
 
-export const aceptarConCambios = async (idContribucion, comentarios) => {
+export const aceptarConCambios = async (idContribucion, comentarios,contribuyenteId) => {
   try {
-    await axios.post(`${API_BASE_URL}/revisiones/${idContribucion}/aceptar-con-cambios`, { comentarios });
+    await axios.post(`${API_BASE_URL}/revisiones/${idContribucion}/aceptar-con-cambios`, { comentarios,contribuyenteId});
   } catch (error) {
     console.error('Error aceptando con cambios:', error);
     throw new Error('Error aceptando con cambios');
   }
 };
 
-export const rechazarRevision = async (idContribucion, comentarios) => {
+export const rechazarRevision = async (idContribucion, comentarios,contribuyenteId) => {
   try {
-    await axios.post(`${API_BASE_URL}/revisiones/${idContribucion}/rechazar`, { comentarios });
+    await axios.post(`${API_BASE_URL}/revisiones/${idContribucion}/rechazar`, { comentarios,contribuyenteId});
   } catch (error) {
     console.error('Error rechazando contribución:', error);
     throw new Error('Error rechazando contribución');

@@ -6,11 +6,16 @@ import { UbicacionSelector } from "../UbicacionSelector/UbicacionSelector";
 import { getCategorias } from "../../services/contribucionesService";
 import { useNavigate } from "react-router-dom";
 
+
+ const today = new Date();
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  const maxDate = today.toISOString().split("T")[0];
+
 const buildDefaultHecho = () => ({
   titulo: "",
   categoria: "",  // ← ahora es solo string
   descripcion: "",
-  fecha: new Date().toISOString().split("T")[0],
+  fecha: maxDate,
   ubicacion: null,
 });
 
@@ -44,6 +49,7 @@ export const FastFactForm = () => {
   const fileInputRef = useRef(null);
   const [categorias, setCategorias] = useState([]);
   const [nuevaCategoria, setNuevaCategoria] = useState("");
+  const [anonimo, setAnonimo] = useState(false);
 
   const [mapKey, setMapKey] = useState(0);
 
@@ -78,7 +84,6 @@ const handleArchivoChange = (event) => {
  ///SI
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     const categoriaFinal =
     hecho.categoria === "__agregar__"
       ? nuevaCategoria   // Usuario escribió una categoría nueva
@@ -88,11 +93,6 @@ const handleArchivoChange = (event) => {
     if (!hecho.ubicacion) {
       setStatus("error");
       setError("Seleccioná una ubicación desde el mapa o la búsqueda.");
-      return;
-    }
-    if (!contribuyenteId) {
-      setStatus("error");
-      setError("No pudimos leer tu contribuyenteId del token.");
       return;
     }
 
@@ -108,6 +108,7 @@ const handleArchivoChange = (event) => {
         },
         archivo,
         token,
+        anonimo,
       });
       setStatus("success");
       //setTimeout(() => setStatus("idle"), 3500);
@@ -139,7 +140,7 @@ const handleArchivoChange = (event) => {
   fetchCategorias();
 }, []);
 
-
+ 
 
   let bodyContent = null;
   if (authLoading) {
@@ -161,7 +162,16 @@ const handleArchivoChange = (event) => {
           <div className="fast-fact__section-header">
             <h3>Detalle del hecho</h3>
           </div>
-
+           <div style={{ marginBottom: "1rem" }}>
+            <button
+              type="button"
+              className={`btn ${anonimo ? "btn--primary" : "btn--secondary"}`}
+              // CORRECCIÓN: Usamos () => función
+              onClick={() => setAnonimo(!anonimo)} 
+            >
+              {anonimo ? "Modo Anónimo Activado" : "Activar Modo Anónimo"}
+            </button>
+          </div>
           <label>
             Título del hecho
             <input
@@ -219,7 +229,8 @@ const handleArchivoChange = (event) => {
                 name="fecha"
                 value={hecho.fecha}
                 onChange={handleHechoChange}
-                max={new Date().toISOString().split("T")[0]}
+                
+                max={maxDate}
                 required
               />
             </label>

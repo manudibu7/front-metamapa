@@ -10,15 +10,15 @@ import {
 import './GestionRevisiones.css';
 
 export const GestionRevisiones = () => {
- // const { isAdmin } = useAuth();
+const { isAdmin,contribuyenteId } = useAuth();
 
- const mockUseAuth = () => {
-    return {
-      isAdmin: true, // Cambiar a false para probar redirección
-    };
-  };
+ //const mockUseAuth = () => {
+ //   return {
+ //     isAdmin: true, // Cambiar a false para probar redirección
+ //   };
+ // };
   const [mensaje, setMensaje] = useState("");
-  const { isAdmin } = mockUseAuth();
+//  const { isAdmin } = mockUseAuth();
   const navigate = useNavigate();
   const [pendientes, setPendientes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +34,7 @@ export const GestionRevisiones = () => {
     const fetchPendientes = async () => {
       try {
         const data = await listarPendientes();
+        console.log('Revisiones pendientes cargadas:', data);
         setPendientes(data);
       } catch (err) {
         console.error('Error al cargar revisiones:', err);
@@ -59,18 +60,18 @@ export const GestionRevisiones = () => {
       texto = `✔️  ${tituloHecho} fue aceptado.`;
       setMensaje(texto);
       setTimeout(() => setMensaje(""), 3000);
-      await aceptarRevision(id, comentario);
+      await aceptarRevision(id, comentario,contribuyenteId);
 
     } else if (actionType === 'CAMBIOS') {
       texto = `⚠️  ${tituloHecho} requiere cambios.`
       setMensaje(texto);
       setTimeout(() => setMensaje(""), 3000);
-      await aceptarConCambios(id, comentario);
+      await aceptarConCambios(id, comentario,contribuyenteId);
     } else if (actionType === 'RECHAZAR') {
       texto = `❌  ${tituloHecho} fue rechazado.`
       setMensaje(texto);
       setTimeout(() => setMensaje(""), 3000);
-      await rechazarRevision(id, comentario);
+      await rechazarRevision(id, comentario,contribuyenteId);
     }
 
     setPendientes((prev) => prev.filter((p) => p.idContribucion !== id));
@@ -132,7 +133,7 @@ export const GestionRevisiones = () => {
               <div className="revision-card__content">
                 <div className="revision-card__header">
                   <span className="revision-card__id">ID: {item.idContribucion}</span>
-                  <span className="revision-card__id">Contribuyente: {item.idContribuyente}</span>
+                  <span className="revision-card__id">{!item.anonimo? "Contribuyente ID: " + item.idContribuyente: "Es una contribucion ANONIMA"}</span>
                 </div>
 
                 <div 

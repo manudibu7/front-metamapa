@@ -44,7 +44,7 @@ const fileToDataUrl = (archivo) =>
     reader.readAsDataURL(archivo);
   });
 
-export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo, token }) => {
+export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo, token,anonimo }) => {
   if (!contribuyenteId) {
     throw new Error('No pudimos obtener el contribuyenteId del token.');
   }
@@ -61,7 +61,8 @@ export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo
     // The backend returns the ID directly, e.g. 10
     const response = await axios.post(`${API_BASE_URL}/contribuciones`, 
       {idContribuyente: contribuyenteId,
-        hecho:hechoDto
+        hecho:hechoDto,
+        anonimo: anonimo
     },{ headers });
     const contribucionId = response.data;
 
