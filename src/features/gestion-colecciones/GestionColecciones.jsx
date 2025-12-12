@@ -91,15 +91,7 @@ export const GestionColecciones = () => {
 
   // --- NUEVA FUNCIÓN: Maneja el cierre del popup y la recarga ---
  const handleClosePopup = async () => {
-  console.log('[GestionColecciones] handleClosePopup - cerrando popup y recargando colecciones');
-        setPopupOpen(false);
-
-  try {
-    await fetchColecciones(true);
- // recarga visible
-  } catch (err) {
-    console.error('[GestionColecciones] error en handleClosePopup fetchColecciones', err);
-  }
+  setPopupOpen(false);
 };
 
   const openCreateModal = () => {
@@ -128,6 +120,7 @@ export const GestionColecciones = () => {
       algoritmoConcenso: alg,
     });
     setModalOpen(true);
+
   };
 
   const closeModal = () => {
@@ -219,9 +212,10 @@ export const GestionColecciones = () => {
         setSummaryData({ type: 'CREATE', newData: { ...form }, oldData: null });
       }
     }
-
+    await fetchColecciones(true); // refetch silencioso para asegurar consistencia
     closeModal();
     setPopupOpen(true);
+
   } catch (err) {
     console.error('[GestionColecciones] Error guardando colección', err);
     alert("Ocurrió un error al guardar la colección.");
@@ -257,6 +251,7 @@ const handleDelete = async (id_coleccion) => {
       };
     await eliminarColeccion(id_coleccion);
     setConfirmDeleteId(null);
+    setColecciones(prev => prev.filter(c => c.id_coleccion !== id_coleccion));
     
     setSummaryData({ 
         type: 'DELETE', 
@@ -264,23 +259,17 @@ const handleDelete = async (id_coleccion) => {
         oldData: null 
       });
 
-    
-
-    // Actualizo localmente sin refetch
-    setColecciones(prev => prev.filter(c => c.id_coleccion !== id_coleccion));
-
-     setPopupOpen(true);
+    setLoadingDelete(false);
+    setPopupOpen(true);
     // y por si acaso, dispara un fetch silencioso para asegurar consistencia
     await fetchColecciones(true);
+    
        
 
     
   } catch (err) {
     console.error('[GestionColecciones] Error eliminando colección', err);
     alert('No pudimos eliminar la colección.');
-  }
-  finally {
-    setLoadingDelete(false);
   }
 };
 
@@ -388,7 +377,7 @@ const handleDelete = async (id_coleccion) => {
           <p>Creá, editá o eliminá colecciones del sistema.</p>
         </div>
         <button type="button" className="btn btn--primary" onClick={openCreateModal}>
-          + Nueva colección
+          Crear nueva colección
         </button>
       </header>
 
