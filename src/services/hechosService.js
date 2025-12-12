@@ -25,6 +25,7 @@ export const hechosService = {
 
 // 💡 URL base de tu backend
 const API_URL = 'http://localhost:8100/hechos';
+const API_ADMI_URL = "http://localhost:8084/hechos";
 // Asegúrate de cambiar 'localhost:8080' por la dirección correcta de tu API.
 
 /**
@@ -82,4 +83,23 @@ export const hechosService = {
         throw error;
     }
   },
+};
+export const actualizarEtiqueta = async (idHecho, etiqueta) => {
+  const response = await fetch(`${API_ADMI_URL}/${idHecho}/etiqueta`, {
+    method: "PUT",
+    headers: { "Content-Type": "text/plain" },
+    body: etiqueta,
+  });
+
+  if (!response.ok) {
+    throw new Error("Error actualizando etiqueta");
+  }
+
+  // No retornamos nada
+};
+
+export const obtenerEtiquetas = async () => {
+  const res = await fetch(`http://localhost:8084/etiquetas`);
+  if (!res.ok) throw new Error("No se pudieron cargar las etiquetas");
+  return await res.json();
 };

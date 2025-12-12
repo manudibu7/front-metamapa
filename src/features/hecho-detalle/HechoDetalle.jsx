@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { icon } from 'leaflet';
-import { hechosService } from '../../services/hechosService';
+import { hechosService, actualizarEtiqueta, obtenerEtiquetas } from '../../services/hechosService';
 import { crearSolicitud } from '../../services/solicitudesService';
 import { useAuthContext } from '../../context/AuthContext';
 import './HechoDetalle.css';
@@ -21,7 +21,7 @@ export const HechoDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { contribuyenteId,isAuthenticated} = useAuthContext(); // <--- OBTENER EL ID DEL CONTEXTO
+  const { contribuyenteId,isAuthenticated, isAdmin} = useAuthContext(); // <--- OBTENER EL ID DEL CONTEXTO
   
   console.log('Usuario:', { isAuthenticated, contribuyenteId });
 
@@ -32,7 +32,15 @@ export const HechoDetalle = () => {
   const [error, setError] = useState(null);
   const [isRequesting, setIsRequesting] = useState(false); // Estado para evitar doble envío
   const [requestMessage, setRequestMessage] = useState(''); // Mensaje de éxito/error
-
+  // Estado para etiquetas
+  const [showEtiquetaModal, setShowEtiquetaModal] = useState(false);
+  const [etiqueta, setEtiqueta] = useState("");
+  const [successEtiqueta, setSuccessEtiqueta] = useState("");
+  const [isEtiquetando, setIsEtiquetando] = useState(false);
+  const [errorEtiqueta, setErrorEtiqueta] = useState(null);
+  const [etiquetasDisponibles, setEtiquetasDisponibles] = useState([]);
+  const [loadingEtiquetas, setLoadingEtiquetas] = useState(true);
+  const [nuevaEtiqueta, setNuevaEtiqueta] = useState("");
   useEffect(() => {
     const fetchHecho = async () => {
       if (!id) return;
@@ -53,10 +61,27 @@ export const HechoDetalle = () => {
         setLoading(false);
       }
     };
-
+    
     fetchHecho();
   }, [id]);
+  useEffect(() => {
+  const fetchEtiquetas = async () => {
+    if (!showEtiquetaModal) return;
 
+    setLoadingEtiquetas(true);
+    try {
+      const data = await obtenerEtiquetas();
+      console.log("Etiquetas recibidas:", data);
+      setEtiquetasDisponibles(data);
+    } catch (err) {
+      console.error("Error cargando etiquetas", err);
+    } finally {
+      setLoadingEtiquetas(false);
+    }
+  };
+
+  fetchEtiquetas();
+}, [showEtiquetaModal]);
   // Función para manejar la solicitud de eliminación
   const handleSolicitarEliminacion = async () => {
     if (!contribuyenteId || !hecho || isRequesting) return;
@@ -96,6 +121,35 @@ export const HechoDetalle = () => {
       setIsRequesting(false);
     }
   };
+  const handleAsignarEtiqueta = async () => {
+  const etiquetaFinal = etiqueta === "__agregar__" ? nuevaEtiqueta : etiqueta;
+
+  if (!etiquetaFinal.trim()) return; 
+
+  setIsEtiquetando(true);
+  setErrorEtiqueta(null);
+  setSuccessEtiqueta("");
+
+  try {
+    await actualizarEtiqueta(hecho.id_hecho, etiquetaFinal);
+
+    setHecho({ ...hecho, etiqueta: etiquetaFinal });
+
+    setSuccessEtiqueta("Etiqueta actualizada correctamente ✔️"); 
+    setEtiqueta("");
+    setNuevaEtiqueta("");
+
+    setTimeout(() => {
+      setShowEtiquetaModal(false);
+      setSuccessEtiqueta(""); 
+    }, 1200);
+  } catch (err) {
+    console.error(err);
+    setErrorEtiqueta("No se pudo actualizar la etiqueta.");
+  } finally {
+    setIsEtiquetando(false);
+  }
+};
 
   // --- Renderizado: Estado de Carga ---
   if (loading) {
@@ -116,46 +170,33 @@ export const HechoDetalle = () => {
     );
   }
 
-  // --- Renderizado: Contenido Principal ---
   return (
     <div className="hecho-detalle">
       <div className="hecho-detalle__container">
         
-        {/* Cabecera */}
         <header className="hecho-detalle__header">
           <button className="hecho-detalle__back" onClick={() => navigate(-1)}>
             ← Volver
           </button>
-          
+
           <div className="hecho-detalle__badges">
-            <span className="badge badge--categoria">{hecho.categoria!=null?hecho.categoria:"Sin Categorias" }</span>
-            <span className="badge badge--estado">{hecho.etiqueta!=null?hecho.etiqueta:"Sin Etiquetas"}</span>
+            <div className="meta-value">{"Categoría: " + hecho.categoria}</div>
+            <div className="meta-value">{"Etiqueta: " + hecho.etiqueta}</div>
           </div>
 
           <h1>{hecho.titulo}</h1>
-          {/*. BOTÓN CONDICIONAL */}
-          {contribuyenteId && ( // <-- La condición clave
-            <button 
-  className="btn-solicitud"
-  onClick={() => setShowModal(true)} // O tu función handleSolicitarEliminacion
-  disabled={isRequesting}
->
-  {isRequesting ? (
-    <>
-      {/* Icono de carga giratorio */}
-      <span className="icon-loading">⏳</span> 
-      <span>Procesando...</span>
-    </>
-  ) : (
-    <>
-      {/* Icono de papelera o advertencia */}
-      <span>🗑️</span> 
-      <span>Solicitar Eliminación</span>
-    </>
-  )}
-</button>
+
+          {contribuyenteId && (
+            <button className="btn-solicitud" onClick={() => setShowModal(true)}>
+              🗑️ Solicitar Eliminación
+            </button>
           )}
-          {/* FIN BOTÓN CONDICIONAL */}
+
+          {isAdmin && (
+            <button className="btn-etiqueta" onClick={() => setShowEtiquetaModal(true)}>
+              🏷️ Asignar Etiqueta
+            </button>
+          )}
 
           <div className="hecho-detalle__meta">
             <div className="meta-item">
@@ -279,6 +320,52 @@ export const HechoDetalle = () => {
                 disabled={isRequesting || !motivo.trim()}
               >
                 {isRequesting ? 'Enviando...' : 'Enviar Solicitud'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal Etiqueta */}
+      {showEtiquetaModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Asignar Etiqueta</h3>
+
+            <label>
+              Etiqueta
+            <select
+              value={etiqueta}
+              onChange={(e) => setEtiqueta(e.target.value)}
+            >
+            <option value="">Seleccioná una etiqueta</option>
+            {etiquetasDisponibles.map(et => (
+              <option key={et.id_etiqueta} value={et.nombre}>
+                {et.nombre}
+              </option>
+            ))}
+              <option value="__agregar__">Otra</option>
+            </select>
+
+              {etiqueta === "__agregar__" && (
+              <input
+                type="text"
+                placeholder="Ingresá nueva etiqueta"
+                value={nuevaEtiqueta}
+                onChange={(e) => setNuevaEtiqueta(e.target.value)}
+              />
+            )}
+            </label>
+
+            {errorEtiqueta && <p className="modal-error">{errorEtiqueta}</p>}
+            {successEtiqueta && <p className="modal-success">{successEtiqueta}</p>}
+            {isEtiquetando && (<p className="modal-loading">⏳ Procesando, haciendo cambios...</p>)}
+            <div className="modal-actions">
+              <button className="btn-cancelar" onClick={() => setShowEtiquetaModal(false)}>
+                Cancelar
+              </button>
+
+              <button className="btn-confirmar" onClick={handleAsignarEtiqueta} disabled={isEtiquetando}>
+                {isEtiquetando ? 'Guardando...' : 'Guardar'}
               </button>
             </div>
           </div>
