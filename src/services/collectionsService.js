@@ -42,11 +42,12 @@ export const collectionsService = {
     throw error;
   }
 },
-  async getHechosDeColeccion(coleccionID) {
+  async getHechosDeColeccion(coleccionID, filtros= {}) {
     try {
-      const url = `${API_PUBLICA_URL}/colecciones/${coleccionID}/hechos`;
-
+      var url = `${API_PUBLICA_URL}/colecciones/${coleccionID}/hechos`;
+      console.log(url)
       const response = await axios.get(url, {
+        params: filtros,
         headers: {
           "Cache-Control": "no-cache",
         },

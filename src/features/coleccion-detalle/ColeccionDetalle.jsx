@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { icon } from 'leaflet';
 import { collectionsService } from '../../services/collectionsService';
@@ -22,27 +22,48 @@ export const ColeccionDetalle = () => {
   const [hechos, setHechos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHecho, setSelectedHecho] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  useEffect(() => {
-    const fetchData = async () => {
-    try {
-      const coleccionData = await collectionsService.getCollectionById(id);
-      setColeccion(coleccionData);
-
-      const hechosData = await collectionsService.getHechosDeColeccion(id);
-      setHechos(hechosData);
-
-    } catch (error) {
-      console.error("Error cargando datos:", error);
-      setColeccion(null);
-      setHechos([]);
-    } finally {
-      setLoading(false);
-    }
+const updateFilter = (key, value) => {
+    setSearchParams((prevParams) => {
+      const newParams = new URLSearchParams(prevParams);
+      
+      if (value) {
+        newParams.set(key, value);
+      } else {
+        newParams.delete(key);
+      }
+      return newParams;
+    });
   };
 
-  fetchData();
-}, [id]);
+
+useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const coleccionData = await collectionsService.getCollectionById(id);
+        setColeccion(coleccionData);
+        const filtrosActuales = Object.fromEntries([...searchParams]);
+        const hechosData = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
+        setHechos(hechosData);
+
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+        setHechos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    // La dependencia es searchParams: cada vez que cambies la URL, se ejecuta esto.
+  }, [id, searchParams]);
+
+// Manejadores de Eventos
+  const handleModoChange = (e) => {
+    updateFilter('modoNavegacion', e.target.value);
+  };
 
   const handleHechoClick = (hechoId) => {
     navigate(`/hechos/${hechoId}`);
@@ -85,6 +106,20 @@ export const ColeccionDetalle = () => {
           <span>{hechos.length} hechos</span>
         </div>
       </header>
+        <div className="filtros-container" >
+            <div className="filtros-group">
+                <label htmlFor="modoSelect" className="filtros-label">Modo:</label>
+                <select 
+                    id="modoSelect"
+                    className="filtros-control" 
+                    value={searchParams.get('modoNavegacion') || ''} 
+                    onChange={handleModoChange}
+                >
+                    <option value="">Irrestricta</option>
+                    <option value="CURADA">Curada</option>
+                </select>
+            </div>
+        </div>
 
       <div className="coleccion-detalle__content">
         <aside className="coleccion-detalle__hechos-list">

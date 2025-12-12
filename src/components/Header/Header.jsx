@@ -29,7 +29,7 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
       <form className="app-header__search" onSubmit={handleSearch}>
         <input
           type="search"
-          placeholder="Buscar hechos"
+          placeholder="Buscar hechos, colecciones o fuentes"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />

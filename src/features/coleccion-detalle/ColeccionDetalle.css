@@ -151,6 +151,63 @@
   overflow: hidden;
 }
 
+.filtros-container {
+  background: var(--background-card);
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.filtros-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filtros-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.filtros-control {
+  background-color: var(--color-bg);
+  border: 1px solid var(--border-color);
+  color: var(--color-text);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 200px;
+}
+
+.filtros-control:focus {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-soft); /* Glow verde suave */
+}
+
+.filtros-btn {
+  background-color: var(--accent-primary);
+  color: #000; /* Texto oscuro para contraste en botón verde */
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.filtros-btn:hover {
+  opacity: 0.9;
+}
+
 .hecho-card__footer {
   display: flex;
   justify-content: space-between;
