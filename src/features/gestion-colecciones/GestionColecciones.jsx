@@ -166,10 +166,13 @@ export const GestionColecciones = () => {
 
  const handleSubmit = async (e) => {
   e.preventDefault();
-  if (!form.titulo.trim()) {
-    alert('El título es obligatorio.');
-    return;
-  }
+ if (!form.titulo.trim()) {
+  setError('El título es obligatorio.');
+  return;
+}
+if(!form.fuentes || form.fuentes.length==0){
+  setError("Tiene que tener al menos una fuente")
+}
   setSubmitting(true);
 
   let oldData = null;
@@ -218,7 +221,7 @@ export const GestionColecciones = () => {
 
   } catch (err) {
     console.error('[GestionColecciones] Error guardando colección', err);
-    alert("Ocurrió un error al guardar la colección.");
+    setError("Ocurrió un error al guardar la colección.");
   } finally {
     setSubmitting(false);
   }
@@ -427,6 +430,11 @@ const handleDelete = async (id_coleccion) => {
           <div className="gestion-colecciones__modal" onClick={(e) => e.stopPropagation()}>
             <h2>{editingId ? 'Editar colección' : 'Nueva colección'}</h2>
             <form onSubmit={handleSubmit}>
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
               <label>
                 Título
                 <input

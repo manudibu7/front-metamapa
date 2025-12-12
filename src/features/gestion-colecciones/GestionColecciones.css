@@ -453,6 +453,17 @@
   margin-top: 25px;
 }
 
+.error-message {
+  background: #fdecea;
+  color: #b71c1c;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #f5c6cb;
+  font-size: 14px;
+}
+
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
