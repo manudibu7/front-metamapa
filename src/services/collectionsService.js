@@ -30,7 +30,7 @@ export const collectionsService = {
     throw new Error(`ID inválido: ${coleccionID}`);
   }
 
-  const url = `${API_PUBLICA_URL}/colecciones/${coleccionID}/hechos`;
+  const url = `${API_PUBLICA_URL}/colecciones/${coleccionID}`;
 
   try {
     const response = await axios.get(url, {

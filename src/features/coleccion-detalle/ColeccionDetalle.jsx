@@ -47,7 +47,7 @@ useEffect(() => {
         const filtrosActuales = Object.fromEntries([...searchParams]);
         const hechosData = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
         setHechos(hechosData);
-
+        console.log(coleccionData);
       } catch (error) {
         console.error("Error cargando datos:", error);
         setHechos([]);
@@ -100,7 +100,7 @@ useEffect(() => {
         <button className="coleccion-detalle__back" onClick={() => navigate('/colecciones')}>
           ← Volver a colecciones
         </button>
-        <h1>{coleccion.nombre}</h1>
+        <h1 className='coleccion-titulo'>{coleccion.titulo}</h1>
         <p className="coleccion-detalle__descripcion">{coleccion.descripcion}</p>
         <div className="coleccion-detalle__meta">
           <span>{hechos.length} hechos</span>
