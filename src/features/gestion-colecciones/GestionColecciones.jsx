@@ -32,6 +32,7 @@ export const GestionColecciones = () => {
   const [loading, setLoading] = useState(true);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [error, setError] = useState('');
+  const [formError,setFormError]= useState('');
   const [submitting, setSubmitting] = useState(false);
 
   // Modal / Form state
@@ -166,13 +167,21 @@ export const GestionColecciones = () => {
 
  const handleSubmit = async (e) => {
   e.preventDefault();
+  setFormError('');
+
  if (!form.titulo.trim()) {
-  setError('El título es obligatorio.');
+  setFormError('El título es obligatorio.');
+  return;
+}
+ if (!form.descripcion.trim()) {
+  setFormError('La descripcion es obligatoria.');
   return;
 }
 if(!form.fuentes || form.fuentes.length==0){
-  setError("Tiene que tener al menos una fuente")
+  setFormError("Tiene que tener al menos una fuente")
+  return
 }
+
   setSubmitting(true);
 
   let oldData = null;
@@ -428,188 +437,193 @@ const handleDelete = async (id_coleccion) => {
       {modalOpen && (
         <div className="gestion-colecciones__modal-overlay" onClick={closeModal}>
           <div className="gestion-colecciones__modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{editingId ? 'Editar colección' : 'Nueva colección'}</h2>
-            <form onSubmit={handleSubmit}>
-            {error && (
-              <div className="error-message">
-                {error}
+           {formError && (
+              <div className="modal-toast">
+                {formError}
               </div>
-            )}
-              <label>
-                Título
-                <input
-                  type="text"
-                  name="titulo"
-                  value={form.titulo}
-                  onChange={handleFormChange}
-                  required
-                  maxLength={200}
-                />
-              </label>
-              <label>
-                Descripción
-                <textarea
-                  name="descripcion"
-                  value={form.descripcion}
-                  onChange={handleFormChange}
-                  rows={3}
-                />
-              </label>
-              <label>
-                Algoritmo de concenso
-                <select 
-                value={form.algoritmoConcenso}
-                onChange={(e) => setForm(prev => ({ ...prev, algoritmoConcenso: e.target.value }))}
-                >
-                  <option value={""}>Selecciona un algoritmo</option>
-                  {algoritmosDisponibles.map(alg => (
-                    <option key={alg.value} value={alg.value}>{alg.label}</option>
-                  ))}
-                </select>
-              </label>
+          )}
 
-              <fieldset className="gestion-colecciones__fuentes">
-                <label>Fuente
-                <select
-                    value=""
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (!val) return;
-                      setForm((prev) => ({
-                        ...prev,
-                        fuentes: [...(prev.fuentes || []), val]
-                      }));
-                      e.target.selectedIndex = 0;
-                    }}
-                  >
-                  <option value="">Agregar fuente...</option>
-                  {fuentes.map((f) =>{const isSelected = form.fuentes.includes(f);
-                    return (
-                      <option 
-                        key={f} 
-                        value={f} 
-                        disabled={isSelected} // Deshabilitamos si ya está seleccionada
-                        style={isSelected ? { color: '#999', fontStyle: 'italic', background: '#f5f5f5' } : {}}
-                      >
-                        {f} {isSelected ? '(Seleccionado)' : ''}
-                      </option>
-                    );
-                  })}
-                </select>
+            <h2>{editingId ? 'Editar colección' : 'Nueva colección'}</h2>
+          
 
+              <form onSubmit={handleSubmit}>
+    
+                <label>
+                  Título
+                  <input
+                    type="text"
+                    name="titulo"
+                    value={form.titulo}
+                    onChange={handleFormChange}
+                    required
+                    maxLength={200}
+                  />
                 </label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  {form.fuentes.map((f) => (
-                    <span key={f} style={{ background: '#e0e7ff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      {f}
-                      <button 
-                        type="button" 
-                        onClick={() => removeFuente(f)}
-                        style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#666', fontWeight: 'bold' }}
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </fieldset>
-              
-              <fieldset className="gestion-colecciones__criterios">
-                <legend>Criterios / Condiciones de Pertenencia</legend>
-                  {form.criterios.map((criterio, idx) => {
-                  const config = configCriterios[criterio.tipo] || { inputType: 'text', options: [] };
-                    // --- VARIABLES NUEVAS ---
-                    // A. Si tiene ID, significa que vino del Backend (es viejo)
-                    const isExisting = !!criterio.id; 
+                <label>
+                  Descripción
+                  <textarea
+                    name="descripcion"
+                    value={form.descripcion}
+                    onChange={handleFormChange}
+                    rows={3}
+                  />
+                </label>
+                <label>
+                  Algoritmo de concenso
+                  <select 
+                  value={form.algoritmoConcenso}
+                  onChange={(e) => setForm(prev => ({ ...prev, algoritmoConcenso: e.target.value }))}
+                  >
+                    <option value={""}>Selecciona un algoritmo</option>
+                    {algoritmosDisponibles.map(alg => (
+                      <option key={alg.value} value={alg.value}>{alg.label}</option>
+                    ))}
+                  </select>
+                </label>
 
-                    // B. Chequeamos si es tipo fecha
-                    const isDate = config.inputType === 'date';
-
-                    // C. Calculamos si el VALOR debe estar bloqueado:
-                    const showAsLabel = isExisting && !isDate;
-                    const existeCategoria = form.criterios.some(c => c.tipo === 'categoria');
-                    const existeFechaAntes = form.criterios.some(c => c.tipo === 'fechaAntes');
-                    const existeFechaDespues = form.criterios.some(c => c.tipo === 'fechaDespues');
-                    if (showAsLabel) {
-                    return (
-                      <div key={idx} className="gestion-colecciones__criterio-row criterio-label-mode">
-                        <span className="criterio-label-text">
-                          <strong>{criterio.tipo}:</strong> {criterio.valor}
-                        </span>
-                        <span title="Condición guardada (Solo lectura)" style={{ cursor: 'help', marginRight: 'auto', marginLeft: '8px' }}>
-                           💾
-                        </span>
-                        <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>✕</button>
-                      </div>
-                    );
-                  }
-                 return(
-                    <div key={idx} className="gestion-colecciones__criterio-row">
-                      <select
-                        value={criterio.tipo}
-                        // Si es viejo (y es fecha, porque cayó aquí), bloqueamos el tipo para no cambiar "Fecha" por "Titulo"
-                        disabled={isExisting} 
-                        onChange={(e) => {
-                          handleCriterioChange(idx, 'tipo', e.target.value);
-                          handleCriterioChange(idx, 'valor', ''); 
-                        }}
-                      >
-                        <option value="" disabled>Seleccionar criterio...</option>
-                        {criterioTipos.map((tipo) => (
-                          <option 
-                            key={tipo} 
-                            value={tipo}
-                            disabled={tipo === 'categoria' && existeCategoria && criterio.tipo !== 'categoria' || 
-                              tipo === 'fechaAntes' && existeFechaAntes && criterio.tipo !== 'fechaAntes' ||
-                              tipo === 'fechaDespues' && existeFechaDespues && criterio.tipo !== 'fechaDespues'}
-                          >
-                            {tipo}
-                          </option>
-                        ))}
-                      </select>
-
-                      {config.inputType === 'select' ? (
-                        <select
-                          value={criterio.valor}
-                          onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
+                <fieldset className="gestion-colecciones__fuentes">
+                  <label>Fuente
+                  <select
+                      value=""
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val) return;
+                        setForm((prev) => ({
+                          ...prev,
+                          fuentes: [...(prev.fuentes || []), val]
+                        }));
+                        e.target.selectedIndex = 0;
+                      }}
+                
+                    >
+                    <option value="">Agregar fuente...</option>
+                    {fuentes.map((f) =>{const isSelected = form.fuentes.includes(f);
+                      return (
+                        <option 
+                          key={f} 
+                          value={f} 
+                          disabled={isSelected} // Deshabilitamos si ya está seleccionada
+                          style={isSelected ? { color: '#999', fontStyle: 'italic', background: '#f5f5f5' } : {}}
                         >
-                          <option value="" disabled>Seleccionar...</option>
-                          {config.options.map((opcion) => (
-                            <option key={opcion} value={opcion}>{opcion}</option>
+                          {f} {isSelected ? '(Seleccionado)' : ''}
+                        </option>
+                      );
+                    })}
+                  </select>
+
+                  </label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    {form.fuentes.map((f) => (
+                      <span key={f} style={{ background: '#e0e7ff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        {f}
+                        <button 
+                          type="button" 
+                          onClick={() => removeFuente(f)}
+                          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#666', fontWeight: 'bold' }}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </fieldset>
+                
+                <fieldset className="gestion-colecciones__criterios">
+                  <legend>Criterios / Condiciones de Pertenencia</legend>
+                    {form.criterios.map((criterio, idx) => {
+                    const config = configCriterios[criterio.tipo] || { inputType: 'text', options: [] };
+                      // --- VARIABLES NUEVAS ---
+                      // A. Si tiene ID, significa que vino del Backend (es viejo)
+                      const isExisting = !!criterio.id; 
+
+                      // B. Chequeamos si es tipo fecha
+                      const isDate = config.inputType === 'date';
+
+                      // C. Calculamos si el VALOR debe estar bloqueado:
+                      const showAsLabel = isExisting && !isDate;
+                      const existeCategoria = form.criterios.some(c => c.tipo === 'categoria');
+                      const existeFechaAntes = form.criterios.some(c => c.tipo === 'fechaAntes');
+                      const existeFechaDespues = form.criterios.some(c => c.tipo === 'fechaDespues');
+                      if (showAsLabel) {
+                      return (
+                        <div key={idx} className="gestion-colecciones__criterio-row criterio-label-mode">
+                          <span className="criterio-label-text">
+                            <strong>{criterio.tipo}:</strong> {criterio.valor}
+                          </span>
+                          <span title="Condición guardada (Solo lectura)" style={{ cursor: 'help', marginRight: 'auto', marginLeft: '8px' }}>
+                            💾
+                          </span>
+                          <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>✕</button>
+                        </div>
+                      );
+                    }
+                  return(
+                      <div key={idx} className="gestion-colecciones__criterio-row">
+                        <select
+                          value={criterio.tipo}
+                          // Si es viejo (y es fecha, porque cayó aquí), bloqueamos el tipo para no cambiar "Fecha" por "Titulo"
+                          disabled={isExisting} 
+                          onChange={(e) => {
+                            handleCriterioChange(idx, 'tipo', e.target.value);
+                            handleCriterioChange(idx, 'valor', ''); 
+                          }}
+                        >
+                          <option value="" disabled>Seleccionar criterio...</option>
+                          {criterioTipos.map((tipo) => (
+                            <option 
+                              key={tipo} 
+                              value={tipo}
+                              disabled={tipo === 'categoria' && existeCategoria && criterio.tipo !== 'categoria' || 
+                                tipo === 'fechaAntes' && existeFechaAntes && criterio.tipo !== 'fechaAntes' ||
+                                tipo === 'fechaDespues' && existeFechaDespues && criterio.tipo !== 'fechaDespues'}
+                            >
+                              {tipo}
+                            </option>
                           ))}
                         </select>
-                      ) : (
-                        <input
-                          type={config.inputType}
-                          placeholder="Valor"
-                          value={criterio.valor}
-                          // Aquí NO ponemos disabled, porque si cayó en este return es porque es editable (o es nuevo o es fecha)
-                          onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
-                        />
-                      )}
-                      
-                      <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>✕</button>
-                    </div>
-                    );
-                  })}
-                <button 
-                  type="button" 
-                  className="btn btn--ghost btn--sm" 
-                  onClick={() => addCriterio(criterioTipos[0], '')}
-                >
-                  + Agregar criterio
-                </button>
-              </fieldset>
 
-              <div className="gestion-colecciones__modal-actions">
-                <button type="button" className="btn btn--ghost" onClick={closeModal} disabled={submitting}>
-                  Cancelar
-                </button>
-                <button type="submit" className="btn btn--primary" disabled={submitting}>
-                  {submitting ? 'Guardando...' : 'Guardar'}
-                </button>
-              </div>
-            </form>
+                        {config.inputType === 'select' ? (
+                          <select
+                            value={criterio.valor}
+                            onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
+                          >
+                            <option value="" disabled>Seleccionar...</option>
+                            {config.options.map((opcion) => (
+                              <option key={opcion} value={opcion}>{opcion}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={config.inputType}
+                            placeholder="Valor"
+                            value={criterio.valor}
+                            // Aquí NO ponemos disabled, porque si cayó en este return es porque es editable (o es nuevo o es fecha)
+                            onChange={(e) => handleCriterioChange(idx, 'valor', e.target.value)}
+                          />
+                        )}
+                        
+                        <button type="button" className="btn btn--icon" onClick={() => removeCriterio(idx)}>✕</button>
+                      </div>
+                      );
+                    })}
+                  <button 
+                    type="button" 
+                    className="btn btn--ghost btn--sm" 
+                    onClick={() => addCriterio(criterioTipos[0], '')}
+                  >
+                    + Agregar criterio
+                  </button>
+                </fieldset>
+
+                <div className="gestion-colecciones__modal-actions">
+                  <button type="button" className="btn btn--ghost" onClick={closeModal} disabled={submitting}>
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn btn--primary" disabled={submitting}>
+                    {submitting ? 'Guardando...' : 'Guardar'}
+                  </button>
+                </div>
+              </form>
           </div>
         </div>
       )}
