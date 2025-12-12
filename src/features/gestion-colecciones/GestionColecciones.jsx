@@ -181,6 +181,10 @@ if(!form.fuentes || form.fuentes.length==0){
   setFormError("Tiene que tener al menos una fuente")
   return
 }
+if(!form.algoritmoConcenso){
+  setFormError("Debe elegir un algoritmo de concenso")
+  return
+}
 
   setSubmitting(true);
 
@@ -230,7 +234,7 @@ if(!form.fuentes || form.fuentes.length==0){
 
   } catch (err) {
     console.error('[GestionColecciones] Error guardando colección', err);
-    setError("Ocurrió un error al guardar la colección.");
+    alert("Ocurrió un error al guardar la colección.");
   } finally {
     setSubmitting(false);
   }
