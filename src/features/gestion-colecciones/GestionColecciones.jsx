@@ -27,6 +27,7 @@ export const GestionColecciones = () => {
   const [colecciones, setColecciones] = useState([]);
   const [fuentes, setFuentes] = useState([]);
   const [categoriasOptions, setCategoriasOptions] = useState([]);
+  const [criterios, setCriterios]= useState(true);
 
   // Estados de carga/error
   const [loading, setLoading] = useState(true);
@@ -407,11 +408,14 @@ const handleDelete = async (id_coleccion) => {
                 <h2>{col.titulo}</h2>
                 <p>{col.descripcion}</p>
                   <h4 className='gestion-colecciones-titulo-condiciones'>Condiciones: </h4>
+                  {col.criterios.length ==0?( <p>• Ninguna</p>):(
                   <ul className="gestion-colecciones__condiciones">
+                
                     {col.criterios.map((cond) => (
                       <li key={cond.id}>{cond.tipo} = {cond.valor}</li>
                     ))}
                   </ul>
+                  )}
               </div>
               <div className="gestion-colecciones__card-actions">
                 <button type="button" className="btn btn--ghost" onClick={() => openEditModal(col)}>
