@@ -21,7 +21,9 @@ export const GestionSolicitudes = () => {
     const fetchSolicitudes = async () => {
       try {
         const data = await obtenerSolicitudes();
-        setSolicitudes(data);
+        const dataFiltrada = data.filter(solicitud => solicitud.estadoSolicitud === 'PENDIENTE');
+        console.log("Solicitudes obtenidas:", dataFiltrada);
+        setSolicitudes(dataFiltrada);
       } catch (err) {
         setError('Error al cargar las solicitudes');
         console.error(err);
