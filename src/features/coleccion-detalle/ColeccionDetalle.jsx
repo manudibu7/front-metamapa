@@ -42,9 +42,9 @@ const resetFiltros = () => {
 
 
 const opcionesFuente = [
-  { value: 'estatica', label: 'Fuente estática' },
-  { value: 'dinamica', label: 'Fuente dinámica' },
-  { value: 'proxy', label: 'Fuente proxy' },
+  { value: 'estatica', label: 'Estatica' },
+  { value: 'dinamica', label: 'Dinamica' },
+  { value: 'proxy', label: 'Proxy' },
 ];
 
 const updateFilter = (key, value) => {

@@ -39,18 +39,18 @@ useEffect(() => {
           <strong>MetaMapa</strong>
         </div>
       </Link>
-
+      
       <form className="app-header__search" onSubmit={handleSearch}>
         <input
           type="search"
-          placeholder="Buscar hechos, colecciones o fuentes"
+          placeholder="Buscar hechos"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
         <button onClick={handleSearch}  type="submit">Buscar</button>
-      </form>
-    <div className="app-header__actions">
-      <div className="toggle-wrapper">
+      </form>      
+      <div className="app-header__actions">
+        <div className="toggle-wrapper">
              <span className="toggle-label">
                 Navegacion Curada: 
             </span>
