@@ -4,8 +4,9 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { icon } from 'leaflet';
 import { collectionsService } from '../../services/collectionsService';
 import './ColeccionDetalle.css';
+import { useNavigation } from '../../context/NavigationContext';
 
-
+// ... (markerIcon se queda igual) ...
 const markerIcon = icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -46,9 +47,6 @@ const opcionesFuente = [
   { value: 'proxy', label: 'Fuente proxy' },
 ];
 
-
-
-
 const updateFilter = (key, value) => {
     setSearchParams((prevParams) => {
       const newParams = new URLSearchParams(prevParams);
@@ -61,7 +59,6 @@ const updateFilter = (key, value) => {
       return newParams;
     });
   };
-
 
 const provinciasUnicas = useMemo(() => {
     const mapa = new Map();
@@ -79,18 +76,25 @@ const categorias = useMemo(() => {
   const lista = hechos.map((h) => h.categoria).filter(Boolean);
   return Array.from(new Set(lista));
 }, [hechos]);
+  
+  // Aún puedes usar searchParams si tienes OTROS filtros, 
+  // pero ya no lo necesitamos para 'modoNavegacion'  
+  // 1. IMPORTAMOS EL MODO DESDE EL CONTEXTO GLOBAL
+  const { modoNavegacion } = useNavigation();
 
-useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const coleccionData = await collectionsService.getCollectionById(id);
         setColeccion(coleccionData);
-        const filtrosActuales = Object.fromEntries([...searchParams]);
+        const filtrosActuales = {
+            ...Object.fromEntries([...searchParams]), 
+            modoNavegacion: modoNavegacion 
+        };
         console.log(filtrosActuales);
         const hechosData = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
         setHechos(hechosData);
-        console.log(coleccionData);
       } catch (error) {
         console.error("Error cargando datos:", error);
         setHechos([]);
@@ -100,14 +104,12 @@ useEffect(() => {
     };
 
     fetchData();
-    // La dependencia es searchParams: cada vez que cambies la URL, se ejecuta esto.
-  }, [id, searchParams]);
 
- 
-// Manejadores de Eventos
-  const handleModoChange = (e) => {
-    updateFilter('modoNavegacion', e.target.value);
-  };
+    // 3. CLAVE: AGREGAR 'modoNavegacion' A LAS DEPENDENCIAS
+    // Esto hace que al tocar el switch del Header, se dispare fetchData de nuevo.
+  }, [id, searchParams, modoNavegacion]); 
+
+  // La dependencia es searchParams: cada vez que cambies la URL, se ejecuta esto.
 
   const handleHechoClick = (hechoId) => {
     navigate(`/hechos/${hechoId}`);
@@ -136,7 +138,7 @@ useEffect(() => {
 
   const center = hechos.length > 0 && hechos[0].ubicacion
     ? [hechos[0].ubicacion.latitud, hechos[0].ubicacion.longitud]
-    : [-38.4161, -63.6167]; // Centro de Argentina
+    : [-38.4161, -63.6167];
 
   return (
     <div className="coleccion-detalle">
@@ -148,6 +150,8 @@ useEffect(() => {
         <p className="coleccion-detalle__descripcion">{coleccion.descripcion}</p>
         <div className="coleccion-detalle__meta">
           <span>{hechos.length} hechos</span>
+           {/* Opcional: Mostrar visualmente en qué modo se está viendo, aunque ya está en el header */}
+          <span className="badge-modo">Modo: {modoNavegacion}</span>
         </div>
       </header>
       
@@ -167,6 +171,7 @@ useEffect(() => {
 
       <div className="coleccion-detalle__content">
         <aside className="coleccion-detalle__hechos-list">
+         {/* ... (El resto de tu renderizado sigue igual) ... */}
           <h2>Hechos en esta colección</h2>
           {hechos.length === 0 ? (
             <p className="coleccion-detalle__empty">No hay hechos en esta colección</p>
@@ -382,4 +387,4 @@ useEffect(() => {
 
     </div>
   );
-};
+}

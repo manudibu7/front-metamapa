@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useNavigation } from '../../context/NavigationContext';
 import './Header.css';
 
-export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) => {
+export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user}) => {
   const [query, setQuery] = useState(''); 
   const navigate = useNavigate();
-  //const [categoria, setCategoria] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado del menú
+  const menuRef = useRef(null); // Referencia para detectar clics fuera
 
+  const { modoNavegacion, toggleModo } = useNavigation();
+  
   const handleSearch = (event) => {
     event.preventDefault(); 
     
@@ -14,6 +18,16 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
     
     navigate(`/hechos?q=${encodeURIComponent(textoBusqueda)}`);
   };
+
+useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuRef]);
 
   return (
     <header className="app-header">
@@ -35,24 +49,65 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
         />
         <button onClick={handleSearch}  type="submit">Buscar</button>
       </form>
-
-      <div className="app-header__actions">
+    <div className="app-header__actions">
+      <div className="toggle-wrapper">
+             <span className="toggle-label">
+                Navegacion Curada: 
+            </span>
+            <label className="switch">
+                <input 
+                    type="checkbox" 
+                    checked={modoNavegacion === 'CURADA'} 
+                    onChange={toggleModo}
+                />
+                <span className="slider round"></span>
+            </label>
+        </div>
         {isAuthenticated ? (
-          <>
-            <span className="app-header__user">{user?.name ?? user?.username ?? 'Cuenta'}</span>
-            <Link to="/mis-contribuciones" className="btn btn--ghost">
-              Mis Contribuciones
-            </Link>
-            <button type="button" className="btn btn--ghost" onClick={onLogout}>
-              Salir
+          <div className="user-menu-container" ref={menuRef}>
+            <button 
+              className="user-menu-trigger" 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <span className="app-header__user">
+                 {user?.name || user?.username || 'Usuario'}
+              </span>
+              <span className="arrow-icon">▼</span>
             </button>
-          </>
+
+            {/* El Dropdown (solo se renderiza si isMenuOpen es true) */}
+            {isMenuOpen && (
+              <div className="dropdown-menu">
+                <div className="dropdown-header-mobile">
+                  {user?.name}
+                </div>
+                <Link 
+                  to="/mis-contribuciones" 
+                  className="dropdown-item"
+                  onClick={() => setIsMenuOpen(false)} // Cerrar al navegar
+                >
+                  Mis Contribuciones
+                </Link>
+                <button 
+                  type="button" 
+                  className="dropdown-item dropdown-item--danger" 
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onLogout();
+                  }}
+                >
+                  Salir
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <button type="button" className="btn btn--ghost" onClick={onLogin}>
             Ingresar
           </button>
         )}
       </div>
+      
     </header>
   );
 };

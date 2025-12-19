@@ -21,6 +21,7 @@ margin-top: 16px;
 .coleccion-detalle__header {
   max-width: 1400px;
   margin: 0 auto 2rem;
+  color: var(--color-text);
 }
 
 .coleccion-detalle__back {
@@ -44,7 +45,6 @@ margin-top: 16px;
   margin-bottom: 0.5rem;
   background: linear-gradient(135deg, var(--accent-primary, #4ade80), var(--accent-secondary, #22d3ee));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
