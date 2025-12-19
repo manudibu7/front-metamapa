@@ -62,3 +62,7 @@
 .hecho-list__empty {
   color: var(--color-text);
 }
+.btn-filtros {
+  margin: 1rem 2rem;
+}
+
