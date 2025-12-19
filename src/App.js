@@ -19,11 +19,13 @@ import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import { HechosListNav } from './components/HechoListaNav/HechoListNav';
 import { ScrollToTopButton } from './components/ScrollToTopButton/ScrollToTopButton';
-
+import { ImportacionDataSet} from './features/importacionesDataSets/ImportacionDataSet'
+import { NavigationProvider } from './context/NavigationContext';
 // ... importaciones ...
 
 const AppShell = () => {
   const { login, logout, isAuthenticated, user } = useAuth();
+  
   const handleSearch = (query) => console.info('Buscar:', query);
 
   return (
@@ -65,7 +67,7 @@ const AppShell = () => {
           <Route path="/admin/eliminaciones" element={<GestionSolicitudes />} />
           <Route path="/admin/revisiones" element={<GestionRevisiones />} />
           <Route path="/admin/revisiones/detalle" element={<ContribucionDetalle />} />
-        
+          <Route path="/admin/subirDataSet" element={<ImportacionDataSet/>}/>
         </Routes>
       </main>
       <Footer />
@@ -77,8 +79,10 @@ const AppShell = () => {
 function App() {
   return (
     <AuthProvider>
+      <NavigationProvider>
       {/* ELIMINAMOS CollectionsProvider DE AQUÍ PARA QUE NO SEA GLOBAL */}
         <AppShell />
+      </NavigationProvider>
     </AuthProvider>
   );
 }

@@ -2,18 +2,18 @@ import { mockCollections } from "../constants/mockCollections";
 import axios from "axios";
 const deepClone = (payload) => JSON.parse(JSON.stringify(payload));
 
-
 const API_PUBLICA_URL = "http://localhost:8100";
 
 export const normalizador= (filtros) => {
     const params = new URLSearchParams();
-
     if (filtros.categoria) params.append('categoria', filtros.categoria);
     if (filtros.fechaDesde) params.append('fecha_acontecimiento_desde', filtros.fechaDesde);
     if (filtros.fechaHasta) params.append('fecha_acontecimiento_hasta', filtros.fechaHasta);
     
     // Aquí mapeamos la 'q' del frontend
     if (filtros.q) params.append('q', filtros.q);
+
+    if (filtros.modoNavegacion) params.append('modoNavegacion', filtros.modoNavegacion);
     return params;
 }
 
