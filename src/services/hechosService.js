@@ -49,7 +49,7 @@ const buildUrlWithFilters = (filtros) => {
 
 
 export const hechosService = {
-  async listarHechos(filtros = {}) {
+  async listarHechos(filtros) {
     const url = buildUrlWithFilters(filtros);
     console.log(`Llamando al backend en: ${url}`);
 
