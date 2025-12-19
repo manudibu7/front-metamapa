@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getContribucionesByContribuyente, updateContribucion, getCategorias } from '../../services/contribucionesService';
 import { getDetalleRevision } from '../../services/revisionesService';
@@ -7,6 +8,7 @@ import './MisContribuciones.css';
 
 export const MisContribuciones = () => {
   const { contribuyenteId, token, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [contribuciones, setContribuciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,7 +63,8 @@ export const MisContribuciones = () => {
     fetchData();
   }, [isAuthenticated, contribuyenteId, token]);
 
-  const handleEditClick = (contribucion) => {
+  const handleEditClick = (e, contribucion) => {
+    e.stopPropagation();
     setEditingContribucion(contribucion);
     setEditFormData({
       titulo: contribucion.hecho.titulo,
@@ -71,6 +74,12 @@ export const MisContribuciones = () => {
       ubicacion: contribucion.hecho.ubicacion
     });
     setNuevaCategoria("");
+  };
+
+  const handleCardClick = (contribucion) => {
+    navigate('/admin/revisiones/detalle', { 
+      state: { hecho: contribucion.hecho } 
+    });
   };
 
   const handleEditChange = (e) => {
@@ -159,7 +168,12 @@ export const MisContribuciones = () => {
       ) : (
         <div className="mis-contribuciones__list">
           {contribuciones.map((c) => (
-            <div key={c.idContribucion} className="contribucion-card">
+            <div 
+              key={c.idContribucion} 
+              className="contribucion-card"
+              onClick={() => handleCardClick(c)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="contribucion-card__header">
                 <h3>{c.hecho.titulo}</h3>
                 <div className="contribucion-card__status">
@@ -188,7 +202,7 @@ export const MisContribuciones = () => {
               {c.revision && (c.revision.estado === 'ACEPTADA_CON_SUGERENCIA' || c.revision.estado === 'PENDIENTE') && (
                 <button 
                   className="btn-edit"
-                  onClick={() => handleEditClick(c)}
+                  onClick={(e) => handleEditClick(e, c)}
                 >
                   Editar
                 </button>
