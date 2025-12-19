@@ -118,6 +118,17 @@ export const getContribucionesByKeycloakId = async (keycloakId, token) => {
   }
 };
 
+export const updateContribucion = async (idContribucion, datosActualizados, token) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  try {
+    const response = await axios.put(`${API_BASE_URL}/contribuciones/${idContribucion}`, datosActualizados, { headers });
+    return response.data;
+  } catch (error) {
+    console.error('Error actualizando contribución:', error);
+    throw new Error('Error actualizando contribución');
+  }
+};
+
 export const getCategorias = async () => {
   try {
       let url = `${API_ADMINISTRATIVA_URL}/categorias`;

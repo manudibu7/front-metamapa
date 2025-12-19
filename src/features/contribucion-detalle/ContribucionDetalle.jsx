@@ -4,6 +4,8 @@ import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { icon } from 'leaflet';
 import './ContribucionDetalle.css';
 
+const API_BASE_URL = 'http://localhost:8090';
+
 const markerIcon = icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -32,7 +34,7 @@ export const ContribucionDetalle = () => {
     <div className="contribucion-detalle">
       <header className="contribucion-detalle__header">
         <button className="contribucion-detalle__back" onClick={() => navigate(-1)}>
-          ← Volver a revisiones
+          ← Volver
         </button>
         
         <div className="contribucion-detalle__badges">
@@ -79,20 +81,27 @@ export const ContribucionDetalle = () => {
           <section className="contribucion-detalle__section">
             <h2>Adjuntos</h2>
             <div className="contribucion-detalle__adjuntos">
-              {hecho.adjuntos.map((adjunto, index) => (
-                <div key={index} className="adjunto-card">
-                  {/* Simple logic to show image preview if url is available, else generic icon */}
-                  {adjunto.url && (adjunto.url.match(/\.(jpeg|jpg|gif|png)$/) || adjunto.tipo === 'imagen') ? (
-                    <img src={adjunto.url} alt="Adjunto" className="adjunto-preview" />
-                  ) : (
-                    <div className="adjunto-icon">📎</div>
-                  )}
-                  <div className="adjunto-info">
-                    {/* Assuming AdjuntoOutputDTO might have url or name */}
-                    <span>{adjunto.url || 'Archivo adjunto'}</span>
+              {hecho.adjuntos.map((adjunto, index) => {
+                const imageUrl = adjunto.url.startsWith('http') ? adjunto.url : `${API_BASE_URL}${adjunto.url}`;
+                const isImage = (adjunto.url.match(/\.(jpeg|jpg|gif|png)$/i) || adjunto.tipo === 'imagen' || adjunto.tipo === 'IMAGE');
+                
+                return (
+                  <div key={index} className="adjunto-card">
+                    {/* Simple logic to show image preview if url is available, else generic icon */}
+                    {adjunto.url && isImage ? (
+                      <img src={imageUrl} alt="Adjunto" className="adjunto-preview" />
+                    ) : (
+                      <div className="adjunto-icon">📎</div>
+                    )}
+                    <div className="adjunto-info">
+                      {/* Assuming AdjuntoOutputDTO might have url or name */}
+                      <a href={imageUrl} target="_blank" rel="noopener noreferrer" className="adjunto-link">
+                        Ver archivo
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
