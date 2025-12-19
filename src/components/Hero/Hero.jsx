@@ -30,7 +30,9 @@ export const Hero = ({ onExplore, onLogin, isAuthenticated }) => {
           Cargar un hecho
         </button>
       </div>
-
+      <button type="button" className="btn btn--ghost" onClick={() => navigate('/hechos')}>
+            Busqueda Avanzada de HECHOS
+          </button>
       {isAuthenticated && isAdmin && (
         <div className="hero__admin">
           <button className="btn btn--admin" onClick={() => navigate('/admin')}>

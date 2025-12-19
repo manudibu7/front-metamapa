@@ -25,17 +25,16 @@ export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user }) =
           <strong>MetaMapa</strong>
         </div>
       </Link>
-
+      
       <form className="app-header__search" onSubmit={handleSearch}>
         <input
           type="search"
-          placeholder="Buscar hechos, colecciones o fuentes"
+          placeholder="Buscar hechos"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
         <button onClick={handleSearch}  type="submit">Buscar</button>
       </form>
-
       <div className="app-header__actions">
         {isAuthenticated ? (
           <>

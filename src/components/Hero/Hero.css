@@ -103,3 +103,8 @@
     flex-direction: column;
   }
 }
+
+/* Botón de búsqueda avanzada */
+.hero > .btn {
+  margin-top: 1rem;  
+}
