@@ -92,7 +92,7 @@ export const GestionSolicitudes = () => {
             <div key={solicitud.id_solicitud} className="solicitud-card">
               <div className="solicitud-card__info">
                 <div className="solicitud-card__header">
-                  <span className="solicitud-card__id">{solicitud.id_solicitud}</span>
+                  <span className="solicitud-card__id">{"Nro de Solicitud: " + solicitud.id_solicitud}</span>
                   <span className={`solicitud-card__status status-${solicitud.estadoSolicitud!=null? solicitud.estadoSolicitud.toLowerCase(): "sin estado"}`}>
                     {solicitud.estadoSolicitud}
                   </span>
@@ -122,7 +122,8 @@ export const GestionSolicitudes = () => {
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Solicitante</span>
-                    <span className="detail-value">{solicitud.id_contribuyente} • {new Date(solicitud.fechaSolicitud).toLocaleDateString()}</span>
+                    <span className="detail-value">{"Id del Solicitante: " + solicitud.id_contribuyente}</span>
+                    <span className="detail-value">{"Fecha de subida: " + new Date(solicitud.fechaSolicitud).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>

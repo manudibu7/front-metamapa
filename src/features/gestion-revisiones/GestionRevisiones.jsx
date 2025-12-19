@@ -132,8 +132,8 @@ const { isAdmin,contribuyenteId } = useAuth();
             <div key={item.idContribucion} className="revision-card">
               <div className="revision-card__content">
                 <div className="revision-card__header">
-                  <span className="revision-card__id">ID: {item.idContribucion}</span>
-                  <span className="revision-card__id">{!item.anonimo? "Contribuyente ID: " + item.idContribuyente: "Es una contribucion ANONIMA"}</span>
+                  <span className="revision-card__id">NroContribución: {item.idContribucion}</span>
+                  <span className="revision-card__id">{!item.anonimo? "Contribuyente: " + item.nombreContribuyente: "Es una contribucion ANONIMA"}</span>
                 </div>
 
                 <div 
