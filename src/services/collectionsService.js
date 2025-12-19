@@ -2,11 +2,20 @@ import { mockCollections } from "../constants/mockCollections";
 import axios from "axios";
 const deepClone = (payload) => JSON.parse(JSON.stringify(payload));
 
-const simulateLatency = (payload) =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve(deepClone(payload)), 550);
-  });
+
 const API_PUBLICA_URL = "http://localhost:8100";
+
+export const normalizador= (filtros) => {
+    const params = new URLSearchParams();
+
+    if (filtros.categoria) params.append('categoria', filtros.categoria);
+    if (filtros.fechaDesde) params.append('fecha_acontecimiento_desde', filtros.fechaDesde);
+    if (filtros.fechaHasta) params.append('fecha_acontecimiento_hasta', filtros.fechaHasta);
+    
+    // Aquí mapeamos la 'q' del frontend
+    if (filtros.q) params.append('q', filtros.q);
+    return params;
+}
 
 export const collectionsService = {
 
@@ -42,12 +51,13 @@ export const collectionsService = {
     throw error;
   }
 },
-  async getHechosDeColeccion(coleccionID, filtros= {}) {
+  async getHechosDeColeccion(coleccionID, filtros) {
     try {
+      const filtrosAcoplados =normalizador(filtros);
       var url = `${API_PUBLICA_URL}/colecciones/${coleccionID}/hechos`;
       console.log(url)
       const response = await axios.get(url, {
-        params: filtros,
+        params: filtrosAcoplados,
         headers: {
           "Cache-Control": "no-cache",
         },

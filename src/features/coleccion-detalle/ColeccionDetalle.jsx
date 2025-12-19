@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import {useMemo, useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { icon } from 'leaflet';
 import { collectionsService } from '../../services/collectionsService';
 import './ColeccionDetalle.css';
+
 
 const markerIcon = icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -15,14 +16,38 @@ const markerIcon = icon({
   shadowSize: [41, 41],
 });
 
+
+
 export const ColeccionDetalle = () => {
+
   const { id } = useParams();
   const navigate = useNavigate();
+
+ 
+
   const [coleccion, setColeccion] = useState(null);
   const [hechos, setHechos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHecho, setSelectedHecho] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [filtrosTemp, setFiltrosTemp] = useState({});
+
+const resetFiltros = () => {
+  setFiltrosTemp({}); 
+  setSearchParams({}); 
+  setMostrarFiltros(false);
+};
+
+
+const opcionesFuente = [
+  { value: 'estatica', label: 'Fuente estática' },
+  { value: 'dinamica', label: 'Fuente dinámica' },
+  { value: 'proxy', label: 'Fuente proxy' },
+];
+
+
+
 
 const updateFilter = (key, value) => {
     setSearchParams((prevParams) => {
@@ -38,6 +63,23 @@ const updateFilter = (key, value) => {
   };
 
 
+const provinciasUnicas = useMemo(() => {
+    const mapa = new Map();
+    hechos.forEach((h) => {
+      if (h.ubicacion?.provincia) {
+        if (!mapa.has(h.ubicacion.provincia)) {
+          mapa.set(h.ubicacion.provincia, h.ubicacion);
+        }
+      }
+    });
+    return Array.from(mapa.values());
+  }, [hechos]);
+
+const categorias = useMemo(() => {
+  const lista = hechos.map((h) => h.categoria).filter(Boolean);
+  return Array.from(new Set(lista));
+}, [hechos]);
+
 useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -45,6 +87,7 @@ useEffect(() => {
         const coleccionData = await collectionsService.getCollectionById(id);
         setColeccion(coleccionData);
         const filtrosActuales = Object.fromEntries([...searchParams]);
+        console.log(filtrosActuales);
         const hechosData = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
         setHechos(hechosData);
         console.log(coleccionData);
@@ -60,6 +103,7 @@ useEffect(() => {
     // La dependencia es searchParams: cada vez que cambies la URL, se ejecuta esto.
   }, [id, searchParams]);
 
+ 
 // Manejadores de Eventos
   const handleModoChange = (e) => {
     updateFilter('modoNavegacion', e.target.value);
@@ -106,20 +150,20 @@ useEffect(() => {
           <span>{hechos.length} hechos</span>
         </div>
       </header>
-        <div className="filtros-container" >
-            <div className="filtros-group">
-                <label htmlFor="modoSelect" className="filtros-label">Modo:</label>
-                <select 
-                    id="modoSelect"
-                    className="filtros-control" 
-                    value={searchParams.get('modoNavegacion') || ''} 
-                    onChange={handleModoChange}
-                >
-                    <option value="">Irrestricta</option>
-                    <option value="CURADA">Curada</option>
-                </select>
-            </div>
-        </div>
+      
+      
+        <button
+          className="btn-filtros"
+          onClick={() => {
+            const paramsActuales = Object.fromEntries([...searchParams]);
+            setFiltrosTemp(paramsActuales);
+            setMostrarFiltros(true);
+          }}
+        >
+          🔍 Filtros
+        </button>
+
+    
 
       <div className="coleccion-detalle__content">
         <aside className="coleccion-detalle__hechos-list">
@@ -191,6 +235,151 @@ useEffect(() => {
           </MapContainer>
         </div>
       </div>
+      
+      {mostrarFiltros && (
+  <div className="filtros-overlay">
+    <div className="filtros-panel">
+
+      <header className="filtros-panel__header">
+        <h2>Filtros</h2>
+        <button
+          className="filtros-panel__close"
+          onClick={() => setMostrarFiltros(false)}
+        >
+          
+        </button>
+      </header>
+
+      <div className="filtros-panel__content">
+
+        <div className="filtro-field">
+          <label>Título</label>
+          <input
+            type="text"
+            placeholder="Buscar por título"
+            value={filtrosTemp.q}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, q: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="filtro-field">
+          <label>Categoría</label>
+          <select
+            value={filtrosTemp.categoria}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, categoria: e.target.value })
+            }
+          >
+            <option value="">Todas las categoria </option>
+            {categorias.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+        </div>
+
+        <div className="filtro-field">
+                <label>Provincia</label>
+                <select
+                  value={filtrosTemp.provincia || ""}
+                  onChange={(e) => {
+                    const nombre = e.target.value;
+                    const ub = provinciasUnicas.find(p => p.provincia === nombre);
+                    if (ub) {
+                      setFiltrosTemp({ 
+                        ...filtrosTemp,
+                        lat: ub.latStr, 
+                        lon: ub.lonStr 
+                      });
+                    } else {
+                      const {lat, lon, ...resto } = filtrosTemp;
+                      setFiltrosTemp(resto);
+                    }
+                  }}
+                >
+                  <option value="">Todas las provincias</option>
+                  {provinciasUnicas.map((ub) => (
+                    <option key={ub.provincia} value={ub.provincia}>{ub.provincia}</option>
+                  ))}
+                </select>
+              </div>
+
+
+        <div className="filtro-field">
+          <label>Tipo de fuente</label>
+          <select
+            value={filtrosTemp.tipoFuente}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, fuenteTipo: e.target.value })
+            }
+          >
+            <option value="">Todas las fuentes</option>
+            {opcionesFuente.map(({ value, label }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+          </select>
+        </div>
+
+        <div className="filtro-field">
+          <label>Fecha desde</label>
+          <input
+            type="date"
+            value={filtrosTemp.fechaDesde}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, fechaDesde: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="filtro-field">
+          <label>Fecha hasta</label>
+          <input
+            type="date"
+            value={filtrosTemp.fechaHasta}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, fechaHasta: e.target.value })
+            }
+          />
+        </div>
+
+      </div>
+
+      <footer className="filtros-panel__actions">
+        <button onClick={() => resetFiltros()}>
+          Cancelar
+        </button>
+
+        <button
+          className="btn-primary"
+          onClick={() => {
+            // 1. Convertimos el estado a una lista de entradas [llave, valor]
+            // 2. Filtramos para quitar valores vacíos, null o undefined
+            // 3. Lo convertimos de nuevo a un objeto limpio
+            const filtrosLimpios = Object.fromEntries(
+              Object.entries(filtrosTemp).filter(([_, value]) => 
+                value !== "" && value !== null && value !== undefined
+              )
+            );
+
+            setSearchParams(filtrosLimpios); // Reemplaza todo lo anterior por lo nuevo y limpio
+            setMostrarFiltros(false);
+          }}
+          >
+            Filtrar
+        </button>
+      </footer>
+
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 };

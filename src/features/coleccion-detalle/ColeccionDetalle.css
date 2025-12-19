@@ -4,6 +4,9 @@
   color: var(--color-text);
   padding: 2rem 1rem;
 }
+.tituloFiltro {
+margin-top: 16px;
+}
 
 .coleccion-detalle--loading,
 .coleccion-detalle--error {
@@ -164,16 +167,29 @@
   box-shadow: var(--shadow-sm);
 }
 
+.btn-filtros {
+  background: #2ecc71;
+  color:  var(--background-secondary);
+  margin-bottom: 10px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: medium;
+}
+
 .filtros-group {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+ 
 }
 
+
 .filtros-label {
-  font-weight: 600;
+  --font-weight: 600;
   font-size: 0.9rem;
   color: var(--text-secondary);
+  
 }
 
 .filtros-control {
@@ -185,7 +201,9 @@
   font-size: 0.9rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
-  min-width: 200px;
+  --max-width: 600px;
+  min-width: 150px
+ 
 }
 
 .filtros-control:focus {
@@ -216,6 +234,8 @@
   border-top: 1px solid var(--border-color, #2a3447);
   font-size: 0.85rem;
 }
+
+
 
 .hecho-card__provincia {
   color: var(--accent-secondary, #22d3ee);
@@ -272,6 +292,53 @@
 .marker-popup__btn:hover {
   opacity: 0.9;
 }
+
+.filtros-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.filtros-panel {
+  background: white;
+  width: 860px;
+  max-width: 95%;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.filtros-panel__header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.filtros-panel__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+.filtro-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.filtros-panel__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+}
+
 
 @media (max-width: 1024px) {
   .coleccion-detalle__content {
