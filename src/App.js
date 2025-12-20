@@ -21,6 +21,7 @@ import { HechosListNav } from './components/HechoListaNav/HechoListNav';
 import { ScrollToTopButton } from './components/ScrollToTopButton/ScrollToTopButton';
 import { ImportacionDataSet} from './features/importacionesDataSets/ImportacionDataSet'
 import { NavigationProvider } from './context/NavigationContext';
+import GestorUsuarios from "./features/gestor-usuarios/GestorUsuarios";
 // ... importaciones ...
 
 const AppShell = () => {
@@ -67,7 +68,8 @@ const AppShell = () => {
           <Route path="/admin/eliminaciones" element={<GestionSolicitudes />} />
           <Route path="/admin/revisiones" element={<GestionRevisiones />} />
           <Route path="/admin/revisiones/detalle" element={<ContribucionDetalle />} />
-          <Route path="/admin/subirDataSet" element={<ImportacionDataSet/>}/>
+          <Route path="/admin/subirDataSet" element={<ImportacionDataSet/>}/>   
+          <Route path="/perfil" element={<GestorUsuarios />} />
         </Routes>
       </main>
       <Footer />
