@@ -25,6 +25,7 @@ export const hechosService = {
 
 // 💡 URL base de tu backend
 const API_URL = 'http://localhost:8100/hechos';
+const API_PUBLICA_URL = 'http://localhost:8100'
 const API_ADMI_URL = "http://localhost:8084/hechos";
 // Asegúrate de cambiar 'localhost:8080' por la dirección correcta de tu API.
 
@@ -33,24 +34,45 @@ const API_ADMI_URL = "http://localhost:8084/hechos";
  * @param {object} filtros - Los filtros proporcionados por el frontend.
  * @returns {string} URL completa con query parameters.
  */
-const buildUrlWithFilters = (filtros) => {
+const buildUrlWithFilters = (filtros, page, size) => {
     const params = new URLSearchParams();
 
     if (filtros.categoria) params.append('categoria', filtros.categoria);
     if (filtros.fechaDesde) params.append('fecha_acontecimiento_desde', filtros.fechaDesde);
     if (filtros.fechaHasta) params.append('fecha_acontecimiento_hasta', filtros.fechaHasta);
-    
+    if (filtros.provincia) params.append('provincia', filtros.provincia)
     // Aquí mapeamos la 'q' del frontend
     if (filtros.q) params.append('q', filtros.q);
 
+    params.append('page', page);
+    params.append('size', size);
     const queryString = params.toString();
     return `${API_URL}${queryString ? '?' + queryString : ''}`;
 };
 
 
 export const hechosService = {
-  async listarHechos(filtros) {
-    const url = buildUrlWithFilters(filtros);
+
+  async obtenerProvincias() {
+    try {
+        const response = await axios.get(`${API_PUBLICA_URL}/provincias`); 
+        return response.data;
+    } catch (error) {
+        return [];
+    }
+  },
+  async obtenerCategorias() {
+    try {
+        const response = await axios.get(`${API_PUBLICA_URL}/categorias`); 
+        return response.data;
+    } catch (error) {
+        console.error("Error al cargar categorías", error);
+        return [];
+    }
+  },
+
+  async listarHechos(filtros, page = 0, size = 10) {
+    const url = buildUrlWithFilters(filtros, page, size);
     console.log(`Llamando al backend en: ${url}`);
 
     try {
@@ -84,6 +106,8 @@ export const hechosService = {
     }
   },
 };
+
+
 export const actualizarEtiqueta = async (idHecho, etiqueta) => {
   const response = await fetch(`${API_ADMI_URL}/${idHecho}/etiqueta`, {
     method: "PUT",

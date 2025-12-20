@@ -10,6 +10,12 @@ export const HechosListNav = () => {
   const [hechos, setHechos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [todasLasCategorias, setTodasLasCategorias] = useState([]);
+  const [todasLasProvincias, setTodasLasProvincias] = useState([]);
+
+  const [pagina, setPagina] = useState(0); 
+  const [metaData, setMetaData] = useState(null);
+  const TAMANO_PAGINA = 10; 
 
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [filtrosTemp, setFiltrosTemp] = useState({});
@@ -20,6 +26,18 @@ export const HechosListNav = () => {
     { value: 'proxy', label: 'Proxy' },
   ];
 
+useEffect(() => {
+    const cargarMaestros = async () => {
+        // Opción A: Si tienes endpoints
+        const cats = await hechosService.obtenerCategorias();
+        setTodasLasCategorias(cats);
+        const provs = await hechosService.obtenerProvincias();
+        setTodasLasProvincias(provs);
+
+    };
+    cargarMaestros();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -27,8 +45,13 @@ export const HechosListNav = () => {
 
       try {
         const filtros = Object.fromEntries([...searchParams]);
-        const data = await hechosService.listarHechos(filtros);
-        setHechos(Array.isArray(data) ? data : []);
+        const data = await hechosService.listarHechos(filtros, pagina, TAMANO_PAGINA);
+        if (data.content) {
+            setHechos(data.content);
+            setMetaData(data.page || data); 
+        } else {
+            setHechos(Array.isArray(data) ? data : []);
+        }
       } catch (err) {
         console.error(err);
         setError('Ocurrió un error al cargar los hechos.');
@@ -38,27 +61,39 @@ export const HechosListNav = () => {
     };
 
     fetchData();
-  }, [searchParams]);
-
-  const categorias = useMemo(() => {
-    const lista = hechos.map(h => h.categoria).filter(Boolean);
-    return Array.from(new Set(lista));
-  }, [hechos]);
-
-  const provinciasUnicas = useMemo(() => {
-    const mapa = new Map();
-    hechos.forEach(h => {
-      if (h.ubicacion?.provincia && !mapa.has(h.ubicacion.provincia)) {
-        mapa.set(h.ubicacion.provincia, h.ubicacion);
-      }
-    });
-    return Array.from(mapa.values());
-  }, [hechos]);
+  }, [searchParams, pagina]);
 
   const resetFiltros = () => {
     setFiltrosTemp({});
     setSearchParams({});
+    setPagina(0); 
     setMostrarFiltros(false);
+  };
+
+  const handleAnterior = () => {
+      if (pagina > 0) setPagina(prev => prev - 1);
+  };
+
+  const handleSiguiente = () => {
+      if (metaData && pagina < metaData.totalPages - 1) {
+          setPagina(prev => prev + 1);
+      }
+  };
+
+  const handleCancelar = () => {
+    setMostrarFiltros(false);
+    setFiltrosTemp(Object.fromEntries([...searchParams]));
+  };
+
+  const handleAplicar = () => {
+      const filtrosLimpios = Object.fromEntries(
+        Object.entries(filtrosTemp).filter(
+          ([_, v]) => v !== '' && v !== null && v !== undefined
+        )
+      );
+      setSearchParams(filtrosLimpios);
+      setPagina(0);
+      setMostrarFiltros(false);
   };
 
   if (loading) return <p>Cargando...</p>;
@@ -78,7 +113,6 @@ export const HechosListNav = () => {
         🔍 Filtros Avanzados
       </button>
 
-      {/* LISTA DE HECHOS */}
       {hechos.length > 0 ? (
         <div className="hechos-list">
           {hechos.map(h => (
@@ -104,6 +138,30 @@ export const HechosListNav = () => {
         </div>
       ) : (
         <p>No hay hechos disponibles.</p>
+      )}
+
+      {metaData && metaData.totalPages > 1 && (
+        <div className="paginacion-container">
+            <button 
+                onClick={handleAnterior} 
+                disabled={pagina === 0}
+                className="btn-paginacion"
+            >
+                Anterior
+            </button>
+            
+            <span className="info-paginacion">
+                Página {metaData.number + 1} de {metaData.totalPages}
+            </span>
+            
+            <button 
+                onClick={handleSiguiente} 
+                disabled={pagina >= metaData.totalPages - 1}
+                className="btn-paginacion"
+            >
+                Siguiente
+            </button>
+        </div>
       )}
 
       {/* POPUP FILTROS */}
@@ -134,8 +192,8 @@ export const HechosListNav = () => {
                   onChange={e => setFiltrosTemp({ ...filtrosTemp, categoria: e.target.value })}
                 >
                   <option value="">Todas</option>
-                  {categorias.map(c => (
-                    <option key={c} value={c}>{c}</option>
+                  {todasLasCategorias.map(c => (
+                    <option key={c.nombre} value={c.nombre}>{c.nombre}</option>
                   ))}
                 </select>
               </div>
@@ -144,22 +202,17 @@ export const HechosListNav = () => {
                 <label>Provincia</label>
                 <select
                   value={filtrosTemp.provincia || ''}
-                  onChange={e => {
-                    const ub = provinciasUnicas.find(p => p.provincia === e.target.value);
-                    if (ub) {
+                  onChange={e => 
                       setFiltrosTemp({
                         ...filtrosTemp,
-                        lat: ub.latStr,
-                        lon: ub.lonStr,
-                        provincia: ub.provincia
-                      });
+                        provincia: e.target.value
+                      })
                     }
-                  }}
                 >
                   <option value="">Todas</option>
-                  {provinciasUnicas.map(p => (
-                    <option key={p.provincia} value={p.provincia}>
-                      {p.provincia}
+                  {todasLasProvincias.map(p => (
+                    <option key={p.nombre} value={p.nombre}>
+                      {p.nombre}
                     </option>
                   ))}
                 </select>
@@ -205,18 +258,14 @@ export const HechosListNav = () => {
             </div>
 
             <footer className="filtros-panel__actions">
-              <button onClick={resetFiltros}>Cancelar</button>
+              <button onClick={handleCancelar}>Cancelar</button>
+              <button onClick={() => {
+                  setFiltrosTemp({});
+                  // Esto aplica limpieza inmediata, o puedes dejar que solo limpie temp y user deba dar click a "Filtrar"
+              }}>Limpiar</button>
               <button
                 className="btn-primary"
-                onClick={() => {
-                  const filtrosLimpios = Object.fromEntries(
-                    Object.entries(filtrosTemp).filter(
-                      ([_, v]) => v !== '' && v !== null && v !== undefined
-                    )
-                  );
-                  setSearchParams(filtrosLimpios);
-                  setMostrarFiltros(false);
-                }}
+                onClick={handleAplicar}
               >
                 Filtrar
               </button>

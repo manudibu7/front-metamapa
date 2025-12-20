@@ -64,5 +64,44 @@
 }
 .btn-filtros {
   margin: 1rem 2rem;
+  background-color:var(--color-primary);
+  color: var(--color-text-dark)
+}
+
+.paginacion-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border-radius: 8px;
+}
+
+.btn-paginacion {
+    padding: 8px 16px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-paginacion:hover:not(:disabled) {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.btn-paginacion:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.info-paginacion {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
 }
 

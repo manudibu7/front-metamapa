@@ -28,8 +28,8 @@ export const FiltrosHechos = ({ categorias, provincias, filtros, onChange }) => 
           <option value="">Todas</option>
           {categorias.map((category, index) => (
             // Usamos index para garantizar unicidad
-            <option key={`${category}-${index}`} value={category}>
-              {category}
+            <option key={`${category.nombre}-${index}`} value={category.nombre}>
+              {category.nombre}
             </option>
           ))}
         </select>
@@ -39,8 +39,8 @@ export const FiltrosHechos = ({ categorias, provincias, filtros, onChange }) => 
         <select name="provincia" value={filtros.provincia ?? ''} onChange={handleChange}>
           <option value="">Todas</option>
           {provincias.map((province) => (
-            <option key={province} value={province}>
-              {province}
+            <option key={province.nombre} value={province.nombre}>
+              {province.nombre}
             </option>
           ))}
         </select>
