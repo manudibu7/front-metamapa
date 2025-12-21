@@ -121,8 +121,6 @@ export const GestionSolicitudes = () => {
                     <span className="detail-value">{solicitud.motivo}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-label">Solicitante</span>
-                    <span className="detail-value">{"Id del Solicitante: " + solicitud.id_contribuyente}</span>
                     <span className="detail-value">{"Fecha de subida: " + new Date(solicitud.fechaSolicitud).toLocaleDateString()}</span>
                   </div>
                 </div>
