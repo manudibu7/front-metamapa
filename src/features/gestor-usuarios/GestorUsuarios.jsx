@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
-import {
-  obtenerMiPerfil,
-  actualizarMiPerfil,
-} from '../../services/contribuyentesService';
+import {obtenerMiPerfil, actualizarMiPerfil,} from '../../services/contribuyentesService';
+import './GestorUsuarios.css';
 
 const GestorUsuarios = () => {
   const { isAuthenticated, loading, user, login, updatePerfil } = useAuthContext();
@@ -117,7 +115,7 @@ const GestorUsuarios = () => {
   }
   console.log({ loading, isAuthenticated, user, keycloakId });
   return (
-    <div>
+    <div className="gestor-usuario">
       <h2>Editar perfil</h2>
 
       <form onSubmit={handleSubmit}>
@@ -157,8 +155,8 @@ const GestorUsuarios = () => {
         </button>
       </form>
 
-      {estado.mensaje && <p>{estado.mensaje}</p>}
-      {estado.error && <p style={{ color: 'red' }}>{estado.error}</p>}
+      {estado.mensaje && <p className="mensaje-exito">{estado.mensaje}</p>}
+      {estado.error && <p className="mensaje-error">{estado.error}</p>}
     </div>
   );
 };
