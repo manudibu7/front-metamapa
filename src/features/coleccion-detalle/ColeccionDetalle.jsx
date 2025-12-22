@@ -348,7 +348,7 @@ const categorias = useMemo(() => {
 
       <footer className="filtros-panel__actions">
         <button onClick={() => resetFiltros()}>
-          Cancelar
+          Limpiar
         </button>
 
         <button

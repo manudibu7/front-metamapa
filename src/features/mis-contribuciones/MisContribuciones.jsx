@@ -39,18 +39,17 @@ export const MisContribuciones = () => {
         setCategorias(categoriasData.map(c => c.nombre));
 
         // Fetch revisions for each contribution
-        const contribucionesConRevision = await Promise.all(
+        const contribucionesConRevision = await Promise.all( 
           contribData.map(async (contribucion) => {
             try {
               const revision = await getDetalleRevision(contribucion.idContribucion);
               return { ...contribucion, revision };
             } catch (err) {
               console.error(`Error fetching revision for contribution ${contribucion.idContribucion}`, err);
-              return { ...contribucion, revision: null };
+              return { ...contribucion, revision: null};
             }
           })
         );
-
         setContribuciones(contribucionesConRevision);
       } catch (err) {
         console.error(err);
@@ -161,6 +160,7 @@ export const MisContribuciones = () => {
   }
 
   return (
+    
     <div className="mis-contribuciones">
       <h2>Mis Contribuciones</h2>
       {contribuciones.length === 0 ? (
@@ -168,6 +168,7 @@ export const MisContribuciones = () => {
       ) : (
         <div className="mis-contribuciones__list">
           {contribuciones.map((c) => (
+            console.log("es un hecho anonimo? "+ c.anonimo),
             <div 
               key={c.idContribucion} 
               className="contribucion-card"
@@ -198,15 +199,18 @@ export const MisContribuciones = () => {
                   <strong>Feedback:</strong> {c.revision.mensaje}
                 </div>
               )}
-
-              {c.revision && (c.revision.estado === 'ACEPTADA_CON_SUGERENCIA' || c.revision.estado === 'PENDIENTE') && (
+            
+              {!c.anonimo? (c.revision && (c.revision.estado === 'ACEPTADA_CON_SUGERENCIA' || c.revision.estado === 'PENDIENTE') )&& (
                 <button 
                   className="btn-edit"
                   onClick={(e) => handleEditClick(e, c)}
                 >
                   Editar
                 </button>
-              )}
+              ):<span 
+                className="contribucion-card__status">
+                  No se puede editar una contribución anónima
+                </span>}
             </div>
           ))}
         </div>
