@@ -10,7 +10,7 @@ export const normalizador= (filtros) => {
     if (filtros.fechaDesde) params.append('fecha_acontecimiento_desde', filtros.fechaDesde);
     if (filtros.fechaHasta) params.append('fecha_acontecimiento_hasta', filtros.fechaHasta);
     if (filtros.provincia) params.append('provincia', filtros.provincia)
-
+    if (filtros.fuenteTipo) params.append('fuenteTipo', filtros.fuenteTipo)
     // Aquí mapeamos la 'q' del frontend
     if (filtros.q) params.append('q', filtros.q);
 
@@ -59,7 +59,7 @@ export const collectionsService = {
       console.log(url)
       const response = await axios.get(url);
       console.log(response)
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Error obteniendo hechos de la colección", error);
       throw error;

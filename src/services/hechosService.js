@@ -41,6 +41,7 @@ const buildUrlWithFilters = (filtros, page, size) => {
     if (filtros.fechaDesde) params.append('fecha_acontecimiento_desde', filtros.fechaDesde);
     if (filtros.fechaHasta) params.append('fecha_acontecimiento_hasta', filtros.fechaHasta);
     if (filtros.provincia) params.append('provincia', filtros.provincia)
+    if (filtros.fuenteTipo) params.append('tipoFuente', filtros.fuenteTipo)
     // Aquí mapeamos la 'q' del frontend
     if (filtros.q) params.append('q', filtros.q);
 

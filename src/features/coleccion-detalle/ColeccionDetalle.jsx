@@ -86,15 +86,16 @@ const categorias = useMemo(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const coleccionData = await collectionsService.getCollectionById(id);
-        setColeccion(coleccionData);
+        //const coleccionData = await collectionsService.getCollectionById(id);
+        //setColeccion(coleccionData);
+        //console.log(coleccionData)
         const filtrosActuales = {
             ...Object.fromEntries([...searchParams]), 
             modoNavegacion: modoNavegacion 
         };
-        const hechosData = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
-        console.log(hechosData)
-        setHechos(hechosData);
+        const coleCompleta = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
+        setColeccion(coleCompleta.data)
+        setHechos(coleCompleta.data.hechos);
       } catch (error) {
         console.error("Error cargando datos:", error);
         setHechos([]);

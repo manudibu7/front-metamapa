@@ -49,7 +49,6 @@
 .acciones-rapidas__card h3 {
   margin-bottom: 0.35rem;
   color: var(--color-text);
-  text-shadow: 0 8px 24px rgba(4, 6, 18, 0.8);
 }
 
 .acciones-rapidas__card p {
