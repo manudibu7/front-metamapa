@@ -1,0 +1,22 @@
+/* ====== ESTILOS PARA ESTADISTICA TORTA ====== */
+
+.estadistica-torta .victory-label {
+  fill: var(--color-text-dark) !important;
+  font-size: 12px !important;
+  font-weight: bold;
+}
+
+/* Tooltip */
+.estadistica-torta .victory-tooltip {
+  fill: var(--color-text) !important;
+  font-size: 12px !important;
+  font-weight: bold;
+}
+
+.estadistica-torta .victory-tooltip > path {
+  fill: var(--color-surface-alt) !important;
+  stroke: var(--color-border) !important;
+  stroke-width: 1 !important;
+  rx: 6;
+  ry: 6;
+}

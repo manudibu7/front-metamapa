@@ -15,14 +15,11 @@
 .gestion-solicitudes__title {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #fff, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
 }
 
 .gestion-solicitudes__subtitle {
-  color: var(--color-muted);
+  color: var(--color-text);
   font-size: 1rem;
 }
 
@@ -32,7 +29,7 @@
 }
 
 .solicitud-card {
-  background: rgba(30, 41, 59, 0.7);
+  background: var(--color-bg);
   backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -63,7 +60,7 @@
   font-family: monospace;
   font-size: 0.85rem;
   color: var(--color-muted);
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--color-bg);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
 }
@@ -96,7 +93,7 @@
 }
 
 .solicitud-card__hecho {
-  background: rgba(15, 23, 43, 0.6);
+  background: var(--color-bg);
   border-radius: var(--radius-md);
   padding: 1rem;
   border-left: 3px solid var(--color-primary);
@@ -105,7 +102,7 @@
 }
 
 .solicitud-card__hecho:hover {
-  background: rgba(15, 23, 43, 0.9);
+  background: var(--color-bg);
   transform: translateX(4px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
@@ -114,7 +111,7 @@
   font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
-  color: #e2e8f0;
+  color: var(--color-text);
 }
 
 .hecho-desc {
@@ -152,7 +149,7 @@
 
 .detail-value {
   font-size: 0.95rem;
-  color: #e2e8f0;
+  color: var(--color-text);
 }
 
 .solicitud-card__actions {
@@ -202,7 +199,7 @@
   text-align: center;
   padding: 4rem;
   color: var(--color-muted);
-  background: rgba(30, 41, 59, 0.3);
+  background: var(--color-bg);
   border-radius: var(--radius-lg);
   border: 1px dashed var(--color-border);
 }

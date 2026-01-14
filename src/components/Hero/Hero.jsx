@@ -23,14 +23,16 @@ export const Hero = ({ onExplore, onLogin, isAuthenticated }) => {
           </button>
         ) : (
           <button className="btn btn--primary" onClick={onLogin}>
-            Ingresar con Keycloak
+            Ingresar
           </button>
         )}
         <button className="btn btn--ghost" onClick={() => navigate('/contribuir')}>
           Cargar un hecho
         </button>
       </div>
-
+      <button type="button" className="btn btn--ghost" onClick={() => navigate('/hechos')}>
+            Busqueda Avanzada de HECHOS
+          </button>
       {isAuthenticated && isAdmin && (
         <div className="hero__admin">
           <button className="btn btn--admin" onClick={() => navigate('/admin')}>

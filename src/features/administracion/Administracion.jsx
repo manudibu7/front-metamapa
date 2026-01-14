@@ -46,6 +46,14 @@ export const Administracion = () => {
       cta: 'Administrar colecciones',
       ruta: '/admin/colecciones',
     },
+    {
+      id: 'importaciones',
+      icono: '📂',
+      titulo: 'Importar datasets',
+      descripcion: 'Importá un dataset que contega hechos a la base de datos del sistema',
+      cta: 'Subir DataSet',
+      ruta: '/admin/subirDataSet'
+    }
   ];
 
   return (

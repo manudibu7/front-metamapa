@@ -1,23 +1,32 @@
+import { useNavigate } from "react-router-dom";
 import './ColeccionesDestacadas.css';
 
-const formatearFecha = (valor) =>
-  new Intl.DateTimeFormat('es-AR', {
+const formatearFecha = (valor) => {
+  if (!valor) return '-';
+
+  const fecha = new Date(valor);
+
+  if (isNaN(fecha.getTime())) return 'Fecha inválida';
+
+  return new Intl.DateTimeFormat('es-AR', {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(valor));
+  }).format(fecha);
+};
+
+
 
 export const ColeccionesDestacadas = ({ colecciones = [], cargando, onExplorar }) => {
-  const destacadas = colecciones.slice(0, 3);
-
+const navigate = useNavigate();
+const destacadas = Array.isArray(colecciones) ? colecciones.slice(0, 3) : [];
   return (
     <section className="colecciones-destacadas" id="colecciones-destacadas">
       <header>
-        <p className="section-eyebrow">Colecciones destacadas</p>
         <div>
-          <h2>Lo más confiable del ecosistema</h2>
-          <p>Panel rápido con las colecciones que concentran más hechos, últimas sincronizaciones y loaders conectados.</p>
+          <h2>Colecciones Destacadas</h2>
+          <p>Algunas de las colecciones que concentran más hechos...</p>
         </div>
         <button type="button" className="btn btn--ghost" onClick={onExplorar}>
           Ver explorador completo
@@ -29,7 +38,8 @@ export const ColeccionesDestacadas = ({ colecciones = [], cargando, onExplorar }
       ) : destacadas.length ? (
         <div className="colecciones-destacadas__grid">
           {destacadas.map((coleccion) => (
-            <article key={coleccion.id} className="coleccion-card">
+            <article key={coleccion.id_coleccion} className="coleccion-card" onClick={() => navigate(`/colecciones/${coleccion.id_coleccion}/hechos`)}
+          style={{ cursor: "pointer" }}>
               <div className="coleccion-card__meta">
                 <span className="coleccion-card__estado">{coleccion.estado}</span>
                 <span>{coleccion.consenso}</span>
@@ -38,23 +48,19 @@ export const ColeccionesDestacadas = ({ colecciones = [], cargando, onExplorar }
               <p>{coleccion.descripcion}</p>
 
               <ul className="coleccion-card__tags">
-                {coleccion.tags.slice(0, 3).map((tag) => (
+                {(coleccion.tags || []).slice(0, 3).map((tag) => (
                   <li key={tag}>{tag}</li>
                 ))}
               </ul>
 
               <div className="coleccion-card__stats">
                 <div>
-                  <strong>{coleccion.totalHechos}</strong>
+                  <strong>{coleccion.cantidadHechos}</strong>
                   <span>hechos</span>
                 </div>
                 <div>
-                  <strong>{coleccion.fuentes.length}</strong>
+                  <strong>{coleccion.fuentes?.length || 0}</strong>
                   <span>loaders</span>
-                </div>
-                <div>
-                  <strong>{formatearFecha(coleccion.ultimaActualizacion)}</strong>
-                  <span>última sync</span>
                 </div>
               </div>
             </article>

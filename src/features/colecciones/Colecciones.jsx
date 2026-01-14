@@ -18,15 +18,11 @@ export const Colecciones = () => {
   const { collections, isLoading } = useCollectionsContext();
   const navigate = useNavigate();
 
-  const handleColeccionClick = (id) => {
-    navigate(`/colecciones/${id}`);
-  };
-
   return (
     <div className="colecciones-page">
       <header className="colecciones-page__header">
         <div>
-          <p className="section-eyebrow">Colecciones del agregador</p>
+          <p className="section-eyebrow">Colecciones del sistema</p>
           <h1>Explorá datasets curados</h1>
           <p>
             Navegá por las colecciones disponibles. Hacé clic en una para ver el detalle completo con mapa interactivo
@@ -51,7 +47,7 @@ export const Colecciones = () => {
               <article
                 key={collection.id}
                 className="coleccion-card"
-                onClick={() => handleColeccionClick(collection.id)}
+                onClick={() => navigate(`/colecciones/${collection.id_coleccion}/hechos`)}
               >
                 <div className="coleccion-card__header">
                   <span className="coleccion-card__estado">{collection.estado}</span>
@@ -71,17 +67,12 @@ export const Colecciones = () => {
 
                 <div className="coleccion-card__footer">
                   <div className="coleccion-card__stat">
-                    <strong>{collection.totalHechos}</strong>
+                    <strong>{collection.cantidadHechos}</strong>
                     <span>hechos</span>
                   </div>
                   <div className="coleccion-card__stat">
                     <strong>{(collection.fuentes ?? []).length}</strong>
-                    <span>loaders</span>
-                  </div>
-                  <div className="coleccion-card__stat">
-                    <span className="coleccion-card__fecha">
-                      {formatSyncDate(collection.ultimaActualizacion)}
-                    </span>
+                    <span>fuentes</span>
                   </div>
                 </div>
 

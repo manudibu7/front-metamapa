@@ -50,7 +50,7 @@ export const AccionesRapidas = ({ onVerColecciones }) => {
       <header>
         <p className="section-eyebrow">Barra rápida</p>
         <h2>Acciones inmediatas sobre el agregador</h2>
-        <p>Todo lo esencial está a dos clics: mapa interactivo, colecciones curadas, carga express y roadmap del TP.</p>
+        <p>Todo lo esencial está a dos clics: mapa interactivo, colecciones curadas, carga express y estadisticas.</p>
       </header>
 
       <div className="acciones-rapidas__grid">

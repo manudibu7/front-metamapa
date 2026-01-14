@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { obtenerSolicitudes, actualizarEstadoSolicitud } from '../../services/solicitudesService';
+import { obtenerSolicitudes, actualizarEstadoSolicitud, eliminarSolicitud } from '../../services/solicitudesService';
 import './GestionSolicitudes.css';
 
 export const GestionSolicitudes = () => {
@@ -13,15 +13,17 @@ export const GestionSolicitudes = () => {
   const [processingId, setProcessingId] = useState(null);
 
   useEffect(() => {
-    if (!isAdmin) {
-      navigate('/');
-      return;
-    }
+   // if (!isAdmin) {
+  //    navigate('/');
+    //  return;
+    //}
 
     const fetchSolicitudes = async () => {
       try {
         const data = await obtenerSolicitudes();
-        setSolicitudes(data);
+        const dataFiltrada = data.filter(solicitud => solicitud.estadoSolicitud === 'PENDIENTE');
+        console.log("Solicitudes obtenidas:", dataFiltrada);
+        setSolicitudes(dataFiltrada);
       } catch (err) {
         setError('Error al cargar las solicitudes');
         console.error(err);
@@ -34,19 +36,26 @@ export const GestionSolicitudes = () => {
   }, [isAdmin, navigate]);
 
   const handleAction = async (id, nuevoEstado) => {
-    setProcessingId(id);
-    try {
-      const updatedSolicitud = await actualizarEstadoSolicitud(id, nuevoEstado);
-      setSolicitudes((prev) =>
-        prev.map((s) => (s.id === id ? updatedSolicitud : s))
-      );
-    } catch (err) {
-      console.error('Error al actualizar solicitud:', err);
-      alert('No se pudo actualizar la solicitud');
-    } finally {
-      setProcessingId(null);
+  setProcessingId(id);
+  try {
+    await actualizarEstadoSolicitud(id, nuevoEstado);
+
+    if (nuevoEstado === "RECHAZADA") {
+      await eliminarSolicitud(id);
     }
-  };
+
+    // Quita la solicitud de la UI
+    setSolicitudes((prev) =>
+      prev.filter((s) => s.id_solicitud !== id)
+    );
+
+  } catch (err) {
+    console.error("Error al actualizar solicitud:", err);
+    alert("No se pudo actualizar la solicitud");
+  } finally {
+    setProcessingId(null);
+  }
+};
 
   if (loading) {
     return (
@@ -63,7 +72,7 @@ export const GestionSolicitudes = () => {
       </div>
     );
   }
-
+  console.log("Solicitud recibida:", solicitudes);
   return (
     <div className="gestion-solicitudes">
       <header className="gestion-solicitudes__header">
@@ -80,18 +89,18 @@ export const GestionSolicitudes = () => {
           </div>
         ) : (
           solicitudes.map((solicitud) => (
-            <div key={solicitud.id} className="solicitud-card">
+            <div key={solicitud.id_solicitud} className="solicitud-card">
               <div className="solicitud-card__info">
                 <div className="solicitud-card__header">
-                  <span className="solicitud-card__id">{solicitud.id}</span>
-                  <span className={`solicitud-card__status status-${solicitud.estado.toLowerCase()}`}>
-                    {solicitud.estado}
+                  <span className="solicitud-card__id">{"Nro de Solicitud: " + solicitud.id_solicitud}</span>
+                  <span className={`solicitud-card__status status-${solicitud.estadoSolicitud!=null? solicitud.estadoSolicitud.toLowerCase(): "sin estado"}`}>
+                    {solicitud.estadoSolicitud}
                   </span>
                 </div>
 
                 <div 
                   className="solicitud-card__hecho"
-                  onClick={() => navigate(`/hechos/${solicitud.hecho.id}`)}
+                  onClick={() => navigate(`/hechos/${solicitud.hecho.id_hecho}`)}
                   title="Ver detalle del hecho"
                 >
                   <div className="hecho-titulo">
@@ -99,9 +108,10 @@ export const GestionSolicitudes = () => {
                   </div>
                   <div className="hecho-desc">{solicitud.hecho.descripcion}</div>
                   <div className="hecho-meta">
-                    <span>📍 {solicitud.hecho.provincia}</span>
+                    <span>📍 {solicitud.hecho.ubicacion.provincia}</span>
+                    <span>📍 {solicitud.hecho.ubicacion.pais}</span>
                     <span>📅 {solicitud.hecho.fecha}</span>
-                    <span>📂 {solicitud.hecho.coleccionTitulo}</span>
+                    <span>📂 {solicitud.hecho.fuente}</span>
                   </div>
                 </div>
 
@@ -111,33 +121,37 @@ export const GestionSolicitudes = () => {
                     <span className="detail-value">{solicitud.motivo}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-label">Solicitante</span>
-                    <span className="detail-value">{solicitud.usuario} • {new Date(solicitud.fechaSolicitud).toLocaleDateString()}</span>
+                    <span className="detail-value">{"Fecha de subida: " + new Date(solicitud.fechaSolicitud).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
 
               <div className="solicitud-card__actions">
-                {solicitud.estado === 'PENDIENTE' ? (
+                {solicitud.estadoSolicitud === 'PENDIENTE' ? (
                   <>
-                    <button
-                      className="btn-action btn-accept"
-                      onClick={() => handleAction(solicitud.id, 'ACEPTADA')}
-                      disabled={processingId === solicitud.id}
-                    >
-                      {processingId === solicitud.id ? 'Procesando...' : '✅ Aceptar Eliminación'}
-                    </button>
-                    <button
-                      className="btn-action btn-reject"
-                      onClick={() => handleAction(solicitud.id, 'RECHAZADA')}
-                      disabled={processingId === solicitud.id}
-                    >
-                      {processingId === solicitud.id ? 'Procesando...' : '❌ Rechazar Solicitud'}
-                    </button>
-                  </>
+                <button className="btn-action btn-accept" onClick={() => {
+                   if (window.confirm("¿Confirmás aceptar esta solicitud de eliminación?")) {
+                      handleAction(solicitud.id_solicitud, 'ACEPTADA');
+                    }
+                    }}
+                  disabled={processingId === solicitud.id_solicitud}
+                  >{processingId === solicitud.id_solicitud ? 'Procesando...' : '✅ Aceptar Eliminación'}
+                </button>
+
+                  <button className="btn-action btn-reject"
+                    onClick={() => {
+                    if (window.confirm("¿Confirmás rechazar esta solicitud?")) {
+                    handleAction(solicitud.id_solicitud, 'RECHAZADA');
+                  }
+                  }}
+                  disabled={processingId === solicitud.id_solicitud}
+                  >
+                  {processingId === solicitud.id_solicitud ? 'Procesando...' : '❌ Rechazar Solicitud'}
+                </button>
+                </>
                 ) : (
                   <div className="action-completed">
-                    Solicitud {solicitud.estado.toLowerCase()}
+                    Solicitud {solicitud.estadoSolicitud != null? solicitud.estadoSolicitud.toLowerCase(): "sinestado"}
                   </div>
                 )}
               </div>

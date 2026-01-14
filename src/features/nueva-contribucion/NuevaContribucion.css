@@ -5,19 +5,19 @@
 }
 
 .nueva-contribucion__volver {
-  background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text);
+  background: var(--color-primary);
+  border: 1px solid var(--border-color, #2a3447);
+  color: var(--color-text-dark);
   padding: 0.5rem 1rem;
-  font-size: 0.95rem;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 0.95rem;
   margin-bottom: 1.5rem;
-  transition: background 0.2s, border-color 0.2s;
+  transition: all 0.2s;
 }
 
 .nueva-contribucion__volver:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-primary);
   border-color: var(--color-primary);
 }
 

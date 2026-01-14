@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  VictoryBar, 
-  VictoryChart, 
-  VictoryAxis, 
-  VictoryTheme, 
-  VictoryPie, 
-  VictoryTooltip, 
-  VictoryLabel,
-  VictoryContainer
-} from 'victory';
-import { getEstadisticas, downloadCSV } from '../../services/estadisticasService';
+import { useEffect, useState } from 'react';
 import './Estadisticas.css';
+import { obtenerEstadisticas, exportarEstadisticasCSV } from '../../services/estadisticasService';
+import EstadisticaTorta from '../../components/Estadistica/EstadisticaTorta/estadisticaTorta';
+import EstadisticaBarra from '../../components/Estadistica/EstadisticaBarra/estadisticaBarra';
+
+const colors = ['#38bdf8', '#818cf8', '#f472b6', '#facc15', '#34d399', '#fb7185'];
 
 export const Estadisticas = () => {
   const [loading, setLoading] = useState(true);
@@ -76,14 +70,61 @@ export const Estadisticas = () => {
     if (colsArray.length > 0) setSelectedCollection(colsArray[0]);
   };
 
-  // Filtered stats based on selection
-  const getCategoryStats = () => {
-    if (!selectedCategory) return { hours: null, provinces: null };
-    
-    // Find stats for this category
-    const categoryStats = rawStats.filter(s => 
-      s.discriminante?.tipo === 'CATEGORIA' && 
-      s.discriminante?.valor === selectedCategory
+  const renderChart = (estadistica) => {
+    const data = (estadistica?.datos ?? []).map((dato, index) => ({
+      x: dato.nombre,
+      y: dato.cantidad,
+      fill: colors[index % colors.length],
+    }));
+
+    if (!data.length) {
+      return <p className="estadisticas__sin-datos">Sin datos disponibles.</p>;
+    }
+
+    if (data.length <= 5) {
+  return <EstadisticaTorta data={data} />;
+  }
+
+
+    return <EstadisticaBarra data={data} />;
+  };
+  const grupoCategoria = estadisticas.filter(e => e.discriminante?.tipo === 'CATEGORIA');
+  const grupoColeccion = estadisticas.filter(e => e.discriminante?.tipo === 'COLECCION');
+  const grupoSin = estadisticas.filter(e => e.discriminante?.tipo === 'SIN');
+
+  const renderSection = (titulo, listaEstadisticas) => {
+    if (!listaEstadisticas || listaEstadisticas.length === 0) return null;
+
+    return (
+      <div className="estadisticas__grupo">
+        {/* Puedes agregar una clase CSS para darle estilo al título si quieres */}
+        <h2 style={{ margin: '2rem 0 1rem', fontSize: '1.5rem', color: '#333' }}>
+          {titulo}
+        </h2>
+        
+        <div className="estadisticas__grid">
+          {listaEstadisticas.map((estadistica, index) => (
+            <article key={`${estadistica?.discriminante?.valor ?? 'estadistica'}-${index}`} className="estadisticas__card">
+              <div className="estadisticas__card-header">
+                <div className="estadisticas__tag">
+                  <span className="estadisticas__label">
+                    {estadistica?.descripcion ?? 'ESTADISTICA'}
+                    <b className="estadisticas__value">
+                      {estadistica?.discriminante?.valor ?? 'Estadística'}
+                    </b>
+                  </span>
+                </div>
+                {estadistica?.resultado && (
+                  <p className="estadisticas__resumen">
+                    Resultado con más hechos: <strong>{estadistica.resultado.nombre + " con " + estadistica.resultado.cantidad + " hechos"}</strong>
+                  </p>
+                )}
+              </div>
+              <div className="estadisticas__chart">{renderChart(estadistica)}</div>
+            </article>
+          ))}
+        </div>
+      </div>
     );
 
     // Distinguish between hours and provinces based on data keys
@@ -119,206 +160,33 @@ export const Estadisticas = () => {
 
   if (loading) return <div className="loading">Cargando estadísticas...</div>;
 
-  return (
-    <div className="estadisticas-container">
-      <header className="estadisticas-header">
-        <h1>Panel de Estadísticas</h1>
-        <p>Visualización de métricas del sistema</p>
-        <button className="btn-download" onClick={downloadCSV}>
-          📥 Descargar Reporte CSV
+ return (
+    <section className="estadisticas">
+      <header className="estadisticas__encabezado">
+        <div>
+          <h1>Estadísticas de Metamapa</h1>
+        </div>
+        <button type="button" className="btn btn--primary" onClick={handleDownload} disabled={downloading}>
+          {downloading ? 'Generando CSV...' : 'Descargar CSV'}
         </button>
       </header>
 
-      {/* Global Stats Section */}
-      <section className="estadisticas-grid">
-        {/* Spam Stat */}
-        {spamStat && (
-          <div className="estadistica-card">
-            <h3>Solicitudes Spam</h3>
-            <div className="spam-stat">
-              <span className="spam-value">{spamStat.resultado.cantidad}</span>
-              <span className="spam-label">Detectados como Spam</span>
-              <span className="spam-total">
-                de {spamStat.datos.find(d => d.nombre === 'cantidad total')?.cantidad || 0} totales
-              </span>
-            </div>
-          </div>
-        )}
+      {/* 3. Renderizamos los grupos en el orden solicitado */}
+      
+      {/* Grupo 1: Categoria */}
+      {renderSection('Por Categoría', grupoCategoria)}
 
-        {/* Global Category Distribution */}
-        {globalCategoryStat && (
-          <div className="estadistica-card">
-            <h3>Hechos por Categoría (Global)</h3>
-            <div className="chart-container">
-              <VictoryPie
-                data={globalCategoryStat.datos}
-                x="nombre"
-                y="cantidad"
-                colorScale="qualitative"
-                innerRadius={50}
-                labelRadius={({ innerRadius }) => innerRadius + 30 }
-                style={{ labels: { fill: "white", fontSize: 12, fontWeight: "bold" } }}
-                labels={({ datum }) => `${datum.nombre}\n(${datum.cantidad})`}
-              />
-            </div>
-          </div>
-        )}
-      </section>
+      {/* Grupo 2: Coleccion */}
+      {renderSection('Por Colección', grupoColeccion)}
 
-      {/* Category Specific Stats */}
-      {categories.length > 0 && (
-        <section className="estadisticas-section">
-          <div className="controls-section">
-            <label>Seleccionar Categoría:</label>
-            <select 
-              value={selectedCategory} 
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              {categories.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
+      {/* Grupo 3: Sin (Generales u otros) */}
+      {renderSection('Generales', grupoSin)}
 
-          <div className="estadisticas-grid">
-            {categoryStats.hours ? (
-              <div className="estadistica-card">
-                <h3>Distribución Horaria - {selectedCategory}</h3>
-                <div className="chart-container">
-                  <VictoryChart
-                    theme={VictoryTheme.material}
-                    domainPadding={20}
-                    containerComponent={<VictoryContainer responsive={true}/>}
-                  >
-                    <VictoryAxis 
-                      style={{ 
-                        tickLabels: { fill: "white", fontSize: 10, angle: -45, textAnchor: 'end' },
-                        axis: { stroke: "white" }
-                      }} 
-                    />
-                    <VictoryAxis 
-                      dependentAxis 
-                      style={{ 
-                        tickLabels: { fill: "white", fontSize: 10 },
-                        axis: { stroke: "white" },
-                        grid: { stroke: "rgba(255,255,255,0.1)" }
-                      }} 
-                    />
-                    <VictoryBar
-                      data={categoryStats.hours.datos}
-                      x="nombre"
-                      y="cantidad"
-                      style={{ data: { fill: "#4ade80" } }}
-                      labels={({ datum }) => datum.cantidad}
-                      labelComponent={<VictoryLabel dy={-5} style={{ fill: "white", fontSize: 10 }} />}
-                    />
-                  </VictoryChart>
-                </div>
-              </div>
-            ) : (
-              <div className="estadistica-card">
-                <h3>Distribución Horaria</h3>
-                <p>No hay datos para esta categoría</p>
-              </div>
-            )}
-
-            {categoryStats.provincias ? (
-              <div className="estadistica-card">
-                <h3>Distribución por Provincia - {selectedCategory}</h3>
-                <div className="chart-container">
-                  <VictoryChart
-                    theme={VictoryTheme.material}
-                    domainPadding={20}
-                  >
-                    <VictoryAxis 
-                      style={{ 
-                        tickLabels: { fill: "white", fontSize: 10, angle: -45, textAnchor: 'end' },
-                        axis: { stroke: "white" }
-                      }} 
-                    />
-                    <VictoryAxis 
-                      dependentAxis 
-                      style={{ 
-                        tickLabels: { fill: "white", fontSize: 10 },
-                        axis: { stroke: "white" },
-                        grid: { stroke: "rgba(255,255,255,0.1)" }
-                      }} 
-                    />
-                    <VictoryBar
-                      data={categoryStats.provincias.datos}
-                      x="nombre"
-                      y="cantidad"
-                      style={{ data: { fill: "#22d3ee" } }}
-                      labels={({ datum }) => datum.cantidad}
-                      labelComponent={<VictoryLabel dy={-5} style={{ fill: "white", fontSize: 10 }} />}
-                    />
-                  </VictoryChart>
-                </div>
-              </div>
-            ) : (
-              <div className="estadistica-card">
-                <h3>Distribución por Provincia</h3>
-                <p>No hay datos para esta categoría</p>
-              </div>
-            )}
-          </div>
-        </section>
+      {/* Mensaje por si no hay nada en ninguno de los grupos */}
+      {estadisticas.length === 0 && (
+         <p className="estadisticas__sin-datos">No hay estadísticas para mostrar.</p>
       )}
 
-      {/* Collection Specific Stats */}
-      {collections.length > 0 && (
-        <section className="estadisticas-section">
-          <div className="controls-section">
-            <label>Seleccionar Colección:</label>
-            <select 
-              value={selectedCollection} 
-              onChange={(e) => setSelectedCollection(e.target.value)}
-            >
-              {collections.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-
-          <div className="estadisticas-grid">
-            {collectionStats.provincias ? (
-              <div className="estadistica-card">
-                <h3>Hechos por Provincia - {selectedCollection}</h3>
-                <div className="chart-container">
-                  <VictoryChart
-                    theme={VictoryTheme.material}
-                    domainPadding={20}
-                  >
-                    <VictoryAxis 
-                      style={{ 
-                        tickLabels: { fill: "white", fontSize: 10, angle: -45, textAnchor: 'end' },
-                        axis: { stroke: "white" }
-                      }} 
-                    />
-                    <VictoryAxis 
-                      dependentAxis 
-                      style={{ 
-                        tickLabels: { fill: "white", fontSize: 10 },
-                        axis: { stroke: "white" },
-                        grid: { stroke: "rgba(255,255,255,0.1)" }
-                      }} 
-                    />
-                    <VictoryBar
-                      data={collectionStats.provincias.datos}
-                      x="nombre"
-                      y="cantidad"
-                      style={{ data: { fill: "#f472b6" } }}
-                      labels={({ datum }) => datum.cantidad}
-                      labelComponent={<VictoryLabel dy={-5} style={{ fill: "white", fontSize: 10 }} />}
-                    />
-                  </VictoryChart>
-                </div>
-              </div>
-            ) : (
-              <div className="estadistica-card">
-                <h3>Hechos por Provincia</h3>
-                <p>No hay datos para esta colección</p>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-    </div>
+    </section>
   );
 };

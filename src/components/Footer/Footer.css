@@ -1,7 +1,6 @@
 .app-footer {
-  margin-top: 4rem;
   padding: 3rem clamp(1rem, 5vw, 5rem);
-  background: linear-gradient(180deg, rgba(4, 6, 18, 0.95), rgba(2, 4, 12, 1));
+  background: var(--color-header-bg);
   border-top: 1px solid rgba(148, 163, 184, 0.2);
   display: flex;
   flex-direction: column;
@@ -18,7 +17,7 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(93, 231, 196, 0.3), rgba(108, 99, 255, 0.4));
+  background: rgb(185, 186, 187);
   display: grid;
   place-items: center;
 }
@@ -29,10 +28,10 @@
 
 .app-footer__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
   gap: 1.5rem;
 }
-
+/*
 .app-footer__grid h4 {
   color: var(--color-primary);
   margin-bottom: 0.6rem;
@@ -45,7 +44,7 @@
   flex-direction: column;
   gap: 0.3rem;
 }
-
+*/
 .app-footer__meta {
   display: flex;
   flex-wrap: wrap;

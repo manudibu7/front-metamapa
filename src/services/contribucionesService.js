@@ -1,5 +1,8 @@
+import axios from 'axios';
+
 const delay = (ms = 700) => new Promise((resolve) => setTimeout(resolve, ms));
-const API_BASE_URL = process.env.REACT_APP_LOADER_API ?? '';
+const API_BASE_URL = 'http://localhost:8090';
+const API_ADMINISTRATIVA_URL = 'http://localhost:8084';
 
 const sanitizeHecho = (hecho) => {
   if (!hecho) throw new Error('El hecho es obligatorio');
@@ -41,37 +44,7 @@ const fileToDataUrl = (archivo) =>
     reader.readAsDataURL(archivo);
   });
 
-const postJson = async (url, body, headers) => {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers,
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    throw new Error(`Error al crear contribución (${response.status})`);
-  }
-  return response.json();
-};
-
-const patchJson = async (url, body, headers) => {
-  const response = await fetch(url, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers,
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    throw new Error(`Error al adjuntar archivo (${response.status})`);
-  }
-  return response.json();
-};
-
-export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo, token }) => {
+export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo, token,anonimo }) => {
   if (!contribuyenteId) {
     throw new Error('No pudimos obtener el contribuyenteId del token.');
   }
@@ -79,41 +52,95 @@ export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo
   const hechoDto = sanitizeHecho(hecho);
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-  // Si no se configuró un backend, simulamos la latencia para no romper la demo.
-  if (!API_BASE_URL) {
-    console.warn('[Loader Dinámico] REACT_APP_LOADER_API no configurada, se usa flujo simulado.');
-    await delay();
-    return {
-      contribuyenteId,
-      contribucionId: Date.now(),
-      archivoAdjunto: archivo ? { nombreOriginal: archivo.name, tipo: archivo.type } : null,
-      simulated: true,
-    };
-  }
-
   const contribucionPayload = {
     idContribuyente: contribuyenteId,
     hecho: hechoDto,
   };
 
-  const { id: contribucionId } = await postJson(`${API_BASE_URL}/contribuciones`, contribucionPayload, headers);
+  try {
+    // The backend returns the ID directly, e.g. 10
+    const response = await axios.post(`${API_BASE_URL}/contribuciones`, 
+      {idContribuyente: contribuyenteId,
+        hecho:hechoDto,
+        anonimo: anonimo
+    },{ headers });
+    const contribucionId = response.data;
 
-  if (archivo) {
-    const dataUrl = await fileToDataUrl(archivo);
-    await patchJson(
-      `${API_BASE_URL}/contribuciones/${contribucionId}`,
-      {
-        tipo: archivo.type || 'application/octet-stream',
-        url: dataUrl,
-        nombreOriginal: archivo.name ?? 'adjunto',
-      },
-      headers
-    );
+    if (archivo) {
+      let tipo = 'TEXTO';
+      if (archivo.type.startsWith('image/')) tipo = 'IMAGEN';
+      else if (archivo.type.startsWith('video/')) tipo = 'VIDEO';
+      else if (archivo.type.startsWith('audio/')) tipo = 'AUDIO';
+
+      const formData = new FormData();
+      formData.append('file', archivo)
+      formData.append('tipo', tipo)
+
+      await axios.patch(
+        `${API_BASE_URL}/contribuciones/${contribucionId}`,formData,
+        { headers: {
+          ...headers,
+          'Content-Type': 'multipart/form-data'
+        } }
+      );
+    }
+
+    return {
+      contribuyenteId,
+      contribucionId,
+      archivoAdjunto: archivo ? { nombreOriginal: archivo.name, tipo: archivo.type } : null,
+    };
+  } catch (error) {
+    console.error('Error enviando contribución:', error);
+    throw new Error(error.response?.data?.message || 'Error al enviar la contribución');
   }
-
-  return {
-    contribuyenteId,
-    contribucionId,
-    archivoAdjunto: archivo ? { nombreOriginal: archivo.name, tipo: archivo.type } : null,
-  };
 };
+
+export const getContribucionesByContribuyente = async (idSistema, token) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  try {
+    const response = await axios.get(`${API_BASE_URL}/contribuciones/contribuyente/${idSistema}`, { headers });
+    return response.data;
+  } catch (error) {
+    console.error('Error obteniendo contribuciones:', error);
+    throw new Error('Error obteniendo contribuciones');
+  }
+};
+
+export const getContribucionesByKeycloakId = async (keycloakId, token) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  try {
+    const response = await axios.get(`${API_BASE_URL}/contribuciones/keycloak/${keycloakId}`, { headers });
+    return response.data;
+  } catch (error) {
+    console.error('Error obteniendo contribuciones:', error);
+    throw new Error('Error obteniendo contribuciones');
+  }
+};
+
+export const updateContribucion = async (idContribucion, datosActualizados, token) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  try {
+    const response = await axios.put(`${API_BASE_URL}/contribuciones/${idContribucion}`, datosActualizados, { headers });
+    return response.data;
+  } catch (error) {
+    console.error('Error actualizando contribución:', error);
+    throw new Error('Error actualizando contribución');
+  }
+};
+
+export const getCategorias = async () => {
+  try {
+      let url = `${API_ADMINISTRATIVA_URL}/categorias`;
+      const response = await axios.get(url, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error obteniendo las categorias", error);
+      throw error;
+    }
+ 
+};
+

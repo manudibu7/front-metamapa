@@ -4,11 +4,10 @@ import { heroFeatures } from '../../constants/homeContent';
 export const ServiceOverview = () => (
   <section className="service-grid">
     <div className="service-grid__intro">
-      <p className="section-eyebrow">Arquitectura modular</p>
+      <p className="section-eyebrow">Servicio especializado</p>
       <h2>Servicios especializados que se refuerzan entre sí</h2>
       <p>
-        Loader estático, loader dinámico, loader proxy, servicio agregador, API pública, API administrativa y
-        estadísticas trabajan en paralelo para garantizar disponibilidad.
+        Desde MetaMapa contamos con una variedad de servicios, ademas de administradores verificados para que los hechos sean lo mas veridicos posibles.
       </p>
     </div>
     <div className="service-grid__cards">

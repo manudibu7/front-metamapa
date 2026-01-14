@@ -19,12 +19,14 @@ export const FiltrosHechos = ({ categorias, provincias, filtros, onChange }) => 
 
   return (
     <div className="filtros-hechos">
+
       <div>
         <label>Categoría</label>
         <select name="categoria" value={filtros.categoria ?? ''} onChange={handleChange}>
           <option value="">Todas</option>
-          {categorias.map((category) => (
-            <option key={category} value={category}>
+          {categorias.map((category, index) => (
+            // Usamos index para garantizar unicidad
+            <option key={`${category}-${index}`} value={category}>
               {category}
             </option>
           ))}
@@ -46,17 +48,6 @@ export const FiltrosHechos = ({ categorias, provincias, filtros, onChange }) => 
         <select name="fuenteTipo" value={filtros.fuenteTipo ?? ''} onChange={handleChange}>
           <option value="">Todas</option>
           {opcionesFuente.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label>Modo</label>
-        <select name="modo" value={filtros.modo ?? ''} onChange={handleChange}>
-          <option value="">Todos</option>
-          {opcionesModo.map(({ value, label }) => (
             <option key={value} value={value}>
               {label}
             </option>

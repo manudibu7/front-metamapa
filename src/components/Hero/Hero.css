@@ -4,10 +4,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-xl, 32px);
   padding: clamp(2rem, 5vw, 4.5rem);
-  background: radial-gradient(circle at 20% 20%, rgba(93, 231, 196, 0.15), transparent 40%),
-    radial-gradient(circle at 80% 0%, rgba(108, 99, 255, 0.2), transparent 45%),
-    linear-gradient(145deg, rgba(5, 6, 23, 0.95), rgba(17, 25, 57, 0.95));
-  box-shadow: 0 40px 90px rgba(2, 6, 23, 0.7);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-soft);
 }
 
 .hero::before,
@@ -36,10 +34,10 @@
   gap: 0.4rem;
   padding: 0.45rem 1.2rem;
   border-radius: 999px;
-  background: rgba(93, 231, 196, 0.18);
+  background: #E8DCC2;
   border: 1px solid rgba(93, 231, 196, 0.35);
   font-size: 0.85rem;
-  color: #b0ffee;
+  color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -58,12 +56,12 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #f9f5ff;
+  color: var(--color-text);
 }
 
 .hero > p {
   position: relative;
-  color: rgba(226, 232, 240, 0.9);
+  color: var(--color-text);
   font-size: 1.05rem;
   line-height: 1.7;
   max-width: 640px;
@@ -87,7 +85,7 @@
 .btn--admin {
   background: linear-gradient(120deg, rgba(255, 215, 97, 0.2), rgba(255, 166, 0, 0.25));
   border: 1px solid rgba(255, 193, 7, 0.5);
-  color: #ffe29d;
+  color: var(--color-text);
   padding: 0.85rem 1.8rem;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -104,4 +102,9 @@
   .hero__cta {
     flex-direction: column;
   }
+}
+
+/* Botón de búsqueda avanzada */
+.hero > .btn {
+  margin-top: 1rem;  
 }

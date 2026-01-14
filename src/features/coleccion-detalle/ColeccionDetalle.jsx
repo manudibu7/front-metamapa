@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import {useMemo, useEffect, useState } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { icon } from 'leaflet';
+import { collectionsService } from '../../services/collectionsService';
 import './ColeccionDetalle.css';
+import { useNavigation } from '../../context/NavigationContext';
 
+// ... (markerIcon se queda igual) ...
 const markerIcon = icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -14,61 +17,100 @@ const markerIcon = icon({
   shadowSize: [41, 41],
 });
 
+
+
 export const ColeccionDetalle = () => {
+
   const { id } = useParams();
   const navigate = useNavigate();
+
+ 
+
   const [coleccion, setColeccion] = useState(null);
   const [hechos, setHechos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHecho, setSelectedHecho] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [filtrosTemp, setFiltrosTemp] = useState({});
+
+const resetFiltros = () => {
+  setFiltrosTemp({}); 
+  setSearchParams({}); 
+  setMostrarFiltros(false);
+};
+
+
+const opcionesFuente = [
+  { value: 'estatica', label: 'Estatica' },
+  { value: 'dinamica', label: 'Dinamica' },
+  { value: 'proxy', label: 'Proxy' },
+];
+
+const updateFilter = (key, value) => {
+    setSearchParams((prevParams) => {
+      const newParams = new URLSearchParams(prevParams);
+      
+      if (value) {
+        newParams.set(key, value);
+      } else {
+        newParams.delete(key);
+      }
+      return newParams;
+    });
+  };
+
+const provinciasUnicas = useMemo(() => {
+    const mapa = new Map();
+    hechos.forEach((h) => {
+      if (h.ubicacion?.provincia) {
+        if (!mapa.has(h.ubicacion.provincia)) {
+          mapa.set(h.ubicacion.provincia, h.ubicacion);
+        }
+      }
+    });
+    return Array.from(mapa.values());
+  }, [hechos]);
+
+const categorias = useMemo(() => {
+  const lista = hechos.map((h) => h.categoria).filter(Boolean);
+  return Array.from(new Set(lista));
+}, [hechos]);
+  
+  // Aún puedes usar searchParams si tienes OTROS filtros, 
+  // pero ya no lo necesitamos para 'modoNavegacion'  
+  // 1. IMPORTAMOS EL MODO DESDE EL CONTEXTO GLOBAL
+  const { modoNavegacion } = useNavigation();
 
   useEffect(() => {
-    // TODO: Reemplazar con llamada real a la API
-    const mockColeccion = {
-      id,
-      nombre: 'Incendios Forestales 2024',
-      descripcion: 'Registro de incendios forestales ocurridos durante el año 2024 en distintas provincias.',
-      cantidadHechos: 15,
-      fechaCreacion: '2024-01-15',
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        //const coleccionData = await collectionsService.getCollectionById(id);
+        //setColeccion(coleccionData);
+        //console.log(coleccionData)
+        const filtrosActuales = {
+            ...Object.fromEntries([...searchParams]), 
+            modoNavegacion: modoNavegacion 
+        };
+        const coleCompleta = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
+        setColeccion(coleCompleta.data)
+        setHechos(coleCompleta.data.hechos);
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+        setHechos([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const mockHechos = [
-      {
-        id: 1,
-        titulo: 'Incendio en Parque Nacional Nahuel Huapi',
-        categoria: 'Incendio forestal',
-        fecha: '2024-02-15',
-        provincia: 'Río Negro',
-        descripcion: 'Gran incendio forestal que afectó más de 500 hectáreas de bosque nativo.',
-        ubicacion: { lat: -41.0915, lng: -71.4225 },
-        fuente: 'ONG Ambiental',
-      },
-      {
-        id: 2,
-        titulo: 'Incendio en Córdoba Sierras',
-        categoria: 'Incendio forestal',
-        fecha: '2024-03-20',
-        provincia: 'Córdoba',
-        descripcion: 'Incendio en zona serrana que requirió evacuación de 200 familias.',
-        ubicacion: { lat: -31.4201, lng: -64.1888 },
-        fuente: 'Bomberos Voluntarios',
-      },
-      {
-        id: 3,
-        titulo: 'Incendio en Delta del Paraná',
-        categoria: 'Incendio forestal',
-        fecha: '2024-04-10',
-        provincia: 'Entre Ríos',
-        descripcion: 'Incendio intencional en humedales del Delta del Paraná afectó fauna local.',
-        ubicacion: { lat: -33.7399, lng: -59.2489 },
-        fuente: 'Prefectura Naval',
-      },
-    ];
+    fetchData();
 
-    setColeccion(mockColeccion);
-    setHechos(mockHechos);
-    setLoading(false);
-  }, [id]);
+    // 3. CLAVE: AGREGAR 'modoNavegacion' A LAS DEPENDENCIAS
+    // Esto hace que al tocar el switch del Header, se dispare fetchData de nuevo.
+  }, [id, searchParams, modoNavegacion]); 
+
+  // La dependencia es searchParams: cada vez que cambies la URL, se ejecuta esto.
 
   const handleHechoClick = (hechoId) => {
     navigate(`/hechos/${hechoId}`);
@@ -96,8 +138,8 @@ export const ColeccionDetalle = () => {
   }
 
   const center = hechos.length > 0 && hechos[0].ubicacion
-    ? [hechos[0].ubicacion.lat, hechos[0].ubicacion.lng]
-    : [-38.4161, -63.6167]; // Centro de Argentina
+    ? [hechos[0].ubicacion.latitud, hechos[0].ubicacion.longitud]
+    : [-38.4161, -63.6167];
 
   return (
     <div className="coleccion-detalle">
@@ -105,17 +147,30 @@ export const ColeccionDetalle = () => {
         <button className="coleccion-detalle__back" onClick={() => navigate('/colecciones')}>
           ← Volver a colecciones
         </button>
-        <h1>{coleccion.nombre}</h1>
+        <h1 className='coleccion-titulo'>{coleccion.titulo}</h1>
         <p className="coleccion-detalle__descripcion">{coleccion.descripcion}</p>
         <div className="coleccion-detalle__meta">
           <span>{hechos.length} hechos</span>
-          <span>·</span>
-          <span>Creada: {new Date(coleccion.fechaCreacion).toLocaleDateString('es-AR')}</span>
         </div>
       </header>
+      
+      
+        <button
+          className="btn-filtros"
+          onClick={() => {
+            const paramsActuales = Object.fromEntries([...searchParams]);
+            setFiltrosTemp(paramsActuales);
+            setMostrarFiltros(true);
+          }}
+        >
+          🔍 Filtros
+        </button>
+
+    
 
       <div className="coleccion-detalle__content">
         <aside className="coleccion-detalle__hechos-list">
+         {/* ... (El resto de tu renderizado sigue igual) ... */}
           <h2>Hechos en esta colección</h2>
           {hechos.length === 0 ? (
             <p className="coleccion-detalle__empty">No hay hechos en esta colección</p>
@@ -123,20 +178,20 @@ export const ColeccionDetalle = () => {
             <div className="hechos-list">
               {hechos.map((hecho) => (
                 <article
-                  key={hecho.id}
-                  className={`hecho-card ${selectedHecho?.id === hecho.id ? 'hecho-card--selected' : ''}`}
-                  onClick={() => handleHechoClick(hecho.id)}
+                  key={hecho.id_hecho}
+                  className={`hecho-card ${selectedHecho?.id_hecho === hecho.id_hecho ? 'hecho-card--selected' : ''}`}
+                  onClick={() => handleHechoClick(hecho.id_hecho)}
                   onMouseEnter={() => setSelectedHecho(hecho)}
                   onMouseLeave={() => setSelectedHecho(null)}
                 >
                   <div className="hecho-card__header">
                     <span className="hecho-card__categoria">{hecho.categoria}</span>
-                    <span className="hecho-card__fecha">{new Date(hecho.fecha).toLocaleDateString('es-AR')}</span>
+                    <span className="hecho-card__fecha">{hecho.fecha}</span>
                   </div>
                   <h3 className="hecho-card__titulo">{hecho.titulo}</h3>
                   <p className="hecho-card__descripcion">{hecho.descripcion}</p>
                   <div className="hecho-card__footer">
-                    <span className="hecho-card__provincia">{hecho.provincia}</span>
+                    <span className="hecho-card__provincia">{hecho.ubicacion.provincia}</span>
                     <span className="hecho-card__fuente">Fuente: {hecho.fuente}</span>
                   </div>
                 </article>
@@ -160,8 +215,8 @@ export const ColeccionDetalle = () => {
               .filter((h) => h.ubicacion)
               .map((hecho) => (
                 <Marker
-                  key={hecho.id}
-                  position={[hecho.ubicacion.lat, hecho.ubicacion.lng]}
+                  key={hecho.id_hecho}
+                  position={[hecho.ubicacion.latitud, hecho.ubicacion.longitud]}
                   icon={markerIcon}
                   eventHandlers={{
                     click: () => handleMapMarkerClick(hecho),
@@ -173,7 +228,7 @@ export const ColeccionDetalle = () => {
                       <p>{hecho.descripcion}</p>
                       <button
                         className="marker-popup__btn"
-                        onClick={() => handleHechoClick(hecho.id)}
+                        onClick={() => handleHechoClick(hecho.id_hecho)}
                       >
                         Ver detalle
                       </button>
@@ -184,6 +239,143 @@ export const ColeccionDetalle = () => {
           </MapContainer>
         </div>
       </div>
+      
+      {mostrarFiltros && (
+  <div className="filtros-overlay">
+    <div className="filtros-panel">
+
+      <header className="filtros-panel__header">
+        <h2>Filtros</h2>
+        <button
+          className="filtros-panel__close"
+          onClick={() => setMostrarFiltros(false)}
+        >
+          
+        </button>
+      </header>
+
+      <div className="filtros-panel__content">
+
+        <div className="filtro-field">
+          <label>Título</label>
+          <input
+            type="text"
+            placeholder="Buscar por título"
+            value={filtrosTemp.q}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, q: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="filtro-field">
+          <label>Categoría</label>
+          <select
+            value={filtrosTemp.categoria}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, categoria: e.target.value })
+            }
+          >
+            <option value="">Todas las categoria </option>
+            {categorias.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+        </div>
+
+        <div className="filtro-field">
+                <label>Provincia</label>
+                <select
+                  value={filtrosTemp.provincia || ''}
+                  onChange={e => 
+                      setFiltrosTemp({
+                        ...filtrosTemp,
+                        provincia: e.target.value
+                      })
+                    }
+                >
+                  <option value="">Todas las provincias</option>
+                  {provinciasUnicas.map((ub) => (
+                    <option key={ub.provincia} value={ub.provincia}>{ub.provincia}</option>
+                  ))}
+                </select>
+              </div>
+
+
+        <div className="filtro-field">
+          <label>Tipo de fuente</label>
+          <select
+            value={filtrosTemp.tipoFuente}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, fuenteTipo: e.target.value })
+            }
+          >
+            <option value="">Todas las fuentes</option>
+            {opcionesFuente.map(({ value, label }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+          </select>
+        </div>
+
+        <div className="filtro-field">
+          <label>Fecha desde</label>
+          <input
+            type="date"
+            value={filtrosTemp.fechaDesde}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, fechaDesde: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="filtro-field">
+          <label>Fecha hasta</label>
+          <input
+            type="date"
+            value={filtrosTemp.fechaHasta}
+            onChange={(e) =>
+              setFiltrosTemp({ ...filtrosTemp, fechaHasta: e.target.value })
+            }
+          />
+        </div>
+
+      </div>
+
+      <footer className="filtros-panel__actions">
+        <button onClick={() => resetFiltros()}>
+          Limpiar
+        </button>
+
+        <button
+          className="btn-primary"
+          onClick={() => {
+            // 1. Convertimos el estado a una lista de entradas [llave, valor]
+            // 2. Filtramos para quitar valores vacíos, null o undefined
+            // 3. Lo convertimos de nuevo a un objeto limpio
+            const filtrosLimpios = Object.fromEntries(
+              Object.entries(filtrosTemp).filter(([_, value]) => 
+                value !== "" && value !== null && value !== undefined
+              )
+            );
+
+            setSearchParams(filtrosLimpios); // Reemplaza todo lo anterior por lo nuevo y limpio
+            setMostrarFiltros(false);
+          }}
+          >
+            Filtrar
+        </button>
+      </footer>
+
+    </div>
+  </div>
+)}
+
+
     </div>
   );
-};
+}

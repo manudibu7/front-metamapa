@@ -11,9 +11,7 @@ html,
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
-  background: radial-gradient(circle at top left, rgba(92, 70, 255, 0.3), transparent 45%),
-    radial-gradient(circle at top right, rgba(45, 212, 191, 0.25), transparent 40%),
-    var(--color-bg);
+  background: var(--color-body-bg);
   color: var(--color-text);
   min-height: 100%;
 }
@@ -57,23 +55,23 @@ button {
 
 .btn--primary {
   background: var(--color-primary);
-  color: #041018;
+  color: var(--color-text-dark);
   box-shadow: var(--shadow-soft);
 }
 
 .btn--primary:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+  box-shadow: var(--shadow-soft);
 }
 
 .btn--ghost {
   background: transparent;
   border: 1px solid var(--color-border);
-  color: var(--color-text);
+  color: var(--color-text-dark);
 }
 
 .btn--ghost:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-text-dark);
   transform: translateY(-2px);
 }

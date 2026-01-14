@@ -10,7 +10,15 @@ import {
 import './GestionRevisiones.css';
 
 export const GestionRevisiones = () => {
-  const { isAdmin } = useAuth();
+const { isAdmin,contribuyenteId } = useAuth();
+
+ //const mockUseAuth = () => {
+ //   return {
+ //     isAdmin: true, // Cambiar a false para probar redirección
+ //   };
+ // };
+  const [mensaje, setMensaje] = useState("");
+//  const { isAdmin } = mockUseAuth();
   const navigate = useNavigate();
   const [pendientes, setPendientes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +34,7 @@ export const GestionRevisiones = () => {
     const fetchPendientes = async () => {
       try {
         const data = await listarPendientes();
+        console.log('Revisiones pendientes cargadas:', data);
         setPendientes(data);
       } catch (err) {
         console.error('Error al cargar revisiones:', err);
@@ -41,36 +50,48 @@ export const GestionRevisiones = () => {
     setComentarios((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleAction = async (id, actionType) => {
-    setProcessingId(id);
-    const comentario = comentarios[id] || '';
+  const handleAction = async (id, actionType, tituloHecho) => {
+  setProcessingId(id);
+  const comentario = comentarios[id] || '';
+  
+  let texto = "";
+  try {
+    if (actionType === 'ACEPTAR') {
+      texto = `✔️  ${tituloHecho} fue aceptado.`;
+      setMensaje(texto);
+      setTimeout(() => setMensaje(""), 3000);
+      await aceptarRevision(id, comentario,contribuyenteId);
 
-    try {
-      if (actionType === 'ACEPTAR') {
-        await aceptarRevision(id, comentario);
-      } else if (actionType === 'CAMBIOS') {
-        await aceptarConCambios(id, comentario);
-      } else if (actionType === 'RECHAZAR') {
-        await rechazarRevision(id, comentario);
-      }
-
-      // Remove from list locally
-      setPendientes((prev) => prev.filter((p) => p.idContribucion !== id));
-      
-      // Clear comment
-      setComentarios((prev) => {
-        const newComments = { ...prev };
-        delete newComments[id];
-        return newComments;
-      });
-
-    } catch (err) {
-      console.error('Error al procesar revisión:', err);
-      alert('Ocurrió un error al procesar la solicitud.');
-    } finally {
-      setProcessingId(null);
+    } else if (actionType === 'CAMBIOS') {
+      texto = `⚠️  ${tituloHecho} requiere cambios.`
+      setMensaje(texto);
+      setTimeout(() => setMensaje(""), 3000);
+      await aceptarConCambios(id, comentario,contribuyenteId);
+    } else if (actionType === 'RECHAZAR') {
+      texto = `❌  ${tituloHecho} fue rechazado.`
+      setMensaje(texto);
+      setTimeout(() => setMensaje(""), 3000);
+      await rechazarRevision(id, comentario,contribuyenteId);
     }
-  };
+
+    setPendientes((prev) => prev.filter((p) => p.idContribucion !== id));
+
+    setComentarios((prev) => {
+      const updated = { ...prev };
+      delete updated[id];
+      return updated;
+    });
+
+
+  } catch (err) {
+    console.error('Error al procesar revisión:', err);
+    alert('Ocurrió un error al procesar la solicitud.');
+  } finally {
+    setProcessingId(null);
+  }
+};
+
+
 
   if (loading) {
     return (
@@ -86,17 +107,6 @@ export const GestionRevisiones = () => {
         <button 
           className="btn-back-admin" 
           onClick={() => navigate('/admin')}
-          style={{ 
-            background: 'transparent', 
-            border: 'none', 
-            color: 'var(--color-muted)', 
-            cursor: 'pointer', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            fontSize: '0.9rem'
-          }}
         >
           ← Volver al panel
         </button>
@@ -105,6 +115,12 @@ export const GestionRevisiones = () => {
           Validá las contribuciones pendientes enviadas por la comunidad.
         </p>
       </header>
+
+        {mensaje && (
+          <div className="toast-feedback">
+            {mensaje}
+          </div>
+        )}
 
       <div className="gestion-revisiones__list">
         {pendientes.length === 0 ? (
@@ -116,8 +132,8 @@ export const GestionRevisiones = () => {
             <div key={item.idContribucion} className="revision-card">
               <div className="revision-card__content">
                 <div className="revision-card__header">
-                  <span className="revision-card__id">ID: {item.idContribucion}</span>
-                  <span className="revision-card__id">Contribuyente: {item.idContribuyente}</span>
+                  <span className="revision-card__id">NroContribución: {item.idContribucion}</span>
+                  <span className="revision-card__id">{!item.anonimo? "Contribuyente: " + item.nombreContribuyente: "Es una contribucion ANONIMA"}</span>
                 </div>
 
                 <div 
@@ -159,28 +175,31 @@ export const GestionRevisiones = () => {
                   />
                   
                   <div className="revision-actions">
-                    <button
-                      className="btn-revision btn-accept"
-                      onClick={() => handleAction(item.idContribucion, 'ACEPTAR')}
-                      disabled={processingId === item.idContribucion}
-                    >
-                      ✅ Aceptar
-                    </button>
-                    <button
-                      className="btn-revision btn-changes"
-                      onClick={() => handleAction(item.idContribucion, 'CAMBIOS')}
-                      disabled={processingId === item.idContribucion}
-                    >
-                      ⚠️ Con cambios
-                    </button>
-                    <button
-                      className="btn-revision btn-reject"
-                      onClick={() => handleAction(item.idContribucion, 'RECHAZAR')}
-                      disabled={processingId === item.idContribucion}
-                    >
-                      ❌ Rechazar
-                    </button>
-                  </div>
+                   <button
+                    className="btn-revision btn-accept"
+                    onClick={() => handleAction(item.idContribucion, 'ACEPTAR', item.hecho.titulo)}
+                    disabled={processingId === item.idContribucion}
+                  >
+                    ✅ Aceptar
+                  </button>
+
+                  <button
+                    className="btn-revision btn-changes"
+                    onClick={() => handleAction(item.idContribucion, 'CAMBIOS', item.hecho.titulo)}
+                    disabled={processingId === item.idContribucion}
+                  >
+                    ⚠️ Con cambios
+                  </button>
+
+                  <button
+                    className="btn-revision btn-reject"
+                    onClick={() => handleAction(item.idContribucion, 'RECHAZAR', item.hecho.titulo)}
+                    disabled={processingId === item.idContribucion}
+                  >
+                    ❌ Rechazar
+                  </button>
+                </div>
+
                 </div>
               </div>
             </div>

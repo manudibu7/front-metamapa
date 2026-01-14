@@ -7,10 +7,16 @@
   gap: 1.5rem;
   align-items: center;
   padding: 1.2rem clamp(1rem, 4vw, 4rem);
-  background: rgba(5, 11, 24, 0.9);
+  background: var(--color-header-bg);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.55);
+  box-shadow: 0 2px 10px rgba(2, 6, 23, 0.55);
+}
+
+
+.btn--ghost {
+  color: var(--color-text-dark);
+  background-color: var(--color-primary);
 }
 
 .app-header__brand {
@@ -18,7 +24,6 @@
   align-items: center;
   gap: 0.8rem;
   text-decoration: none;
-  color: inherit;
   cursor: pointer;
 }
 
@@ -26,12 +31,11 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(93, 231, 196, 0.4), rgba(108, 99, 255, 0.5));
+  background-color: rgb(185, 186, 187);
   display: grid;
   place-items: center;
   font-size: 1.4rem;
-  color: #041018;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.45);
 }
 
 .app-header__brand strong {
@@ -49,22 +53,26 @@
 .app-header__search {
   display: grid;
   grid-template-columns: 1fr auto;
-  background: rgba(12, 18, 34, 0.95);
+  background: var(--color);
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  border: 1px solid rgba(26, 27, 27, 0.35);
   padding: 0.2rem;
   gap: 0.4rem;
+  width: 100%;          /* Intenta llenar el espacio... */
+  max-width: 500px;     /* ...pero detente en 500px */
+  margin-right: auto;
 }
 
 .app-header__search input {
   border: none;
+  outline: none;
   background: transparent;
   padding: 0.8rem 1.1rem;
   color: var(--color-text);
 }
 
 .app-header__search input::placeholder {
-  color: rgba(148, 163, 184, 0.6);
+  color: rgba(74, 75, 77, 0.6);
 }
 
 .app-header__search button {
@@ -73,7 +81,7 @@
   padding: 0.65rem 1.5rem;
   font-weight: 600;
   background: var(--color-primary);
-  color: #041018;
+  color: var(--color-text-dark);
 }
 
 .app-header__actions {
@@ -83,8 +91,89 @@
 
 .app-header__user {
   align-self: center;
-  color: var(--color-muted);
+  color: var(--color-text);
   font-weight: 600;
+}
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espacio entre el texto y el switch */
+  margin-left: 10px;
+  background: rgba(255, 255, 255, 0.5); /* Un fondito sutil opcional */
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,0.1);
+  margin: auto;
+}
+
+.toggle-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-text);
+  white-space: nowrap; /* Evita que el texto se rompa en dos líneas */
+}
+
+/* --- TUS ESTILOS DEL SWITCH (ligeramente ajustados) --- */
+
+/* El contenedor del switch mantiene su tamaño fijo solo para el botón */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px; /* Lo hice un poco más pequeño para que sea elegante */
+  height: 28px;
+  flex-shrink: 0; /* Evita que se aplaste si falta espacio */
+  margin-top: 5px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px; /* Ajustado al nuevo alto */
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+/* Cuando está activado (Modo Curado) */
+input:checked + .slider {
+  background-color: var(--color-primary, #2196F3); /* Usa tu variable primary */
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--color-primary, #2196F3);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px); /* Ajustado al nuevo ancho */
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 
 @media (max-width: 900px) {
@@ -94,5 +183,161 @@
 
   .app-header__actions {
     justify-content: flex-start;
+  }
+}
+
+/* --- USER MENU DROPDOWN --- */
+
+/* El contenedor mantiene al menú pegado al botón */
+.user-menu-container {
+  position: relative;
+  display: inline-block;
+  margin-top: 0.4rem;
+}
+
+/* Botón del usuario mejorado */
+.user-menu-trigger {
+  background-color: #f8fafc; /* Fondo gris muy suave (Slate 50) */
+  border: 1px solid #e2e8f0; /* Borde sutil */
+  border-radius: 9999px;     /* Bordes totalmente redondos */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 6px 12px 6px 6px; /* Padding asimétrico para el icono */
+  transition: all 0.2s ease;
+  height: 40px; /* Misma altura que el toggle wrapper para alineación */
+}
+
+.user-menu-trigger:hover {
+  background-color: #f1f5f9; /* Un poco más oscuro al pasar el mouse */
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra suave */
+}
+
+/* El texto del nombre */
+.app-header__user {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155; /* Slate 700 */
+  margin-left: 4px;
+}
+
+.arrow-icon {
+  font-size: 0.7rem;
+  color: var(--color-muted, #64748b);
+}
+
+/* El Menú Flotante (La cajita blanca) */
+.dropdown-menu {
+  position: absolute;
+  top: 110%; /* Un poquito separado del botón (100% es pegado) */
+  right: 0;  /* Alineado a la derecha del contenedor */
+  width: 200px;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 8px 0;
+  z-index: 100; /* Para que flote por encima de todo */
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Opcional: animación suave de entrada */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Los elementos dentro del menú */
+.dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f5f9;
+}
+
+/* Estilo especial para el botón de Salir */
+.dropdown-item--danger {
+  color: #ef4444; /* Rojo */
+  border-top: 1px solid #f1f5f9; /* Separador sutil arriba */
+}
+
+.dropdown-item--danger:hover {
+  background-color: #fef2f2; /* Fondo rojo muy clarito */
+}
+
+.dropdown-header-mobile {
+  display: none; /* Oculto en escritorio */
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  border-bottom: 1px solid #f1f5f9;
+}
+@media (max-width: 900px) {
+
+  /* 1. MANTENER EN UNA LÍNEA */
+  /* Sobrescribimos el comportamiento anterior para que NO se apile */
+  .app-header {
+    grid-template-columns: auto 1fr auto; /* Izq - Centro - Der */
+    gap: 0.8rem; /* Reducimos el espacio entre elementos */
+    padding: 0.8rem 1rem; /* Reducimos el padding general */
+  }
+
+  /* 2. LOGO: Ocultar el texto "MetaMapa", dejar solo el icono */
+  .app-header__brand div {
+    display: none;
+  }
+
+  /* 3. SWITCH: Ocultar el texto "Navegación Curada" */
+  .toggle-label {
+    display: none;
+  }
+  
+  /* Ajustamos el contenedor del switch para que se encoja al no tener texto */
+  .toggle-wrapper {
+    gap: 0;
+    padding: 4px 8px; /* Un poco más compacto */
+    margin-left: 5px;
+  }
+
+  /* 4. USUARIO: Ocultar el nombre, dejar solo la flecha (y avatar si hubiera) */
+  .app-header__user {
+    display: none;
+  }
+
+  /* Ajustamos el botón de usuario para que sea un cuadradito o círculo */
+  .user-menu-trigger {
+    padding: 0;
+    width: 36px;       /* Ancho fijo */
+    height: 36px;      /* Alto fijo */
+    justify-content: center; /* Centrar la flecha */
+  }
+
+  .arrow-icon {
+    margin: 0; /* Quitar márgenes extra de la flecha */
+    font-size: 0.8rem; /* Ajustar tamaño si es necesario */
+  }
+
+  .app-header__search button {
+      padding: 0.5rem; /* O puedes poner padding: 0.5rem; para hacerlo chico */
+  }
+  
+  /* Hacemos que la barra de búsqueda ocupe el espacio disponible sin romperse */
+  .app-header__search {
+      padding-right: 0.5rem; /* Ajuste fino */
   }
 }

@@ -6,15 +6,13 @@ const simulateDelay = (data, delay = 400) =>
     setTimeout(() => resolve(JSON.parse(JSON.stringify(data))), delay);
   });
 
-// Generate some mock requests based on existing facts
+//solicitudes mockeadas
 const generateMockSolicitudes = () => {
   const solicitudes = [];
   let reqId = 1;
 
-  // Pick a few facts from the first collection
   const collection = mockCollections[0];
   if (collection && collection.hechos) {
-    // Request 1
     if (collection.hechos[0]) {
       solicitudes.push({
         id: `SOL-${reqId++}`,
@@ -25,7 +23,6 @@ const generateMockSolicitudes = () => {
         estado: 'PENDIENTE',
       });
     }
-    // Request 2
     if (collection.hechos[1]) {
       solicitudes.push({
         id: `SOL-${reqId++}`,
@@ -38,7 +35,6 @@ const generateMockSolicitudes = () => {
     }
   }
 
-  // Pick a fact from another collection if available
   const collection2 = mockCollections[1];
   if (collection2 && collection2.hechos && collection2.hechos[0]) {
     solicitudes.push({
@@ -55,6 +51,7 @@ const generateMockSolicitudes = () => {
 };
 
 // In-memory store for the session
+/*
 let solicitudesStore = generateMockSolicitudes();
 
 export const obtenerSolicitudes = async () => {
@@ -73,4 +70,66 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
       }
     }, 400);
   });
+};
+*/
+const BASE_URL = "http://localhost:8100/solicitudes";
+const ADMINISTRATIVA_URL = "http://localhost:8084/solicitudes";
+
+// GET /solicitudes
+export const obtenerSolicitudes = async () => {
+  try {
+    const response = await fetch(BASE_URL);
+    console.log("Código de estado recibido:", response.status);
+    if (!response.ok) {
+      throw new Error("Error al obtener solicitudes");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error en obtenerSolicitudeees:", error);
+    throw error;
+  }
+};
+
+// POST /solicitudes
+export const crearSolicitud = async (solicitud) => {
+  try {
+    const response = await fetch(BASE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(solicitud),
+    });
+
+    if (!response.ok) {
+      const msg = await response.text();
+      throw new Error(msg || "Error al crear solicitud");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error en crearSolicitud:", error);
+    throw error;
+  }
+};
+
+export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
+  const response = await fetch(`${ADMINISTRATIVA_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ estado: nuevoEstado }),
+  });
+
+  if (!response.ok) throw new Error("Error al actualizar estado");
+
+  return await response.json(); // ← ahora sí existe y funciona
+};
+// DELETE solicitudes
+export const eliminarSolicitud = async (id) => {
+  const response = await fetch(`${ADMINISTRATIVA_URL}/${id}`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    throw new Error("Error eliminando solicitud");
+  }
 };

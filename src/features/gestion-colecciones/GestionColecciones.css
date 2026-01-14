@@ -1,24 +1,29 @@
+/* GestionColecciones.css */
+
 .gestion-colecciones {
   padding: 2rem clamp(1rem, 5vw, 4rem) 4rem;
   max-width: 1024px;
   margin: 0 auto;
+  font-family: var(--font-family);
+  color: var(--color-text);
 }
 
 .gestion-colecciones__volver {
-  background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  color: var(--color-text-dark); /* Texto claro sobre fondo oscuro */
   padding: 0.5rem 1rem;
-  font-size: 0.95rem;
+  border-radius: 8px; /* Podrías usar var(--radius-md) pero quizás sea muy redondo para un botón chico */
   cursor: pointer;
+  font-size: 0.95rem;
   margin-bottom: 1.5rem;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .gestion-colecciones__volver:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--color-primary);
+  background: var(--color-surface-alt); /* Un poco más claro/oscuro que primary */
+  border-color: var(--color-surface-alt);
+  box-shadow: var(--shadow-soft);
 }
 
 .gestion-colecciones__header {
@@ -32,9 +37,7 @@
 .gestion-colecciones__header h1 {
   font-size: clamp(1.8rem, 4vw, 2.5rem);
   margin: 0.3rem 0 0.5rem;
-  background: linear-gradient(to right, #fff, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-primary);
 }
 
 .gestion-colecciones__header p {
@@ -55,39 +58,34 @@
   align-items: center;
   gap: 1.5rem;
   padding: 1.5rem;
-  background: rgba(15, 23, 42, 0.6);
+  /* Usamos blanco puro para destacar sobre el fondo grisáceo */
+  background: #ffffff; 
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  transition: border-color 0.2s, transform 0.2s;
+  transition: var(--transition-base);
 }
 
 .gestion-colecciones__card:hover {
-  border-color: var(--color-primary);
-  transform: translateY(-2px);
-}
-
-.gestion-colecciones__card-info {
-  flex: 1;
+  box-shadow: var(--shadow-soft);
 }
 
 .gestion-colecciones__card-info h2 {
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-  color: #f1f5f9;
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
+  color: var(--color-text);
 }
 
 .gestion-colecciones__card-info > p {
-  color: var(--color-muted);
+  color: var(--color-text);
   font-size: 0.95rem;
   margin-bottom: 0.75rem;
   line-height: 1.5;
 }
 
-.gestion-colecciones__card-meta {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.85rem;
-  color: #94a3b8;
+.gestion-colecciones__condiciones {
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
 }
 
 .gestion-colecciones__card-meta span {
@@ -103,41 +101,134 @@
   flex-shrink: 0;
 }
 
+.gestion-colecciones__vacio {
+  text-align: center;
+  color: var(--color-muted);
+  padding: 2rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.gestion-colecciones__estado {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text);
+}
+
+.gestion-colecciones__estado--error {
+  color: var(--color-danger);
+}
+
+/* Acceso denegado */
+.gestion-colecciones--denied {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.gestion-colecciones__denied {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  max-width: 480px;
+  text-align: center;
+  /* Fondo oscuro semitransparente usando tus variables surface */
+  background: var(--color-surface); 
+  color: var(--color-text-dark);
+  box-shadow: var(--shadow-hover);
+}
+
+.gestion-colecciones__denied-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
 /* Modal */
 .gestion-colecciones__modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.6); /* Overlay oscuro estándar */
+  display: grid;
+  place-items: center;
   padding: 1rem;
+  backdrop-filter: blur(4px);
 }
 
 .gestion-colecciones__modal {
-  background: #0f172a;
+  /* Fondo blanco para el modal */
+  background: #ffffff; 
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
+  padding: 2rem 2.5rem;
+  width: min(720px, 100%);
+  max-height: 92vh;
   overflow-y: auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  animation: modalSlideIn 0.3s ease-out;
+  box-shadow: var(--shadow-hover);
+  color: var(--color-text);
+  position: relative;
 }
 
-@keyframes modalSlideIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.gestion-colecciones__modal h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
 }
 
 .gestion-colecciones__modal-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--color-border);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.gestion-colecciones__modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.gestion-colecciones__modal input,
+.gestion-colecciones__modal textarea,
+.gestion-colecciones__modal select {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-body-bg); /* Un gris muy suave para los inputs */
+  color: var(--color-text);
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  font-family: var(--font-family);
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.gestion-colecciones__modal input:focus,
+.gestion-colecciones__modal textarea:focus,
+.gestion-colecciones__modal select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(11, 36, 71, 0.1); /* Sombra suave basada en primary */
+}
+
+.gestion-colecciones__criterios legend {
+  font-weight: 600;
+  padding: 0 0.5rem;
+  color: var(--color-primary);
+}
+
+.gestion-colecciones-titulo-condiciones {
+  margin: 0px;
+  margin-top: 5px;
+  color: var(--color-muted);
+}
+
+.gestion-colecciones__criterio-row {
+  display: flex;
+  gap: 0.75rem;
   align-items: center;
   position: sticky;
   top: 0;
@@ -145,15 +236,100 @@
   z-index: 10;
 }
 
-.gestion-colecciones__modal-header h2 {
-  font-size: 1.25rem;
-  margin: 0;
-  color: #f1f5f9;
+.gestion-colecciones__criterio-row input,
+.gestion-colecciones__criterio-row select {
+  flex: 1 1 45%;
+  min-width: 140px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-body-bg);
+  color: var(--color-text);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
 }
 
-.btn-close {
-  background: transparent;
+/* Campos deshabilitados */
+.gestion-colecciones__criterio-row input:disabled,
+.gestion-colecciones__criterio-row select:disabled {
+  background-color: #e5e7eb; /* Gris un poco más oscuro que body-bg */
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.gestion-colecciones__fuentes {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: rgba(255,255,255,0.5);
+}
+
+.gestion-colecciones__fuentes-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
+.gestion-colecciones__fuente-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.gestion-colecciones__fuente-option input {
+  accent-color: var(--color-primary);
+}
+
+/* --- BOTONES --- */
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-text-dark);
   border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.btn--primary:hover {
+  background: var(--color-surface-alt);
+}
+
+.btn--danger {
+  background: var(--color-danger);
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.btn--danger:hover {
+  opacity: 0.9;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn--danger-outline {
+  background: transparent;
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn--danger-outline:hover {
+  background: rgba(248, 113, 113, 0.1); /* Tint de color-danger */
+}
+
+.btn--icon {
+  background: transparent;
+  border: 1px solid var(--color-border);
   color: var(--color-muted);
   font-size: 1.5rem;
   cursor: pointer;
@@ -285,13 +461,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
-  transition: all 0.2s;
+  font-size: 0.9rem;
+  padding: 0;
+  line-height: 1;
+  transition: var(--transition-fast);
 }
 
-.btn-icon-danger:hover {
-  background: #ef4444;
-  color: white;
+.btn--icon:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: rgba(248, 113, 113, 0.1);
 }
 
 .gestion-colecciones__modal-actions {
@@ -303,28 +482,220 @@
   border-top: 1px solid var(--color-border);
 }
 
-/* Estados vacíos y de carga */
-.gestion-colecciones__vacio,
-.gestion-colecciones__estado {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: var(--color-muted);
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-md);
-  border: 1px dashed var(--color-border);
+/* Modal Actions */
+.gestion-colecciones__modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
 }
 
-.gestion-colecciones__denied {
+.gestion-colecciones__modal-actions .btn--ghost {
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.gestion-colecciones__modal-actions .btn--ghost:hover {
+  background-color: var(--color-body-bg);
+  border-color: var(--color-text);
+  color: var(--color-text);
+}
+
+/* Separar el botón agregar criterio */
+.gestion-colecciones__criterios {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  text-align: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.gestion-colecciones__denied-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+.gestion-colecciones__criterios .btn--sm {
+  margin-top: 0.5rem;
+  align-self: flex-start;
+}
+
+@media (max-width: 640px) {
+  .gestion-colecciones__header {
+    flex-direction: column;
+  }
+
+  .gestion-colecciones__card {
+    flex-direction: column;
+  }
+
+  .gestion-colecciones__card-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* --- POPUP (Usando variables) --- */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: var(--shadow-hover);
+  text-align: center;
+  border: 1px solid var(--color-border);
+}
+
+.modal-success-icon {
+  font-size: 40px;
+  color: var(--color-success); /* Variable Success */
+  margin-bottom: 15px;
+}
+
+.modal-summary {
+  background: var(--color-body-bg); /* F2F2F2 */
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin: 20px 0;
+  text-align: left;
+  font-size: 0.95rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.modal-summary p {
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+
+.modal-toast {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fdecea;
+  color: #b71c1c;
+  padding: 15px 12px;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  font-size: 18px;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+
+
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Estilo para la fila cuando está en modo Label */
+.criterio-label-mode {
+  background-color: var(--color-body-bg); /* Usamos body-bg en vez de hardcode gris */
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.criterio-label-text {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+.criterio-label-text strong {
+  color: var(--color-primary); /* Destacar titulo con Primary */
+  margin-right: 6px;
+  text-transform: capitalize;
+}
+
+.changed-badge {
+  /* No tienes variable amarilla explícita excepto warning, usemos warning */
+  background-color: rgba(251, 191, 36, 0.2); /* Tint de warning */
+  color: #92400e; /* Color oscuro legible sobre amarillo */
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-weight: bold;
+}
+/* --- CAMBIOS PARA EL POPUP --- */
+
+/* Contenedor de las etiquetas de fuentes */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap; /* <--- ESTO EVITA QUE SE SALGAN DEL CUADRO */
+  gap: 0.5rem;     /* Espacio entre etiquetas */
+  margin-top: 0.5rem;
+}
+
+/* Estilo de cada etiqueta de fuente */
+.tag {
+  background: #e0e7ff;
+  color: var(--color-primary);
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(0,0,0,0.05);
+  word-break: break-word; /* Por si una fuente tiene un nombre larguísimo */
+}
+
+/* Estilo para cuando un valor ha sido modificado */
+.value-modified {
+  color: #b45309; /* Un naranja oscuro/ámbar para resaltar */
+  background-color: #fef3c7; /* Fondo amarillo muy suave */
+  padding: 0 4px;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Estilo pequeño para mostrar el valor anterior en el título */
+.old-value-badge {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-style: italic;
+  margin-left: 0.5rem;
+}
+
+/* Ajuste para la lista de criterios */
+.criteria-list {
+  padding-left: 1rem;
+  margin-top: 0.5rem;
+}
+
+.criteria-list li {
+  margin-bottom: 0.25rem;
+  color: var(--color-text);
 }

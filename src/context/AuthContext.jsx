@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Keycloak from 'keycloak-js';
 import keycloakConfig from '../config/keycloakConfig';
+import { syncKeycloakUser } from '../services/contribuyentesService';
 
 const AuthContext = createContext({
   isAuthenticated: false,
@@ -123,7 +124,24 @@ export const AuthProvider = ({ children }) => {
           const roles = extractRoles(keycloak.tokenParsed);
           const isAdmin = roles.includes('admin') || roles.includes('administrador') || roles.includes('ADMIN');
           console.log('[Auth] 👤 Usuario autenticado:', user);
-          console.log('[Auth] 🆔 ContribuyenteId:', keycloak.tokenParsed?.contribuyenteId ?? keycloak.tokenParsed?.sub);
+          
+          let contribuyenteId = null;
+          try {
+            // Sincronizar con backend para obtener idSistema
+            const syncResponse = await syncKeycloakUser(
+              user.id, 
+              keycloak.tokenParsed.given_name, 
+              keycloak.tokenParsed.family_name
+            );
+            contribuyenteId = syncResponse.idSistema;
+            console.log('[Auth] ✅ Usuario sincronizado. ID Sistema:', contribuyenteId);
+          } catch (err) {
+            console.error('[Auth] ❌ Error sincronizando usuario:', err);
+            // Fallback: intentar usar el del token si existe, o null
+            contribuyenteId = keycloak.tokenParsed?.contribuyenteId ?? null;
+          }
+
+          console.log('[Auth] 🆔 ContribuyenteId final:', contribuyenteId);
           console.log('[Auth] 🎭 Roles:', roles);
           console.log('[Auth] 👑 Es admin:', isAdmin);
           
@@ -138,7 +156,7 @@ export const AuthProvider = ({ children }) => {
             isAuthenticated: true,
             loading: false,
             user,
-            contribuyenteId: keycloak.tokenParsed?.contribuyenteId ?? keycloak.tokenParsed?.sub ?? null,
+            contribuyenteId,
             token: keycloak.token,
             roles,
             isAdmin,
