@@ -7,67 +7,42 @@ import EstadisticaBarra from '../../components/Estadistica/EstadisticaBarra/esta
 const colors = ['#38bdf8', '#818cf8', '#f472b6', '#facc15', '#34d399', '#fb7185'];
 
 export const Estadisticas = () => {
-  const [loading, setLoading] = useState(true);
-  const [rawStats, setRawStats] = useState([]);
-  
-  // Processed data
-  const [globalCategoryStat, setGlobalCategoryStat] = useState(null);
-  const [spamStat, setSpamStat] = useState(null);
-  
-  // Selection options
-  const [categories, setCategories] = useState([]);
-  const [collections, setCollections] = useState([]);
-  
-  // Selected values
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedCollection, setSelectedCollection] = useState('');
+  const [estadisticas, setEstadisticas] = useState([]);
+  const [estado, setEstado] = useState({ loading: true, error: '' });
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchData = async () => {
       try {
-        const data = await getEstadisticas();
-        setRawStats(data);
-        processData(data);
+        const data = await obtenerEstadisticas();
+        setEstadisticas(data ?? []);
+        setEstado({ loading: false, error: '' });
       } catch (error) {
-        console.error("Error fetching statistics:", error);
-      } finally {
-        setLoading(false);
+        setEstado({ loading: false, error: 'No pudimos cargar las estadísticas.' });
+        console.error('[Estadísticas] Error al cargar estadísticas', error);
       }
     };
     fetchData();
   }, []);
 
-  const processData = (data) => {
-    const cats = new Set();
-    const cols = new Set();
-
-    data.forEach(stat => {
-      const discTipo = stat.discriminante?.tipo;
-      const discValor = stat.discriminante?.valor;
-      const resultName = stat.resultado?.nombre;
-
-      // Infer type based on discriminante and result
-      if (discTipo === 'SIN') {
-        if (resultName === 'cantidad spam') {
-          setSpamStat(stat);
-        } else {
-          setGlobalCategoryStat(stat);
-        }
-      } else if (discTipo === 'CATEGORIA') {
-        cats.add(discValor);
-      } else if (discTipo === 'COLECCION') {
-        cols.add(discValor);
-      }
-    });
-
-    const catsArray = Array.from(cats);
-    const colsArray = Array.from(cols);
-
-    setCategories(catsArray);
-    setCollections(colsArray);
-
-    if (catsArray.length > 0) setSelectedCategory(catsArray[0]);
-    if (colsArray.length > 0) setSelectedCollection(colsArray[0]);
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+      const csv = await exportarEstadisticasCSV();
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'estadisticas.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('[Estadísticas] Error al exportar CSV', error);
+      alert('No pudimos generar el CSV. Intentá nuevamente.');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const renderChart = (estadistica) => {
@@ -126,39 +101,23 @@ export const Estadisticas = () => {
         </div>
       </div>
     );
-
-    // Distinguish between hours and provinces based on data keys
-    // Hours usually contain ':' (e.g. "13:00"), Provinces don't
-    let hours = null;
-    let provinces = null;
-
-    categoryStats.forEach(stat => {
-      const firstKey = stat.datos?.[0]?.nombre;
-      if (firstKey && firstKey.includes(':')) {
-        hours = stat;
-      } else {
-        provinces = stat;
-      }
-    });
-
-    return { hours, provinces };
   };
 
-  const getCollectionStats = () => {
-    if (!selectedCollection) return { provinces: null };
-
-    const provinces = rawStats.find(s => 
-      s.discriminante?.tipo === 'COLECCION' && 
-      s.discriminante?.valor === selectedCollection
+  if (estado.loading) {
+    return (
+      <section className="estadisticas">
+        <p className="estadisticas__estado">Cargando estadísticas...</p>
+      </section>
     );
+  }
 
-    return { provinces };
-  };
-
-  const categoryStats = getCategoryStats();
-  const collectionStats = getCollectionStats();
-
-  if (loading) return <div className="loading">Cargando estadísticas...</div>;
+  if (estado.error) {
+    return (
+      <section className="estadisticas">
+        <p className="estadisticas__estado estadisticas__estado--error">{estado.error}</p>
+      </section>
+    );
+  }
 
  return (
     <section className="estadisticas">

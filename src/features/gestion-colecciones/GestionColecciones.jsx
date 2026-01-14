@@ -89,7 +89,7 @@ export const GestionColecciones = () => {
       setLoading(false);
       return;
     }
-    fetchData();
+    fetchColecciones();
   }, [isAuthenticated, isAdmin]);
 
   const handleClosePopup = async () => {
