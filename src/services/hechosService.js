@@ -24,10 +24,9 @@ export const hechosService = {
 // hecho.service.js
 
 // 💡 URL base de tu backend
-const API_URL = 'http://localhost:8100/hechos';
-const API_PUBLICA_URL = 'http://localhost:8100'
-const API_ADMI_URL = "http://localhost:8084/hechos";
-// Asegúrate de cambiar 'localhost:8080' por la dirección correcta de tu API.
+const API_URL = process.env.REACT_APP_API_PUBLICA_URL + "/hechos";
+const API_PUBLICA_URL = process.env.REACT_APP_API_PUBLICA_URL 
+const API_ADMI_URL = process.env.REACT_APP_API_ADMINISTRATIVA_URL + "/hechos";
 
 /**
  * Función auxiliar para construir la URL con los parámetros de consulta (Query Params).

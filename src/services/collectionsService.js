@@ -2,7 +2,7 @@ import { mockCollections } from "../constants/mockCollections";
 import axios from "axios";
 const deepClone = (payload) => JSON.parse(JSON.stringify(payload));
 
-const API_PUBLICA_URL = "http://localhost:8100";
+const API_PUBLICA_URL = process.env.REACT_APP_API_PUBLICA_URL;
 
 export const normalizador= (filtros) => {
     const params = new URLSearchParams();

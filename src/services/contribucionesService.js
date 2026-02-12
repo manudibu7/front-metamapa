@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const delay = (ms = 700) => new Promise((resolve) => setTimeout(resolve, ms));
-const API_BASE_URL = 'http://localhost:8090';
-const API_ADMINISTRATIVA_URL = 'http://localhost:8084';
+const API_BASE_URL = process.env.REACT_APP_DINAMICA_URL;
+const API_ADMINISTRATIVA_URL = process.env.REACT_APP_API_ADMINISTRATIVA_URL;
 
 const sanitizeHecho = (hecho) => {
   if (!hecho) throw new Error('El hecho es obligatorio');

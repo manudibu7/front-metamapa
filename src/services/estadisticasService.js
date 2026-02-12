@@ -92,7 +92,7 @@ export const exportarEstadisticasCSV = async () => {
 */
 
 // 💡 URL base de tu backend para el controlador /estadisticas
-const API_URL_BASE = 'http://localhost:8200/estadisticas';
+const API_URL_BASE = process.env.REACT_APP_ESTADISTICAS_URL;
 
 /*
  * Función genérica para manejar respuestas HTTP, verificando el estado 'ok'.
