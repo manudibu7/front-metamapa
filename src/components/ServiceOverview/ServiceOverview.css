@@ -5,6 +5,17 @@
   align-items: start;
 }
 
+@media (max-width: 640px) {
+  .service-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .service-grid__cards {
+    grid-template-columns: 1fr; /* Force single column on mobile */
+  }
+}
+
 .service-grid__intro h2 {
   font-size: clamp(1.8rem, 4vw, 2.6rem);
   margin-bottom: 1rem;

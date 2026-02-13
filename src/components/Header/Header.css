@@ -154,17 +154,16 @@
   transition: .4s;
 }
 
-/* Cuando está activado (Modo Curado) */
 input:checked + .slider {
-  background-color: var(--color-primary, #2196F3); /* Usa tu variable primary */
+  background-color: var(--color-primary);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px var(--color-primary, #2196F3);
+  box-shadow: 0 0 1px var(--color-primary);
 }
 
 input:checked + .slider:before {
-  transform: translateX(22px); /* Ajustado al nuevo ancho */
+  transform: translateX(22px); /* Ajuste del movimiento */
 }
 
 /* Rounded sliders */
@@ -176,77 +175,55 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-@media (max-width: 900px) {
-  .app-header {
-    grid-template-columns: 1fr;
-  }
-
-  .app-header__actions {
-    justify-content: flex-start;
-  }
-}
-
-/* --- USER MENU DROPDOWN --- */
-
-/* El contenedor mantiene al menú pegado al botón */
 .user-menu-container {
   position: relative;
   display: inline-block;
-  margin-top: 0.4rem;
 }
 
-/* Botón del usuario mejorado */
 .user-menu-trigger {
-  background-color: #f8fafc; /* Fondo gris muy suave (Slate 50) */
-  border: 1px solid #e2e8f0; /* Borde sutil */
-  border-radius: 9999px;     /* Bordes totalmente redondos */
-  cursor: pointer;
+  background: none;
+  border: 1px solid #cbd5e1; /* Borde sutil */
+  border-radius: 40px; /* Redondeado, estilo "pill" */
+  padding: 6px 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  padding: 6px 12px 6px 6px; /* Padding asimétrico para el icono */
+  gap: 8px;
+  cursor: pointer;
   transition: all 0.2s ease;
-  height: 40px; /* Misma altura que el toggle wrapper para alineación */
+  background-color: white; /* Blanco limpio */
 }
 
 .user-menu-trigger:hover {
-  background-color: #f1f5f9; /* Un poco más oscuro al pasar el mouse */
-  border-color: #cbd5e1;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra suave */
-}
-
-/* El texto del nombre */
-.app-header__user {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #334155; /* Slate 700 */
-  margin-left: 4px;
+  background-color: #f8fafc;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Sombra suave al hover */
 }
 
 .arrow-icon {
   font-size: 0.7rem;
-  color: var(--color-muted, #64748b);
+  color: #64748b;
+  margin-left: 2px;
 }
 
-/* El Menú Flotante (La cajita blanca) */
+/* --- Dropdown, posicionado debajo del botón --- */
 .dropdown-menu {
   position: absolute;
-  top: 110%; /* Un poquito separado del botón (100% es pegado) */
-  right: 0;  /* Alineado a la derecha del contenedor */
-  width: 200px;
-  background-color: white;
+  top: calc(100% + 8px); /* 8px de separación */
+  right: 0;
+  width: 220px;
+  background-color: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  padding: 8px 0;
-  z-index: 100; /* Para que flote por encima de todo */
-  overflow: hidden;
-  animation: slideDown 0.2s ease-out;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 8px 0; /* Padding vertical interno */
+  z-index: 100;
+  
+  /* Animación suave de entrada */
+  animation: fadeIn 0.2s ease-out forwards;
+  transform-origin: top right;
 }
 
-/* Opcional: animación suave de entrada */
-@keyframes slideDown {
+@keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -287,57 +264,85 @@ input:checked + .slider:before {
   color: #94a3b8;
   border-bottom: 1px solid #f1f5f9;
 }
-@media (max-width: 900px) {
 
-  /* 1. MANTENER EN UNA LÍNEA */
-  /* Sobrescribimos el comportamiento anterior para que NO se apile */
+@media (max-width: 900px) {
+  /* 1. LAYOUT RESPONSIVE TABLET */
   .app-header {
-    grid-template-columns: auto 1fr auto; /* Izq - Centro - Der */
-    gap: 0.8rem; /* Reducimos el espacio entre elementos */
-    padding: 0.8rem 1rem; /* Reducimos el padding general */
+    grid-template-columns: auto 1fr auto; 
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
   }
 
-  /* 2. LOGO: Ocultar el texto "MetaMapa", dejar solo el icono */
+  /* 2. LOGO: Ocultar texto */
   .app-header__brand div {
     display: none;
   }
+  
+  .app-header__brand strong, 
+  .app-header__brand small {
+      display: none;
+  }
 
-  /* 3. SWITCH: Ocultar el texto "Navegación Curada" */
+  /* 3. SWITCH: Ocultar texto */
   .toggle-label {
     display: none;
   }
   
-  /* Ajustamos el contenedor del switch para que se encoja al no tener texto */
   .toggle-wrapper {
     gap: 0;
-    padding: 4px 8px; /* Un poco más compacto */
+    padding: 4px 8px;
     margin-left: 5px;
   }
 
-  /* 4. USUARIO: Ocultar el nombre, dejar solo la flecha (y avatar si hubiera) */
+  /* 4. USUARIO: Icono */
   .app-header__user {
     display: none;
   }
 
-  /* Ajustamos el botón de usuario para que sea un cuadradito o círculo */
   .user-menu-trigger {
     padding: 0;
-    width: 36px;       /* Ancho fijo */
-    height: 36px;      /* Alto fijo */
-    justify-content: center; /* Centrar la flecha */
+    width: 36px;
+    height: 36px;
+    justify-content: center;
   }
 
   .arrow-icon {
-    margin: 0; /* Quitar márgenes extra de la flecha */
-    font-size: 0.8rem; /* Ajustar tamaño si es necesario */
+    margin: 0;
+    font-size: 0.8rem;
   }
 
   .app-header__search button {
-      padding: 0.5rem; /* O puedes poner padding: 0.5rem; para hacerlo chico */
+      padding: 0.5rem;
   }
   
-  /* Hacemos que la barra de búsqueda ocupe el espacio disponible sin romperse */
   .app-header__search {
-      padding-right: 0.5rem; /* Ajuste fino */
+      padding-right: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .app-header {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 
+      "brand actions"
+      "search search";
+    row-gap: 1rem;
+    padding: 0.8rem;
+  }
+
+  .app-header__brand {
+    grid-area: brand;
+  }
+
+  .app-header__actions {
+    grid-area: actions;
+    justify-self: end;
+  }
+
+  .app-header__search {
+    grid-area: search;
+    max-width: 100%;
+    width: 100%;
+    margin-right: 0;
   }
 }
