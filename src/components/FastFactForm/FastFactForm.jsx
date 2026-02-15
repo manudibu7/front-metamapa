@@ -65,6 +65,7 @@ export const FastFactForm = () => {
 const handleArchivoChange = (event) => {
   const file = event.target.files?.[0];
   if (file && file.size > 10 * 1024 * 1024) { 
++    setStatus("error");
      setError("El archivo es demasiado pesado (Max 10MB)");
      return;
   }
