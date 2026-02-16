@@ -16,19 +16,26 @@ export const GET_PROVINCIAS = gql`
   }
 `;
 
+// CORREGIDO: Se agregaron las definiciones de variables ($titulo: String, etc.)
 export const GET_COLECCIONES = gql`
-  query obtenerColecciones {
-    listarColecciones(
+  query obtenerColecciones(
     $titulo: String
     $descripcion: String
     $tipo_algoritmo: String
-    $fuente_id: String) {
-        id_coleccion
-        titulo
-        descripcion
-        cantidadHechos
-        fuentes
-        tipoDeAlgoritmo
+    $fuente_id: [String] 
+  ) {
+    listarColecciones(
+      titulo: $titulo
+      descripcion: $descripcion
+      tipo_algoritmo: $tipo_algoritmo
+      fuente_id: $fuente_id
+    ) {
+      id_coleccion
+      titulo
+      descripcion
+      cantidadHechos
+      fuentes
+      tipoDeAlgoritmo
     }
   }
 `;
@@ -55,11 +62,11 @@ export const GET_HECHOS_COLECCION = gql`
       provincia: $provincia
       fuenteTipo: $fuenteTipo
       q: $q
-    ){
+    ) {
       titulo
       descripcion
       id_coleccion
-      hechos{
+      hechos {
         id_hecho
         titulo
         descripcion
@@ -80,118 +87,108 @@ export const GET_HECHOS_COLECCION = gql`
           tipoMedia
         }
       }
-    }  
+    }
   }
 `;
 
+// CORREGIDO: Se agregó la llave de cierre "}" faltante y se corrigió el nombre del campo (ID mayúscula)
 export const GET_COLECCION_ID = gql`
   query obtenerColeccionPorID($coleccionID: ID!) {
-    obtenerColeccionPorId(coleccionID: $coleccionID) {
-        id_coleccion
+    obtenerColeccionPorID(coleccionID: $coleccionID) {
+      id_coleccion
+      titulo
+      descripcion
+      cantidadHechos
+      fuentes
+      tipoDeAlgoritmo
+      hechos {
+        id_hecho
         titulo
         descripcion
-        cantidadHechos
-        fuentes
-        tipoDeAlgoritmo
-        hechos{
-            id_hecho
-            titulo
-            descripcion
-            categoria
-            fecha
-            fechaDeCarga
-            etiqueta
-            tipoHecho
-            fuente
-            ubicacion {
-                latitud
-                longitud
-                provincia
-                pais
-            }
-            adjuntos {
-                url
-                tipoMedia
-            }
+        categoria
+        fecha
+        fechaDeCarga
+        etiqueta
+        tipoHecho
+        fuente
+        ubicacion {
+          latitud
+          longitud
+          provincia
+          pais
+        }
+        adjuntos {
+          url
+          tipoMedia
+        }
       }
     }
+  }
 `;
 
 export const GET_HECHO = gql`
-    query obtenerHecho($id: ID!) {
-        obtenerHecho(id: $id) {
-            id_hecho
-            titulo
-            descripcion
-            categoria
-            fecha
-            fechaDeCarga
-            etiqueta
-            tipoHecho
-            fuente
-            ubicacion {
-                latitud
-                longitud
-                provincia
-                pais
-            }
-            adjuntos {
-                url
-                tipoMedia
-            }
-        }
+  query obtenerHecho($id: ID!) {
+    obtenerHecho(id: $id) {
+      id_hecho
+      titulo
+      descripcion
+      categoria
+      fecha
+      fechaDeCarga
+      etiqueta
+      tipoHecho
+      fuente
+      ubicacion {
+        latitud
+        longitud
+        provincia
+        pais
+      }
+      adjuntos {
+        url
+        tipoMedia
+      }
     }
+  }
 `;
 
 export const GET_HECHOS_FILTRADOS = gql`
-    query obtenerHechosFiltrados(
-        $modoNavegacion: String
-        $fecha_reporte_desde: String
-        $fecha_reporte_hasta: String
-        $fecha_acontecimiento_desde: String
-        $fecha_acontecimiento_hasta: String
-        $provincia: String
-        $fuenteTipo: String
-        $q: String
-        $page: Int
-        $size: Int
-    ){
-        listarHechosSegun(
-            modoNavegacion: $modoNavegacion
-            fecha_reporte_desde: $fecha_reporte_desde
-            fecha_reporte_hasta: $fecha_reporte_hasta
-            fecha_acontecimiento_desde: $fecha_acontecimiento_desde
-            fecha_acontecimiento_hasta: $fecha_acontecimiento_hasta
-            provincia: $provincia
-            fuenteTipo: $fuenteTipo
-            q: $q
-            page: $page
-            size: $size
-        ){
-            content {
-                id_hecho
-                titulo
-                descripcion
-                categoria
-                fecha
-                fechaDeCarga
-                etiqueta
-                tipoHecho
-                fuente
-                ubicacion {
-                    latitud
-                    longitud
-                    provincia
-                    pais
-                }
-                adjuntos {
-                    url
-                    tipoMedia
-                }
-            }
-            totalPages
-            page
-            size
+  query obtenerHechosFiltrados(
+    $fecha_reporte_desde: String
+    $fecha_reporte_hasta: String
+    $fecha_acontecimiento_desde: String
+    $fecha_acontecimiento_hasta: String
+    $provincia: String
+    $fuenteTipo: String
+    $q: String
+    $page: Int
+    $size: Int
+    $categoria: String
+  ) {
+    listarHechosSegun(
+      fecha_reporte_desde: $fecha_reporte_desde
+      fecha_reporte_hasta: $fecha_reporte_hasta
+      fecha_acontecimiento_desde: $fecha_acontecimiento_desde
+      fecha_acontecimiento_hasta: $fecha_acontecimiento_hasta
+      provincia: $provincia
+      fuenteTipo: $fuenteTipo
+      q: $q
+      page: $page
+      size: $size
+      categoria: $categoria
+    ) {
+      content {
+        titulo
+        descripcion
+        categoria
+        fecha
+        fuente
+        ubicacion {
+          provincia
         }
+      }
+      totalPages
+      totalElements
     }
+  }
 `;

@@ -41,8 +41,8 @@ export const TableroHechos = () => {
     () => ({
       // Usamos 'listaHechos' que garantizamos que es un Array
       total: listaHechos.length,
-      categorias: new Set(listaHechos.map((h) => h.categoria)).size,
-      provincias: new Set(listaHechos.map((h) => h.provincia)).size,
+      categorias: todasLasCategorias.length,
+      provincias: todasLasProvincias.length,
     }),
     [listaHechos] // Dependencia actualizada
   );

@@ -71,7 +71,7 @@ export const hechosService = {
     }
   },
 
-  async listarHechos(filtros, page = 0, size = 10) {
+  async listarHechos(filtros, page = 0, size = 52) {
     const url = buildUrlWithFilters(filtros, page, size);
     console.log(`Llamando al backend en: ${url}`);
 
