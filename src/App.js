@@ -25,7 +25,7 @@ import { NavigationProvider } from './context/NavigationContext';
 // MONITOREO PROACTIVO (AGREGADO)
 import { SystemStatusProvider } from './context/SystemStatusContext';
 import ErrorBoundary from './monitoring/ErrorBoundary';
-import { useBackendMonitor } from './monitoring/useBackendMonitorseBackendMonitor';
+import { useBackendMonitor } from './monitoring/useBackendMonitor';
 import { useConnectivityMonitor } from './monitoring/ConnectivityMonitor';
 import { initGlobalErrorHandler } from './monitoring/GlobalErrorHandler';
 import { useSystemStatus } from './context/SystemStatusContext';
