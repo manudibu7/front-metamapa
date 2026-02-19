@@ -28,11 +28,25 @@ export const TableroHechos = () => {
 
   useEffect(() => {
     const cargarMaestros = async () => {
-      const cats = await hechosService.obtenerCategorias();
-      setTodasLasCategorias(cats.map(c => c.nombre || c)); 
+      try {
+        const cats = await hechosService.obtenerCategorias();
+        if (Array.isArray(cats)) {
+          setTodasLasCategorias(cats.map(c => c.nombre || c));
+        } else {
+          console.warn('obtenerCategorias no devolvió un array:', cats);
+          setTodasLasCategorias([]);
+        }
       
-      const provs = await hechosService.obtenerProvincias();
-      setTodasLasProvincias(provs.map(p => p.nombre || p)); 
+        const provs = await hechosService.obtenerProvincias();
+        if (Array.isArray(provs)) {
+          setTodasLasProvincias(provs.map(p => p.nombre || p));
+        } else {
+          console.warn('obtenerProvincias no devolvió un array:', provs);
+          setTodasLasProvincias([]);
+        }
+      } catch (error) {
+        console.error("Error cargando maestros:", error);
+      }
     };
     cargarMaestros();
   }, []);

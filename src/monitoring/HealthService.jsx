@@ -1,10 +1,12 @@
+const API_URL = process.env.REACT_APP_API_PUBLICA_URL || "http://localhost:8100";
+
 export const checkBackendHealth = async () => {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
 
     const response = await fetch(
-      "https://TU_BACKEND.onrender.com/actuator/health",
+      `${API_URL}/actuator/health`,
       {
         method: "GET",
         signal: controller.signal,
