@@ -1,13 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Keycloak from 'keycloak-js';
 import keycloakConfig from '../config/keycloakConfig';
-import { syncKeycloakUser } from '../services/contribuyentesService';
+import {syncKeycloakUser , obtenerMiPerfil} from '../services/contribuyentesService';
 
 const AuthContext = createContext({
   isAuthenticated: false,
   loading: true,
   user: null,
   contribuyenteId: null,
+  perfil: null,
   token: null,
   roles: [],
   isAdmin: false,
@@ -48,11 +49,21 @@ export const AuthProvider = ({ children }) => {
     loading: true,
     user: null,
     contribuyenteId: null,
+    perfil: null,
     token: null,
     roles: [],
     isAdmin: false,
   });
-
+  
+  const updatePerfil = useCallback((perfilActualizado) => {
+    setState((prev) => ({
+      ...prev,
+      user: {
+        ...prev.user,
+        name: `${perfilActualizado.nombre} ${perfilActualizado.apellido}`.trim(),
+      },
+    }));
+  }, []);
   useEffect(() => {
     if (hasInitializedRef.current) {
       return;
@@ -126,6 +137,7 @@ export const AuthProvider = ({ children }) => {
           console.log('[Auth] 👤 Usuario autenticado:', user);
           
           let contribuyenteId = null;
+          let perfil = null;
           try {
             // Sincronizar con backend para obtener idSistema
             const syncResponse = await syncKeycloakUser(
@@ -134,6 +146,7 @@ export const AuthProvider = ({ children }) => {
               keycloak.tokenParsed.family_name
             );
             contribuyenteId = syncResponse.idSistema;
+            perfil = await obtenerMiPerfil(user.id);
             console.log('[Auth] ✅ Usuario sincronizado. ID Sistema:', contribuyenteId);
           } catch (err) {
             console.error('[Auth] ❌ Error sincronizando usuario:', err);
@@ -157,6 +170,7 @@ export const AuthProvider = ({ children }) => {
             loading: false,
             user,
             contribuyenteId,
+            perfil,
             token: keycloak.token,
             roles,
             isAdmin,
@@ -192,6 +206,7 @@ export const AuthProvider = ({ children }) => {
           loading: false,
           user: null,
           contribuyenteId: null,
+          perfil: null,
           token: null,
           roles: [],
           isAdmin: false,
@@ -218,6 +233,7 @@ export const AuthProvider = ({ children }) => {
       loading: false,
       user: null,
       contribuyenteId: null,
+      perfil: null,
       token: null,
       roles: [],
       isAdmin: false,
@@ -229,8 +245,9 @@ export const AuthProvider = ({ children }) => {
       ...state,
       login,
       logout,
+      updatePerfil,
     }),
-    [state, login, logout]
+    [state, login, logout, updatePerfil]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

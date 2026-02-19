@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNavigation } from '../../context/NavigationContext';
+import { useAuthContext } from '../../context/AuthContext';
 import './Header.css';
 
+
 export const Header = ({ onSearch, onLogin, onLogout, isAuthenticated, user}) => {
+  const { perfil } = useAuthContext();
   const [query, setQuery] = useState(''); 
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado del menú
@@ -70,7 +73,7 @@ useEffect(() => {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <span className="app-header__user">
-                 {user?.name || user?.username || 'Usuario'}
+                 {perfil? `${perfil.nombre} ${perfil.apellido}`: user?.name || user?.username || 'Usuario'}
               </span>
               <span className="arrow-icon">▼</span>
             </button>
@@ -79,7 +82,7 @@ useEffect(() => {
             {isMenuOpen && (
               <div className="dropdown-menu">
                 <div className="dropdown-header-mobile">
-                  {user?.name}
+                  {perfil? `${perfil.nombre} ${perfil.apellido}`: user?.name}
                 </div>
                 <Link 
                   to="/mis-contribuciones" 
@@ -87,6 +90,13 @@ useEffect(() => {
                   onClick={() => setIsMenuOpen(false)} // Cerrar al navegar
                 >
                   Mis Contribuciones
+                </Link>
+                <Link 
+                  to="/perfil" 
+                  className="dropdown-item"
+                  onClick={() => setIsMenuOpen(false)} // Cerrar al navegar
+                >
+                  Editar perfil
                 </Link>
                 <button 
                   type="button" 
