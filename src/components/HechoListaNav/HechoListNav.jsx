@@ -2,20 +2,51 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { hechosService } from '../../services/hechosService';
 import './HechoListNav.css';
+import { useQuery } from '@apollo/client';
+import { 
+  GET_HECHOS_FILTRADOS, 
+  GET_CATEGORIAS, 
+  GET_PROVINCIAS 
+} from '../../graphql/queries';
+
 
 export const HechosListNav = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  const [hechos, setHechos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [todasLasCategorias, setTodasLasCategorias] = useState([]);
-  const [todasLasProvincias, setTodasLasProvincias] = useState([]);
-
-  const [pagina, setPagina] = useState(0); 
-  const [metaData, setMetaData] = useState(null);
+  const [pagina, setPagina] = useState(0);   
   const TAMANO_PAGINA = 10; 
+  ///----------GRAPHQL----------
+   const { data: categoriasData } = useQuery(GET_CATEGORIAS);
+   const { data: provinciasData } = useQuery(GET_PROVINCIAS);
+
+   const todasLasCategorias = categoriasData?.listarCategorias || [];
+   const todasLasProvincias = provinciasData?.listarProvincias || [];
+  const { data, loading, error } = useQuery(GET_HECHOS_FILTRADOS, {
+    variables: {
+      q: searchParams.get('q') || null,
+      categoria: searchParams.get('categoria') || null,
+      provincia: searchParams.get('provincia') || null,
+      fuenteTipo: searchParams.get('fuenteTipo') || null,
+      fecha_acontecimiento_desde: searchParams.get('fechaDesde') || null, 
+      fecha_acontecimiento_hasta: searchParams.get('fechaHasta') || null,
+      page: pagina,
+      size: TAMANO_PAGINA
+    },
+  });
+
+  const metaData = {
+    totalPages: data?.listarHechosSegun?.totalPages || 0,
+    totalElements: data?.listarHechosSegun?.totalElements || 0
+  };
+  const hechos = data?.listarHechosSegun?.content || [];
+
+  ///----------REST----------
+  //const [hechos, setHechos] = useState([]);
+  //const [loading, setLoading] = useState(false);
+  //const [error, setError] = useState(null);
+  //const [todasLasCategorias, setTodasLasCategorias] = useState([]);
+  //const [todasLasProvincias, setTodasLasProvincias] = useState([]);
+
 
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [filtrosTemp, setFiltrosTemp] = useState({});
@@ -26,7 +57,9 @@ export const HechosListNav = () => {
     { value: 'proxy', label: 'Proxy' },
   ];
 
-useEffect(() => {
+  ///----------REST----------
+  /*
+  useEffect(() => {
     const cargarMaestros = async () => {
         // Opción A: Si tienes endpoints
         const cats = await hechosService.obtenerCategorias();
@@ -37,8 +70,9 @@ useEffect(() => {
     };
     cargarMaestros();
   }, []);
+  */
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -62,7 +96,7 @@ useEffect(() => {
 
     fetchData();
   }, [searchParams, pagina]);
-
+*/
   const resetFiltros = () => {
     setFiltrosTemp({});
     setSearchParams({});
@@ -97,7 +131,7 @@ useEffect(() => {
   };
 
   if (loading) return <p>Cargando...</p>;
-  if (error) return <p>{error}</p>;
+  if (error) return <p>{error.message}</p>;
 
   return (
     <div className="hechos-list-nav">
@@ -149,11 +183,6 @@ useEffect(() => {
             >
                 Anterior
             </button>
-            
-            <span className="info-paginacion">
-                Página {metaData.number + 1} de {metaData.totalPages}
-            </span>
-            
             <button 
                 onClick={handleSiguiente} 
                 disabled={pagina >= metaData.totalPages - 1}

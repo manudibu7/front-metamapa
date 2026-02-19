@@ -1,7 +1,7 @@
 // services/coleccionesAdminService.js
 import axios from "axios";
 
-const API_ADMINISTRATIVA_URL = "http://localhost:8084";
+const API_ADMINISTRATIVA_URL = process.env.REACT_APP_API_ADMINISTRATIVA_URL;
 
 // 1. Obtener Fuentes (Movido aquí para que sea exclusivo de Admin)
 export const obtenerFuentes = async () => {

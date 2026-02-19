@@ -86,15 +86,16 @@ const categorias = useMemo(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const coleccionData = await collectionsService.getCollectionById(id);
-        setColeccion(coleccionData);
+        //const coleccionData = await collectionsService.getCollectionById(id);
+        //setColeccion(coleccionData);
+        //console.log(coleccionData)
         const filtrosActuales = {
             ...Object.fromEntries([...searchParams]), 
             modoNavegacion: modoNavegacion 
         };
-        console.log(filtrosActuales);
-        const hechosData = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
-        setHechos(hechosData);
+        const coleCompleta = await collectionsService.getHechosDeColeccion(id, filtrosActuales);
+        setColeccion(coleCompleta.data)
+        setHechos(coleCompleta.data.hechos);
       } catch (error) {
         console.error("Error cargando datos:", error);
         setHechos([]);
@@ -150,8 +151,6 @@ const categorias = useMemo(() => {
         <p className="coleccion-detalle__descripcion">{coleccion.descripcion}</p>
         <div className="coleccion-detalle__meta">
           <span>{hechos.length} hechos</span>
-           {/* Opcional: Mostrar visualmente en qué modo se está viendo, aunque ya está en el header */}
-          <span className="badge-modo">Modo: {modoNavegacion}</span>
         </div>
       </header>
       
@@ -290,21 +289,13 @@ const categorias = useMemo(() => {
         <div className="filtro-field">
                 <label>Provincia</label>
                 <select
-                  value={filtrosTemp.provincia || ""}
-                  onChange={(e) => {
-                    const nombre = e.target.value;
-                    const ub = provinciasUnicas.find(p => p.provincia === nombre);
-                    if (ub) {
-                      setFiltrosTemp({ 
+                  value={filtrosTemp.provincia || ''}
+                  onChange={e => 
+                      setFiltrosTemp({
                         ...filtrosTemp,
-                        lat: ub.latStr, 
-                        lon: ub.lonStr 
-                      });
-                    } else {
-                      const {lat, lon, ...resto } = filtrosTemp;
-                      setFiltrosTemp(resto);
+                        provincia: e.target.value
+                      })
                     }
-                  }}
                 >
                   <option value="">Todas las provincias</option>
                   {provinciasUnicas.map((ub) => (
@@ -357,7 +348,7 @@ const categorias = useMemo(() => {
 
       <footer className="filtros-panel__actions">
         <button onClick={() => resetFiltros()}>
-          Cancelar
+          Limpiar
         </button>
 
         <button

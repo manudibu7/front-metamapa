@@ -1,4 +1,5 @@
 import './App.css';
+import { useEffect } from 'react';
 import { Routes, Route, Outlet} from 'react-router-dom';
 import { Home } from './features/home/Home';
 import { Colecciones } from './features/colecciones/Colecciones';
@@ -22,6 +23,14 @@ import { ScrollToTopButton } from './components/ScrollToTopButton/ScrollToTopBut
 import { ImportacionDataSet} from './features/importacionesDataSets/ImportacionDataSet'
 import { NavigationProvider } from './context/NavigationContext';
 import GestorUsuarios from "./features/gestor-usuarios/GestorUsuarios";
+// MONITOREO PROACTIVO (AGREGADO)
+import { SystemStatusProvider } from './context/SystemStatusContext';
+import ErrorBoundary from './monitoring/ErrorBoundary';
+import { useBackendMonitor } from './monitoring/useBackendMonitor';
+import { useConnectivityMonitor } from './monitoring/ConnectivityMonitor';
+import { initGlobalErrorHandler } from './monitoring/GlobalErrorHandler';
+import { useSystemStatus } from './context/SystemStatusContext';
+import { SystemStatusBanner } from './components/SystemStatusBanner';
 // ... importaciones ...
 
 const AppShell = () => {
@@ -29,8 +38,16 @@ const AppShell = () => {
   
   const handleSearch = (query) => console.info('Buscar:', query);
 
+  // MONITOREO PROACTIVO (AGREGADO)
+  const { backendUp, online } = useSystemStatus();
+  useBackendMonitor();
+  useConnectivityMonitor();
+
+
   return (
     <div className="app-shell">
+      {/* MONITOREO VISUAL (AGREGADO) */}
+      <SystemStatusBanner />
       <Header
         onSearch={handleSearch}
         onLogin={login}
@@ -79,13 +96,20 @@ const AppShell = () => {
 };
 
 function App() {
+  useEffect(() => {
+    initGlobalErrorHandler();
+  }, []);
   return (
-    <AuthProvider>
-      <NavigationProvider>
-      {/* ELIMINAMOS CollectionsProvider DE AQUÍ PARA QUE NO SEA GLOBAL */}
-        <AppShell />
-      </NavigationProvider>
-    </AuthProvider>
+    <SystemStatusProvider> {/* AGREGADO PARA MONITOREO */}
+      <ErrorBoundary> {/* AGREGADO PARA MONITOREO  */}
+        <AuthProvider>
+          <NavigationProvider>
+          {/* ELIMINAMOS CollectionsProvider DE AQUÍ PARA QUE NO SEA GLOBAL */}
+            <AppShell />
+          </NavigationProvider>
+        </AuthProvider>
+      </ErrorBoundary>
+    </SystemStatusProvider>
   );
 }
 

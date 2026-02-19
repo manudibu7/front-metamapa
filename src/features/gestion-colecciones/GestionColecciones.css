@@ -2,7 +2,7 @@
 
 .gestion-colecciones {
   padding: 2rem clamp(1rem, 5vw, 4rem) 4rem;
-  max-width: 960px;
+  max-width: 1024px;
   margin: 0 auto;
   font-family: var(--font-family);
   color: var(--color-text);
@@ -31,7 +31,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .gestion-colecciones__header h1 {
@@ -42,18 +42,20 @@
 
 .gestion-colecciones__header p {
   color: var(--color-muted);
+  font-size: 1.05rem;
 }
 
+/* Lista de tarjetas */
 .gestion-colecciones__lista {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .gestion-colecciones__card {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 1.5rem;
   padding: 1.5rem;
   /* Usamos blanco puro para destacar sobre el fondo grisáceo */
@@ -76,6 +78,8 @@
 .gestion-colecciones__card-info > p {
   color: var(--color-text);
   font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
 }
 
 .gestion-colecciones__condiciones {
@@ -84,13 +88,16 @@
   color: var(--color-muted);
 }
 
-.gestion-colecciones__condiciones li {
-  margin-bottom: 0.25rem;
+.gestion-colecciones__card-meta span {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .gestion-colecciones__card-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   flex-shrink: 0;
 }
 
@@ -170,7 +177,9 @@
   color: var(--color-primary);
 }
 
-.gestion-colecciones__modal form {
+.gestion-colecciones__modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -221,7 +230,10 @@
   display: flex;
   gap: 0.75rem;
   align-items: center;
-  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  background: #0f172a;
+  z-index: 10;
 }
 
 .gestion-colecciones__criterio-row input,
@@ -319,9 +331,132 @@
   background: transparent;
   border: 1px solid var(--color-border);
   color: var(--color-muted);
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--radius-md);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.btn-close:hover {
+  color: #fff;
+}
+
+.gestion-colecciones__form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.form-group select option {
+  background-color: #0f172a;
+  color: #fff;
+}
+
+.form-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Fuentes Grid */
+.gestion-colecciones__fuentes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.fuente-checkbox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.fuente-checkbox:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.fuente-checkbox.active {
+  border-color: var(--color-primary);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.fuente-checkbox input {
+  display: none;
+}
+
+.fuente-name {
+  font-weight: 500;
+  color: #f1f5f9;
+}
+
+.fuente-type {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Criterios */
+.criterios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.criterio-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn-icon-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -338,9 +473,13 @@
   background: rgba(248, 113, 113, 0.1);
 }
 
-.btn--sm {
-  font-size: 0.9rem;
-  padding: 0.4rem 0.75rem;
+.gestion-colecciones__modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
 }
 
 /* Modal Actions */

@@ -109,3 +109,9 @@
   color: var(--color-text);
   word-break: break-all;
 }
+
+@media (max-width: 768px) {
+  .contribucion-detalle {
+    padding: 1rem;
+  }
+}

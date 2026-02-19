@@ -72,8 +72,8 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
   });
 };
 */
-const BASE_URL = "http://localhost:8100/solicitudes";
-const ADMINISTRATIVA_URL = "http://localhost:8084/solicitudes";
+const BASE_URL = process.env.REACT_APP_API_PUBLICA_URL + "/solicitudes";
+const ADMINISTRATIVA_URL = process.env.REACT_APP_API_ADMINISTRATIVA_URL + "/solicitudes";
 
 // GET /solicitudes
 export const obtenerSolicitudes = async () => {

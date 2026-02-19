@@ -233,3 +233,34 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@media (max-width: 768px) {
+  .fast-fact {
+    padding: 1.5rem; /* Reduced from 2.5rem */
+    width: 100%;
+    border: none; /* Remove border on mobile for cleaner look */
+    box-shadow: none; /* Remove shadow on mobile */
+  }
+
+  .fast-fact header h2 {
+    font-size: 1.8rem;
+  }
+
+  .fast-fact__section {
+    padding: 1rem; /* Reduced from 1.5rem */
+  }
+
+  /* Force single column for grids on small screens */
+  .fast-fact__grid--three,
+  .fast-fact__grid--two {
+    grid-template-columns: 1fr;
+  }
+
+  .fast-fact__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+ 
+  .fast-fact__actions button {
+    width: 100%;
+  }
+}

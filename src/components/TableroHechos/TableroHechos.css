@@ -70,11 +70,21 @@
 @media (max-width: 1024px) {
   .tablero-hechos__contenido {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
 @media (max-width: 640px) {
   .tablero-hechos {
     padding: 1.5rem;
+  }
+  
+  .tablero-hechos__encabezado h2 {
+    font-size: 1.75rem; 
+  }
+  
+  .tablero-hechos__resumen {
+    grid-template-columns: 1fr; 
+    gap: 0.75rem;
   }
 }
