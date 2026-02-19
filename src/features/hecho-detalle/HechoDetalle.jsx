@@ -43,7 +43,11 @@ export const HechoDetalle = () => {
   const [nuevaEtiqueta, setNuevaEtiqueta] = useState("");
   useEffect(() => {
     const fetchHecho = async () => {
-      if (!id) return;
+      if (!id || id === 'undefined') {
+        setError("ID de hecho no válido.");
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
