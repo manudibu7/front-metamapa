@@ -54,7 +54,8 @@ export const UbicacionSelector = ({ value, onChange }) => {
         {
           headers: {
             'Accept-Language': 'es',
-            'User-Agent': 'MetaMapa Loader Dinamico',
+            // 'User-Agent': 'MetaMapa' // Nominatim requiere identificación, pero los navegadores bloquean este header en fetch client-side.
+            // Si sigue fallando, la solución ideal es usar un proxy o backend propio.
           },
         }
       );
