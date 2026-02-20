@@ -168,7 +168,6 @@ export const MisContribuciones = () => {
       ) : (
         <div className="mis-contribuciones__list">
           {contribuciones.map((c) => (
-            console.log("es un hecho anonimo? "+ c.anonimo),
             <div 
               key={c.idContribucion} 
               className="contribucion-card"
