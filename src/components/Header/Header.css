@@ -51,39 +51,51 @@
 }
 
 .app-header__search {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  background: var(--color);
+  display: flex;
+  align-items: center;
+  /* El borde y fondo van en el contenedor, no en el input */
+  background: var(--color-header-bg, #ffffff); 
   border-radius: 999px;
-  border: 1px solid rgba(26, 27, 27, 0.35);
-  padding: 0.2rem;
-  gap: 0.4rem;
-  width: 100%;          /* Intenta llenar el espacio... */
-  max-width: 500px;     /* ...pero detente en 500px */
-  margin-right: auto;
+  border: 1px solid #cbd5e1; /* Color de borde suave */
+  /* Padding asimétrico: más espacio a la izq para el texto, menos a la der para abrazar el botón */
+  padding: 0.25rem 0.25rem 0.25rem 1.2rem; 
+  width: 100%;          
+  max-width: 450px;     
+  margin: 0 auto;
+  transition: border-color 0.2s;
+}
+
+.app-header__search:focus-within {
+  border-color: var(--color-primary, #0f172a);
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
 }
 
 .app-header__search input {
+  flex: 1; /* Ocupa todo el espacio disponible */
+  min-width: 0; /* CLAVE PARA MÓVILES: Evita que el input rompa el contenedor */
   border: none;
   outline: none;
   background: transparent;
-  padding: 0.8rem 1.1rem;
+  padding: 0.5rem 0;
   color: var(--color-text);
+  font-size: 0.95rem;
 }
 
 .app-header__search input::placeholder {
-  color: rgba(74, 75, 77, 0.6);
+  color: #94a3b8;
 }
 
 .app-header__search button {
   border: none;
   border-radius: 999px;
-  padding: 0.65rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   font-weight: 600;
-  background: var(--color-primary);
-  color: var(--color-text-dark);
+  background: var(--color-primary, #0f172a); /* Usando el azul oscuro de tu imagen */
+  color: white; /* Letra blanca para contrastar */
+  cursor: pointer;
+  transition: opacity 0.2s;
+  flex-shrink: 0; /* Evita que el botón se aplaste */
 }
-
 .app-header__actions {
   display: flex;
   gap: 0.8rem;
@@ -265,84 +277,160 @@ input:checked + .slider:before {
   border-bottom: 1px solid #f1f5f9;
 }
 
+.app-header__search button:hover {
+  opacity: 0.9;
+}
+
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 26px;
+  height: 18px;
+  background: transparent !important; /* Fuerza a quitar el fondo azul oscuro de tu imagen */
+  border: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  padding: 0;
+  z-index: 100;
+  outline: none;
+}
+.hamburger-line {
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-text-dark, #333);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.hamburger-line {
+  width: 100%;
+  height: 2.5px;
+  background-color: var(--color-primary, #0f172a);
+  border-radius: 10px;
+}
+
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6); /* Fondo oscuro elegante */
+  backdrop-filter: blur(3px); /* Difumina lo que hay detrás */
+  z-index: 45; /* Debajo del header pero encima de la app */
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.app-header.on-top {
+  z-index: 50; /* Mantiene el header sobre el overlay */
+}
+
 @media (max-width: 900px) {
-  /* 1. LAYOUT RESPONSIVE TABLET */
   .app-header {
     grid-template-columns: auto 1fr auto; 
-    gap: 0.8rem;
+    gap: 1rem;
     padding: 0.8rem 1rem;
   }
 
-  /* 2. LOGO: Ocultar texto */
-  .app-header__brand div {
+  .app-header__brand div { display: none; }
+  .hamburger-menu { display: flex; }
+
+  /* Menú Desplegable Estilo "Tarjeta Elegante" */
+  .app-header__actions {
     display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #f1f5f9;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    gap: 1.2rem;
+  }
+
+  .app-header__actions--mobile-open {
+    display: flex;
+    animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Ajustes limpios dentro del menú móvil */
+  .toggle-wrapper { 
+    width: 100%; 
+    justify-content: space-between; 
+    margin: 0; 
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+    border-radius: 0;
+    background: transparent;
+  }
+  .toggle-label { display: inline-block; font-size: 1.05rem; font-weight: 500; color: #334155; }
+  
+  .app-header__user { display: inline-block; font-size: 1.05rem; }
+  .user-menu-trigger { 
+    width: 100%; 
+    justify-content: space-between; 
+    padding: 1rem 0; 
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    border-radius: 0;
   }
   
-  .app-header__brand strong, 
-  .app-header__brand small {
-      display: none;
+  .dropdown-menu {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    padding-left: 0;
+    border-radius: 0;
+    animation: none;
   }
 
-  /* 3. SWITCH: Ocultar texto */
-  .toggle-label {
-    display: none;
-  }
-  
-  .toggle-wrapper {
-    gap: 0;
-    padding: 4px 8px;
-    margin-left: 5px;
+  .dropdown-item {
+    padding: 12px 0;
+    font-size: 1rem;
+    color: #475569;
   }
 
-  /* 4. USUARIO: Icono */
-  .app-header__user {
-    display: none;
-  }
-
-  .user-menu-trigger {
-    padding: 0;
-    width: 36px;
-    height: 36px;
-    justify-content: center;
-  }
-
-  .arrow-icon {
-    margin: 0;
-    font-size: 0.8rem;
-  }
-
-  .app-header__search button {
-      padding: 0.5rem;
-  }
-  
-  .app-header__search {
-      padding-right: 0.5rem;
+  /* Botón de ingresar a pantalla completa */
+  .login-btn-mobile {
+    width: 100%;
+    padding: 0.8rem;
+    text-align: center;
+    border-radius: 12px;
+    font-size: 1rem;
+    margin-top: 0.5rem;
   }
 }
 
 @media (max-width: 576px) {
   .app-header {
-    grid-template-columns: 1fr auto;
-    grid-template-areas: 
-      "brand actions"
-      "search search";
-    row-gap: 1rem;
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem; 
     padding: 0.8rem;
   }
-
-  .app-header__brand {
-    grid-area: brand;
-  }
-
-  .app-header__actions {
-    grid-area: actions;
-    justify-self: end;
-  }
-
+  
   .app-header__search {
-    grid-area: search;
-    max-width: 100%;
-    width: 100%;
-    margin-right: 0;
+    margin: 0;
+    padding: 0.2rem 0.2rem 0.2rem 0.8rem; 
+    max-width: none;
+    flex: 1; 
   }
+
+  .app-header__search input { font-size: 0.9rem; padding: 0.4rem 0; }
+  .app-header__search button { padding: 0.5rem 0.9rem; font-size: 0.85rem; }
 }

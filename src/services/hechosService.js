@@ -123,7 +123,7 @@ export const actualizarEtiqueta = async (idHecho, etiqueta) => {
 };
 
 export const obtenerEtiquetas = async () => {
-  const res = await fetch(`http://localhost:8084/etiquetas`);
+  const res = await fetch(`${API_PUBLICA_URL}/etiquetas`);
   if (!res.ok) throw new Error("No se pudieron cargar las etiquetas");
   return await res.json();
 };
