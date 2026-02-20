@@ -178,6 +178,7 @@ export const GET_HECHOS_FILTRADOS = gql`
       categoria: $categoria
     ) {
       content {
+        id_hecho
         titulo
         descripcion
         categoria
