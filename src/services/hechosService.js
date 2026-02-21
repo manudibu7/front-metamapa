@@ -54,34 +54,40 @@ const buildUrlWithFilters = (filtros, page, size) => {
 export const hechosService = {
 
   async obtenerProvincias() {
+    console.log('[Hechos] 🌍 Obteniendo provincias...');
     try {
         const response = await axios.get(`${API_PUBLICA_URL}/provincias`); 
+        console.log('[Hechos] ✅ Provincias obtenidas:', response.data.length);
         return response.data;
     } catch (error) {
+        console.error('[Hechos] ❌ Error al obtener provincias:', error);
         return [];
     }
   },
   async obtenerCategorias() {
+    console.log('[Hechos] 🏷️ Obteniendo categorías...');
     try {
         const response = await axios.get(`${API_PUBLICA_URL}/categorias`); 
+        console.log('[Hechos] ✅ Categorías obtenidas:', response.data.length);
         return response.data;
     } catch (error) {
-        console.error("Error al cargar categorías", error);
+        console.error("[Hechos] ❌ Error al cargar categorías", error);
         return [];
     }
   },
 
   async listarHechos(filtros, page = 0, size = 52) {
     const url = buildUrlWithFilters(filtros, page, size);
-    console.log(`Llamando al backend en: ${url}`);
+    console.log(`[Hechos] 🔍 Listando hechos. Page: ${page}, Filtros:`, filtros);
+    console.log(`[Hechos] 📡 URL: ${url}`);
 
     try {
         const response = await axios.get(url);
-        console.log(response)
+        console.log('[Hechos] ✅ Hechos obtenidos:', response.data.content ? response.data.content.length : 'Formato desconocido');
         return response.data; 
 
     } catch (error) {
-        console.error("Fallo al obtener hechos del backend:", error);
+        console.error("[Hechos] ❌ Fallo al obtener hechos del backend:", error);
         throw error;
     }
   },
@@ -93,15 +99,16 @@ export const hechosService = {
     // 🌟 URL específica para un hecho: Ejem: /api/v1/hechos/123
     const url = `${API_URL}/${id}`; 
 
-    console.log(`Llamando al backend para detalle en: ${url}`);
+    console.log(`[Hechos] 🔍 Obteniendo detalle hecho ID: ${id}`);
+    console.log(`[Hechos] 📡 URL: ${url}`);
 
     try {
         const response = await axios.get(url);
-        
+        console.log('[Hechos] ✅ Detalle obtenido correctamente');
         return response.data; 
 
     } catch (error) {
-        console.error("Fallo al obtener hechos del backend:", error);
+        console.error("[Hechos] ❌ Fallo al obtener detalle hecho:", error);
         throw error;
     }
   },
@@ -109,6 +116,7 @@ export const hechosService = {
 
 
 export const actualizarEtiqueta = async (idHecho, etiqueta) => {
+  console.log(`[Hechos] 🏷️ Buscando actualizar etiqueta hecho ID: ${idHecho} -> ${etiqueta}`);
   const response = await fetch(`${API_ADMI_URL}/${idHecho}/etiqueta`, {
     method: "PUT",
     headers: { "Content-Type": "text/plain" },
@@ -116,14 +124,22 @@ export const actualizarEtiqueta = async (idHecho, etiqueta) => {
   });
 
   if (!response.ok) {
+    console.error(`[Hechos] ❌ Error actualizando etiqueta: ${response.status}`);
     throw new Error("Error actualizando etiqueta");
   }
+  console.log('[Hechos] ✅ Etiqueta actualizada');
 
   // No retornamos nada
 };
 
 export const obtenerEtiquetas = async () => {
+  console.log('[Hechos] 🏷️ Obteniendo etiquetas disponibles...');
   const res = await fetch(`${API_PUBLICA_URL}/etiquetas`);
-  if (!res.ok) throw new Error("No se pudieron cargar las etiquetas");
-  return await res.json();
+  if (!res.ok) {
+     console.error('[Hechos] ❌ Error obteniendo etiquetas');
+     throw new Error("No se pudieron cargar las etiquetas");
+  }
+  const data = await res.json();
+  console.log('[Hechos] ✅ Etiquetas obtenidas:', data.length);
+  return data;
 };

@@ -21,15 +21,16 @@ export const normalizador= (filtros) => {
 export const collectionsService = {
 
   async getCollections() {
+    console.log('[Colecciones] 📚 Obteniendo todas las colecciones...');
     try {
       let url = `${API_PUBLICA_URL}/colecciones`;
       const response = await axios.get(url, {
         headers: { "Cache-Control": "no-cache" },
       });
-
+      console.log('[Colecciones] ✅ Colecciones obtenidas:', response.data.length);
       return response.data;
     } catch (error) {
-      console.error("Error obteniendo las colecciones", error);
+      console.error('[Colecciones] ❌ Error obteniendo las colecciones:', error);
       throw error;
     }
   },
@@ -41,13 +42,15 @@ export const collectionsService = {
   }
 
   const url = `${API_PUBLICA_URL}/colecciones/${coleccionID}`;
+  console.log(`[Colecciones] 📖 Obteniendo colección ID: ${coleccionID}`);
+  console.log(`[Colecciones] 📡 URL: ${url}`);
 
   try {
     const response = await axios.get(url);
-    console.log(response.data)
+    console.log('[Colecciones] ✅ Colección obtenida:', response.data.titulo);
     return response.data;
   } catch (error) {
-    console.error("Error obteniendo la colección", error);
+    console.error('[Colecciones] ❌ Error obteniendo colección:', error);
     throw error;
   }
   },
@@ -56,12 +59,14 @@ export const collectionsService = {
       const filtrosAcoplados =normalizador(filtros);
       var url = `${API_PUBLICA_URL}/colecciones/${coleccionID}/hechos`;
       url += `${filtrosAcoplados ? '?' + filtrosAcoplados : ''}`
-      console.log(url)
+      console.log(`[Colecciones] 🔍 Buscando hechos para colección ID: ${coleccionID}`);
+      console.log(`[Colecciones] 📡 URL: ${url}`);
+      
       const response = await axios.get(url);
-      console.log(response)
+      console.log('[Colecciones] ✅ Hechos obtenidos:', response.data ? response.data.length : 0);
       return response;
     } catch (error) {
-      console.error("Error obteniendo hechos de la colección", error);
+      console.error('[Colecciones] ❌ Error obteniendo hechos de la colección:', error);
       throw error;
     }
   },

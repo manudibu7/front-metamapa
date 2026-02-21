@@ -44,7 +44,9 @@ const fileToDataUrl = (archivo) =>
     reader.readAsDataURL(archivo);
   });
 
-export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo, token,anonimo }) => {
+export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo, token, anonimo }) => {
+  console.log('[Contribuciones] 🚀 Enviando contribución rápida...', { contribuyenteId, anonimo });
+
   if (!contribuyenteId) {
     throw new Error('No pudimos obtener el contribuyenteId del token.');
   }
@@ -52,21 +54,17 @@ export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo
   const hechoDto = sanitizeHecho(hecho);
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-  const contribucionPayload = {
-    idContribuyente: contribuyenteId,
-    hecho: hechoDto,
-  };
-
   try {
-    // The backend returns the ID directly, e.g. 10
     const response = await axios.post(`${API_BASE_URL}/contribuciones`, 
       {idContribuyente: contribuyenteId,
         hecho:hechoDto,
         anonimo: anonimo
     },{ headers });
     const contribucionId = response.data;
+    console.log('[Contribuciones] ✅ Contribución creada con ID:', contribucionId);
 
     if (archivo) {
+      console.log('[Contribuciones] 📎 Subiendo archivo adjunto...');
       let tipo = 'TEXTO';
       if (archivo.type.startsWith('image/')) tipo = 'IMAGEN';
       else if (archivo.type.startsWith('video/')) tipo = 'VIDEO';
@@ -83,6 +81,7 @@ export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo
           'Content-Type': 'multipart/form-data'
         } }
       );
+      console.log('[Contribuciones] ✅ Archivo adjunto subido correctamente');
     }
 
     return {
@@ -91,54 +90,61 @@ export const enviarContribucionRapida = async ({ contribuyenteId, hecho, archivo
       archivoAdjunto: archivo ? { nombreOriginal: archivo.name, tipo: archivo.type } : null,
     };
   } catch (error) {
-    console.error('Error enviando contribución:', error);
+    console.error('[Contribuciones] ❌ Error enviando contribución:', error);
     throw new Error(error.response?.data?.message || 'Error al enviar la contribución');
   }
 };
 
 export const getContribucionesByContribuyente = async (idSistema, token) => {
+  console.log(`[Contribuciones] 👤 Obteniendo contribuciones por ID de sistema: ${idSistema}`);
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
   try {
     const response = await axios.get(`${API_BASE_URL}/contribuciones/contribuyente/${idSistema}`, { headers });
+    console.log('[Contribuciones] ✅ Contribuciones obtenidas:', response.data.length);
     return response.data;
   } catch (error) {
-    console.error('Error obteniendo contribuciones:', error);
+    console.error('[Contribuciones] ❌ Error obteniendo contribuciones:', error);
     throw new Error('Error obteniendo contribuciones');
   }
 };
 
 export const getContribucionesByKeycloakId = async (keycloakId, token) => {
+  console.log(`[Contribuciones] 🔑 Obteniendo contribuciones por Keycloak ID: ${keycloakId}`);
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
   try {
     const response = await axios.get(`${API_BASE_URL}/contribuciones/keycloak/${keycloakId}`, { headers });
+    console.log('[Contribuciones] ✅ Contribuciones obtenidas (Keycloak):', response.data.length);
     return response.data;
   } catch (error) {
-    console.error('Error obteniendo contribuciones:', error);
+    console.error('[Contribuciones] ❌ Error obteniendo contribuciones por Keycloak:', error);
     throw new Error('Error obteniendo contribuciones');
   }
 };
 
 export const updateContribucion = async (idContribucion, datosActualizados, token) => {
+  console.log(`[Contribuciones] ✏️ Actualizando contribución ID: ${idContribucion}`);
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
   try {
     const response = await axios.put(`${API_BASE_URL}/contribuciones/${idContribucion}`, datosActualizados, { headers });
+    console.log('[Contribuciones] ✅ Contribución actualizada correctamente');
     return response.data;
   } catch (error) {
-    console.error('Error actualizando contribución:', error);
+    console.error('[Contribuciones] ❌ Error actualizando contribución:', error);
     throw new Error('Error actualizando contribución');
   }
 };
 
 export const getCategorias = async () => {
+  console.log('[Contribuciones] 📂 Obteniendo categorías disponibles...');
   try {
       let url = `${API_ADMINISTRATIVA_URL}/categorias`;
       const response = await axios.get(url, {
         headers: { "Cache-Control": "no-cache" },
       });
-
+      console.log('[Contribuciones] ✅ Categorías obtenidas:', response.data.length);
       return response.data;
     } catch (error) {
-      console.error("Error obteniendo las categorias", error);
+      console.error("[Contribuciones] ❌ Error obteniendo las categorias", error);
       throw error;
     }
  

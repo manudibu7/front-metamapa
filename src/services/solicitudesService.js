@@ -77,22 +77,27 @@ const ADMINISTRATIVA_URL = process.env.REACT_APP_API_ADMINISTRATIVA_URL + "/soli
 
 // GET /solicitudes
 export const obtenerSolicitudes = async () => {
+  console.log('[Solicitudes] 📋 Obteniendo solicitudes...');
   try {
     const response = await fetch(BASE_URL);
-    console.log("Código de estado recibido:", response.status);
+    console.log(`[Solicitudes] 📡 Estado respuesta: ${response.status}`);
+    
     if (!response.ok) {
       throw new Error("Error al obtener solicitudes");
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('[Solicitudes] ✅ Solicitudes obtenidas:', data.length);
+    return data;
   } catch (error) {
-    console.error("Error en obtenerSolicitudeees:", error);
+    console.error('[Solicitudes] ❌ Error en obtenerSolicitudes:', error);
     throw error;
   }
 };
 
 // POST /solicitudes
 export const crearSolicitud = async (solicitud) => {
+  console.log('[Solicitudes] 🚀 Creando nueva solicitud...', solicitud);
   try {
     const response = await fetch(BASE_URL, {
       method: "POST",
@@ -102,34 +107,45 @@ export const crearSolicitud = async (solicitud) => {
 
     if (!response.ok) {
       const msg = await response.text();
+      console.error(`[Solicitudes] ❌ Error del servidor: ${msg}`);
       throw new Error(msg || "Error al crear solicitud");
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('[Solicitudes] ✅ Solicitud creada con éxito');
+    return data;
   } catch (error) {
-    console.error("Error en crearSolicitud:", error);
+    console.error('[Solicitudes] ❌ Error en crearSolicitud:', error);
     throw error;
   }
 };
 
 export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
+  console.log(`[Solicitudes] ✏️ Actualizando solicitud ID: ${id} -> Estado: ${nuevoEstado}`);
   const response = await fetch(`${ADMINISTRATIVA_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ estado: nuevoEstado }),
   });
 
-  if (!response.ok) throw new Error("Error al actualizar estado");
+  if (!response.ok) {
+    console.error('[Solicitudes] ❌ Fallo al actualizar estado');
+    throw new Error("Error al actualizar estado");
+  }
 
+  console.log('[Solicitudes] ✅ Estado actualizado con éxito');
   return await response.json(); // ← ahora sí existe y funciona
 };
 // DELETE solicitudes
 export const eliminarSolicitud = async (id) => {
+  console.log(`[Solicitudes] 🗑️ Eliminando solicitud ID: ${id}`);
   const response = await fetch(`${ADMINISTRATIVA_URL}/${id}`, {
     method: "DELETE"
   });
 
   if (!response.ok) {
+    console.error('[Solicitudes] ❌ Fallo al eliminar solicitud');
     throw new Error("Error eliminando solicitud");
   }
+  console.log('[Solicitudes] ✅ Solicitud eliminada con éxito');
 };
