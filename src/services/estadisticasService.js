@@ -131,7 +131,7 @@ export const obtenerEstadisticas = async () => {
     const url = API_URL_BASE;
 
     try {
-            const response = await fetch(url, {
+            const response = await fetch(url+"/estadisticas", {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json'
@@ -163,7 +163,7 @@ export const obtenerEstadisticas = async () => {
 
 export const exportarEstadisticasCSV = async () => {
     // Llama a GET /estadisticas/exportar
-    const url = `${API_URL_BASE}/exportar`;
+    const url = `${API_URL_BASE}/estadisticas/exportar`;
 
     try {
         const response = await fetch(url, {
