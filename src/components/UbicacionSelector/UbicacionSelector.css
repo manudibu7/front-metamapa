@@ -63,3 +63,23 @@
   color: var(--color-danger);
   font-weight: 600;
 }
+
+@media (max-width: 600px) {
+  .ubicacion-selector__search {
+    flex-wrap: wrap;
+  }
+
+  .ubicacion-selector__search input {
+    min-width: 100%;
+    order: 1;
+  }
+
+  .ubicacion-selector__search button {
+    flex: 1;
+    order: 2;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+  }
+}
